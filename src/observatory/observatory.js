@@ -18,22 +18,6 @@ import { createIntroStarfield } from '../webgl/intro-starfield.js';
 
 const CAMPAIGNS_URL = '/campaigns.json';
 
-// Bumped every round-6 change so Memo can confirm Safari is serving the FRESH bundle (a
-// stale cache/HMR would make "blur still there" / "flip nothing changed" look like code
-// bugs when really the new code never loaded). Shows as a faint corner stamp + a console
-// line. Bump this string on each meaningful change this round.
-const BUILD = 'r8.1 · 2026-06-22';
-function stampBuild() {
-  try { console.info(`[observatory] build ${BUILD}`); } catch { /* ok */ }
-  if (document.getElementById('observatory-build')) return;
-  const el = document.createElement('div');
-  el.id = 'observatory-build';
-  el.textContent = BUILD;
-  el.setAttribute('aria-hidden', 'true');
-  el.style.cssText = 'position:fixed;left:8px;bottom:7px;z-index:9999;font:10px/1 ui-monospace,monospace;color:rgba(255,255,255,0.35);letter-spacing:0.04em;pointer-events:none;';
-  document.body.appendChild(el);
-}
-
 // Canonical muse hexes (from tokens.css). Hardcoded so the globe never depends on
 // getComputedStyle('--<muse>') resolving in time — on Safari the imported CSS var
 // reads back as '' during boot, which painted every muse disc grey (#888 fallback).
@@ -49,7 +33,6 @@ const HALO_FIT = 0.70;
 let currentFocus = null; // the tile currently snapped to centre (drives tap → flip)
 
 async function boot() {
-  stampBuild();
   let campaigns = [];
   try {
     const res = await fetch(CAMPAIGNS_URL, { cache: 'no-store' });

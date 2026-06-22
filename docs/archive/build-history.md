@@ -1,6 +1,13 @@
-# Muse Observatory — Plan (living doc)
+# Muse Observatory — Build History (ARCHIVE)
 
-> **Status:** PLANNING. Nothing built yet. This is the sign-off doc — we talk it out here, lock decisions, *then* implement.
+> **⚠ ARCHIVE — history, not current spec.** This is the original living plan + the 8
+> rounds of globe iteration, kept verbatim for context. For *what is true now* read
+> [../architecture.md](../architecture.md), [../data-schema.md](../data-schema.md), and
+> [../decisions.md](../decisions.md). Several decisions below are **superseded** by the
+> 2026-06-22 foundation review (notably: globe-as-navigation → demoted to a "wow" view;
+> see decisions G-A…D).
+
+> **Original status:** PLANNING. Nothing built yet. This is the sign-off doc — we talk it out here, lock decisions, *then* implement.
 > Last updated: 2026-06-19. Owner: Memo + Claude. Branch: `memo-edits-1906`.
 
 The Muse Observatory is cocoex's **campaign archive** — the destination of the "Explore campaigns" CTAs in the Comet section. Every Stardust (artist-led) and Horizon (community-led) campaign lives here as a long-form record. The index is a WebGL globe; each record is a shareable article built from the canonical Stardust/Horizon format.
