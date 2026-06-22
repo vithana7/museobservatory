@@ -29,6 +29,10 @@ Compare the docs against the live code + content. Check, at minimum:
 - **Schema:** does `docs/data-schema.md` match the real frontmatter in
   `content/campaigns/*.md` and the JSON shape emitted by `scripts/observatory/build.mjs`?
   (Run `./dev.sh preview` or read `build.mjs` to confirm the actual `campaigns.json` shape.)
+  Check the filename-identity rule (D-1), the `assets/images/<slug>/` bare-filename hero
+  convention, and the warn-only validation list still match `build.mjs`.
+- **Authoring commands:** does `.claude/commands/create-new-event.md` still match the schema
+  it scaffolds (fields asked, derived fields skipped, filename + asset-folder rules)?
 - **Modules:** does `docs/architecture.md`'s module map match `src/observatory/*` and
   `src/webgl/*`? New/renamed/deleted files?
 - **Decisions:** are any decisions in `docs/decisions.md` now contradicted by the code
