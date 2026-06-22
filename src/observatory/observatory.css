@@ -39,8 +39,8 @@ body.observatory {
 }
 
 /* fixed full-screen backdrop layers — all shown only with the globe (body.globe-active).
-   Cloud (z0) = intro cosmic-noise nebula, brightened so it actually reads → halo (z1) =
-   the neutral cosmic atmosphere hugging the sphere → starfield (z2) → globe (z3). The
+   Cloud (z0) = intro cosmic-noise nebula, softly lifted + blurred so it reads without grain →
+   halo (z1) = the smooth neutral atmosphere hugging the sphere → starfield (z2) → globe (z3). The
    starfield shader writes OPAQUE black, so `mix-blend-mode: screen` lets the cloud + halo
    show through it (screen with black = identity, white stars stay bright). The globe is
    alpha:true so the backdrop shows through the gaps between tiles. The opacity transition
@@ -58,7 +58,8 @@ body.observatory {
 }
 #observatory-cloud {
   z-index: 0;
-  filter: brightness(2.4) contrast(1.05);   /* the source nebula is near-black — lift it */
+  filter: brightness(1.5) contrast(0.95) blur(2px);   /* lift the near-black nebula, but softly — blur smooths the grain */
+  opacity: 0.7;
 }
 /* Neutral cosmic atmosphere: a soft WHITE/grey glow ATTACHED to the globe's circumference.
    --halo-r is the sphere's on-screen radius in px, written every frame by observatory.js
@@ -66,42 +67,20 @@ body.observatory {
    with the zoom instead of floating in a fixed background. Kept achromatic on purpose — a
    tinted halo wrongly implies a muse colour (round 4). The ring sits AT --halo-r and
    feathers OUTWARD; the interior stays clear so the tiles read. */
+/* A SMOOTH atmosphere: a soft radial glow hugging the sphere's silhouette, feathering
+   outward. No fractal-noise texture (it read as a grainy "milky way" and fought the clean
+   globe). Achromatic on purpose — a tint would imply a muse hue. */
 #observatory-halo {
   z-index: 1;
   --halo-r: 30vmin; /* fallback before the first frame sets px */
   background:
     radial-gradient(circle at 50% 50%,
       rgba(255, 255, 255, 0) 0,
-      rgba(255, 255, 255, 0) calc(var(--halo-r) - 10px),
-      rgba(255, 255, 255, 0.11) var(--halo-r),
-      rgba(232, 236, 245, 0.06) calc(var(--halo-r) + 9vmin),
-      rgba(255, 255, 255, 0) calc(var(--halo-r) + 26vmin));
+      rgba(255, 255, 255, 0) calc(var(--halo-r) - 12px),
+      rgba(255, 255, 255, 0.14) var(--halo-r),
+      rgba(232, 236, 245, 0.07) calc(var(--halo-r) + 10vmin),
+      rgba(255, 255, 255, 0) calc(var(--halo-r) + 28vmin));
   pointer-events: none;
-}
-/* Galaxy texture: fractal-noise (feTurbulence) clouds composited over the halo glow so the
-   atmosphere reads as a grainy nebula, not a smooth ring (Memo's ask). White wisps on transparent
-   (feColorMatrix → luminance alpha), screen-blended, and masked to the SAME ring band so the
-   texture only shows where the glow lives. Achromatic on purpose (a tint would imply a muse hue). */
-#observatory-halo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  opacity: 0.7;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.018' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.55 0.55 0.55 0 -0.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-  background-size: 42vmin 42vmin;
-  background-repeat: repeat;
-  -webkit-mask-image: radial-gradient(circle at 50% 50%,
-      transparent calc(var(--halo-r) - 9vmin),
-      #000 var(--halo-r),
-      #000 calc(var(--halo-r) + 7vmin),
-      transparent calc(var(--halo-r) + 25vmin));
-  mask-image: radial-gradient(circle at 50% 50%,
-      transparent calc(var(--halo-r) - 9vmin),
-      #000 var(--halo-r),
-      #000 calc(var(--halo-r) + 7vmin),
-      transparent calc(var(--halo-r) + 25vmin));
 }
 #observatory-starfield {
   z-index: 2;
@@ -210,30 +189,27 @@ a.observatory-list-link:focus-visible {
       base.css/comet.css; tuned for this dark page) ──────────────────────────────── */
 /* Mobile (base): bottom-centre. Desktop: top-right, mirroring the cocoex wordmark
    (top-left). Shown only with the globe; subtle until hovered/used. */
+/* Zoom now lives inside the left .filter-wrap rail (below the filter), so it's static. The
+   −/+ glyphs sit INSIDE the track (black, on the bright glass) so it reads as a zoom. */
 .zoom-wrap {
-  position: fixed;
-  bottom: clamp(16px, 4vh, 28px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 6;
-  display: none;
+  display: flex;
   align-items: center;
-  opacity: 0.3;
-  transition: opacity 0.3s ease;
 }
-@media (min-width: 768px) {
-  .zoom-wrap {
-    top: clamp(16px, 3vw, 28px);   /* same vertical offset as .observatory-back */
-    bottom: auto;
-    left: auto;
-    right: clamp(16px, 3vw, 28px);
-    transform: none;
-  }
+.zoom-glyph {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;               /* above the glass, below the thumb (z-index:2) */
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 700;
+  color: #111;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
-body.globe-active .zoom-wrap { display: flex; }
-.zoom-wrap:hover,
-.zoom-wrap:focus-within,
-.zoom-wrap:active { opacity: 1; }
+.zoom-glyph--minus { left: 6px; }
+.zoom-glyph--plus { right: 6px; }
 
 .zoom-pill {
   position: relative;
@@ -350,6 +326,180 @@ body.globe-active .zoom-wrap { display: flex; }
 
 @media (prefers-reduced-motion: reduce) {
   .beam-glow::before, .beam-glow::after, .pill-glass { animation: none; }
+}
+
+/* ── filter control — a rail (same beam-glow + glass pill as zoom) ──────────────────
+      Desktop: a vertically-centred LEFT-edge rail (clears the cocoex wordmark, top-left,
+      z-index 10); the facet panel opens to the right. Mobile (≤767px, below): bottom-centred,
+      panel opens upward. Shown only with the globe; subtle until used. */
+.filter-wrap {
+  position: fixed;
+  left: clamp(16px, 3vw, 28px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  display: none;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-height: 80vh;
+  opacity: 0.45;
+  transition: opacity 0.3s ease;
+}
+body.globe-active .filter-wrap { display: flex; }
+.filter-wrap:hover,
+.filter-wrap:focus-within,
+.filter-wrap:active,
+.filter-wrap.is-open { opacity: 1; }
+
+.filter-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(84px, 11vw, 116px);   /* match the zoom pill width */
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50px;
+  background: transparent;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  flex: none;
+}
+.filter-pill-label {
+  position: relative;
+  z-index: 2;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.filter-pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.filter-pill .pill-glass { opacity: 0.85; }
+
+/* The panel opens to the RIGHT of the filter pill (anchored to its top edge) so it sticks
+   beside the pill rather than pushing the zoom down. White liquid-glass body to match the
+   pill aesthetic. Scrolls internally if the facet list ever outgrows the rail. */
+.filter-panel {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 12px);   /* just right of the rail (pill width) */
+  width: min(260px, 70vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 18px 18px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), transparent 45%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.78) 45%, rgba(255, 255, 255, 0.88) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  color: #111;
+  display: flex;
+  flex-direction: column;
+}
+.filter-panel[hidden] { display: none; }
+.filter-group { margin-bottom: 16px; }
+.filter-group:last-of-type { margin-bottom: 12px; }
+.filter-group-label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #555;
+}
+.filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 11px;
+  line-height: 1.2;
+  color: #222;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.filter-chip:hover { background: rgba(0, 0, 0, 0.1); }
+.filter-chip[aria-pressed="true"] {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+.filter-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chip, #888);
+  flex: none;
+}
+.filter-geo {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #111;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+.filter-geo::placeholder { color: rgba(0, 0, 0, 0.4); }
+.filter-geo:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+.filter-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+.filter-count { font-size: 11px; color: #555; }
+.filter-clear {
+  font-size: 11px;
+  color: #111;
+  background: none;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.filter-clear:hover { opacity: 1; }
+.filter-clear[hidden] { display: none; }
+
+/* Mobile: the rail sits BOTTOM-CENTRED (not the left edge), pill + zoom side by side, and
+   the facet panel opens UPWARD + centred (the desktop right-opening panel would overflow a
+   narrow viewport). Desktop keeps the left rail untouched. */
+@media (max-width: 767px) {
+  .filter-wrap {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: clamp(16px, 4vh, 28px);
+    transform: translateX(-50%);
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    max-height: none;
+  }
+  .filter-panel {
+    top: auto;
+    bottom: calc(100% + 12px);   /* open upward, above the rail */
+    left: 50%;
+    transform: translateX(-50%);
+    max-height: 60vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-wrap, .filter-chip { transition: none; }
 }
 
 /* ── tile flip-card (tap a tile → flips to its black detail face) ─────────────────── */

@@ -47,23 +47,30 @@ Identity is derived from the filename (decision D-1/D-2); validation is warn-onl
 (`validateCampaign`, D-3) except the draft gate; the emitted shape is the `CampaignIndex`
 typedef and is pinned by `npm test` (`build.test.mjs`) so refactors can't silently change it.
 
-### Layer 3 — Selection (the scaling engine) — *not yet built*
+### Layer 3 — Selection (the scaling engine) — *built + tested*
 
-A client-side module that sits between `campaigns.json` and the views:
-- **Session-random sample** for the globe's initial state (the globe shows a bounded
-  subset — "you happen to be on these", not the whole archive).
-- **Filters** (muse / type / geo / status), ANDed, to discover and narrow.
-- **Sparse-set guard** for when a filter narrows to very few results.
+`src/observatory/selection.js` (pure, no DOM/WebGL; covered by `selection.test.mjs`) sits
+between `campaigns.json` and the views:
+- **Session-random sample** for the globe's initial state — `sample(campaigns, n, seed)`,
+  a seeded shuffle so tiles stay stable within a visit and are fresh next time. The globe
+  shows a bounded subset ("you happen to be on these", not the whole archive).
+- **Filters** — `filterCampaigns(campaigns, { muse, type, geo, status })`, ANDed; returns
+  the **true** matching set (not a re-sample). geo is a regex over all geo fields.
+- **Sparse-set guard** — `applySparseGuard(matches, threshold)`, detection-only for now
+  (the fallback policy is still open, A-4).
 
-This layer is what lets the archive grow without limit while the globe stays a fixed,
-performant size. The semantics are still being designed — see [roadmap.md](roadmap.md).
+It is wired in `observatory.js`: `boot()` samples the landing set, `initFilters()` builds
+the filter UI and swaps `globe.setItems()` + the list on every facet change. This is what
+lets the archive grow without limit while the globe stays a fixed, performant size. See
+the locked semantics (S-1/S-2/S-3) in [decisions.md](decisions.md).
 
 ### Layer 4 — Views
 
 - **Globe** (`src/observatory/globe.js` et al.) — WebGL2, ported from reactbits'
   InfiniteMenu. Renders whatever subset layer 3 hands it via `setItems`. The "wow" view.
-- **Grid/list** — the accessible, scannable peer. Currently exists as the "list
-  fallback"; to be promoted to a first-class view.
+- **Grid/list** — the accessible, scannable peer. Rendered unconditionally and kept in
+  sync with the filtered set; still CSS-clipped to an a11y-only sliver while the globe is
+  active (no sighted globe↔list toggle yet — see [questions.md](questions.md)).
 - **Record pages** — generated static HTML, one per campaign.
 
 ## Data flow
@@ -128,11 +135,12 @@ table unless requirements change fundamentally (many editors, high churn, live u
 ### How the globe scales (the key constraint)
 
 InfiniteMenu uses a fixed 42-vertex icosahedron; tile `i` renders campaign `i % count`.
-This means the globe does **not** scale by adding tiles — past ~42 campaigns some would
+This means the globe does **not** scale by adding tiles — past 42 campaigns some would
 never render. It scales by **always rendering a bounded subset** (layer 3's job):
-session-random initially, filtered thereafter. The archive can grow to thousands while
-the globe stays a fixed ~12–42-tile, fixed-cost render. This is why layer 3 is the
-foundation, not the globe.
+session-random initially, filtered thereafter, capped at `CAMPAIGN_CAP = 42` (muses live
+in the filter, not on the globe — S-1). The archive can grow to thousands while the globe
+stays a fixed ≤42-tile, fixed-cost render. This is why layer 3 is the foundation, not the
+globe.
 
 ## What is NOT in scope (deliberately)
 

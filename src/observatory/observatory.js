@@ -11,10 +11,10 @@
 
 import '../styles/tokens.css';
 import './observatory.css';
-import { MUSES } from '../data.js';
 import { Globe } from './globe.js';
 import { createStarfield } from '../webgl/starfield.js';
 import { createIntroStarfield } from '../webgl/intro-starfield.js';
+import { CAMPAIGN_CAP, makeSeed, sample, filterCampaigns } from './selection.js';
 
 const CAMPAIGNS_URL = '/campaigns.json';
 
@@ -32,6 +32,9 @@ const HALO_FIT = 0.70;
 
 let currentFocus = null; // the tile currently snapped to centre (drives tap → flip)
 
+// Real archive entries only (no globe-only density fillers) — the set filters operate on.
+const realCampaigns = (all) => all.filter((c) => !c.filler);
+
 async function boot() {
   let campaigns = [];
   try {
@@ -43,26 +46,23 @@ async function boot() {
     return; // the static list intro stays; nothing else to show
   }
 
+  // The list is the complete, honest archive (layer 4 find/scan view).
   renderList(campaigns);
-  maybeInitGlobe(campaigns);
+  // The globe is a BOUNDED view (decision G-A/S-1): a session-stable random sample of up to
+  // 42 campaigns (the full icosahedron — muses left the globe, so no vertices are reserved).
+  // makeSeed() keeps it stable within the visit, fresh next time. Filters replace this with
+  // the true matching set (S-2).
+  const seed = makeSeed();
+  const landing = sample(realCampaigns(campaigns), CAMPAIGN_CAP, seed);
+  maybeInitGlobe(landing, campaigns);
 }
 
-// ── globe items: 7 permanent muse anchors + the campaign tiles ──────────────────
+// ── globe items: campaign tiles ONLY ────────────────────────────────────────────
+// Muses no longer ride the globe (decision S-1, revised 2026-06-22): they live solely in
+// the filter as the "Muse" facet. The globe shows only Stardust/Horizon campaign tiles, so
+// all 42 vertices are available for campaigns (CAMPAIGN_CAP is back to 42).
 function buildItems(campaigns) {
-  const css = getComputedStyle(document.documentElement);
-  const museItems = MUSES.map((m) => {
-    const slug = m.name.toLowerCase();
-    return {
-      kind: 'muse',
-      name: m.name,
-      cause: m.cause,
-      description: m.description,
-      hex: css.getPropertyValue(`--${slug}`).trim() || MUSE_HEX[slug] || '#888',
-      symbol: `/assets/images/muse/${slug}-white.png`,
-    };
-  });
-
-  const campaignItems = campaigns.map((c) => ({
+  return campaigns.map((c) => ({
     kind: 'campaign',
     title: c.title,
     cause: c.cause,
@@ -76,11 +76,9 @@ function buildItems(campaigns) {
     status: c.status,
     year: c.year,
   }));
-
-  return [...museItems, ...campaignItems];
 }
 
-function maybeInitGlobe(campaigns) {
+function maybeInitGlobe(landing, allCampaigns) {
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canWebGL2 = (() => {
     try { return !!document.createElement('canvas').getContext('webgl2'); } catch { return false; }
@@ -111,7 +109,7 @@ function maybeInitGlobe(campaigns) {
 
   let globe;
   let lastHaloR = 0;
-  const items = buildItems(campaigns);
+  const items = buildItems(landing);
   try {
     globe = new Globe(canvas, items, {
       scale: defaultScale, // pull the camera back so the sphere of tiles reads as a globe
@@ -144,6 +142,7 @@ function maybeInitGlobe(campaigns) {
   globe.loadAtlas();
   initZoomControl(globe);
   initFlip(canvas, globe);
+  initFilters(globe, allCampaigns);
 
   // dev-only: ?flipdemo=N auto-opens the flip for items[N] (or the first hero campaign) after
   // settle, with a synthetic source rect — lets headless Chrome screenshot the OPEN END state
@@ -331,15 +330,6 @@ function fillFlip(item) {
   back.style.setProperty('--accent', item.hex || '#ffffff');
   front.classList.remove('has-hero');
 
-  if (item.kind === 'muse') {
-    front.innerHTML = `<img class="tile-flip-symbol" src="${esc(item.symbol)}" alt="" />`;
-    back.innerHTML = rimSvg(`Muse · ${item.name}`) + `
-      <h2 class="tile-flip-name">${esc(item.cause)}</h2>
-      ${item.description ? `<p class="tile-flip-desc">${esc(item.description)}</p>` : ''}
-      <span class="tile-flip-action tile-flip-action--inert">Filter this cause · soon</span>`;
-    return;
-  }
-
   // campaign — the FRONT mirrors the WebGL tile (hero photo cover-fit + accent wash + label, or
   // the accent disc + label) so the morph grows from the SAME image the tile shows (round 8 / A).
   const typeWord = item.type === 'horizon' ? 'Horizon' : 'Stardust';
@@ -469,6 +459,134 @@ function initFlip(canvas, globe) {
   // close on backdrop click or Escape
   wrap.addEventListener('click', (e) => { if (e.target === wrap) closeFlip(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFlip(); });
+}
+
+// ── filter control: a left-edge pill → a panel of facets that narrow the globe ──────
+//    No filter → the session-random sample (S-2 landing state). Any filter active →
+//    the TRUE matching set, capped at CAMPAIGN_CAP for the globe (S-2). The list always
+//    mirrors the same set so the two views agree.
+const TYPE_LABEL = { stardust: 'Stardust', horizon: 'Horizon' };
+const STATUS_LABEL = { ongoing: 'Ongoing', upcoming: 'Upcoming', closed: 'Closed' };
+
+function initFilters(globe, allCampaigns) {
+  const toggle = document.getElementById('observatory-filter-toggle');
+  const panel = document.getElementById('observatory-filter-panel');
+  const wrap = document.querySelector('.filter-wrap');
+  if (!toggle || !panel || !wrap) return;
+
+  const pool = allCampaigns.filter((c) => !c.filler); // real entries only
+  const facets = { muse: null, type: null, status: null, geo: '' };
+  const seed = makeSeed(); // reuse the session seed so "clear" returns the SAME landing sample
+
+  // Derive the option sets from the data (only offer facets that exist).
+  const uniq = (key) => [...new Set(pool.map((c) => c[key]).filter(Boolean))];
+  const muses = uniq('muse');
+  const types = uniq('type');
+  const statuses = uniq('status');
+  const museHex = (m) => {
+    const found = pool.find((c) => c.muse === m);
+    return found?.hex || MUSE_HEX[m] || '#888';
+  };
+
+  const chip = (group, value, label, dotHex) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'filter-chip';
+    b.dataset.group = group;
+    b.dataset.value = value;
+    b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = (dotHex ? `<span class="filter-chip-dot" style="--chip:${esc(dotHex)}"></span>` : '') + `<span>${esc(label)}</span>`;
+    return b;
+  };
+
+  const group = (label, key, values, labelFor, dotFor) => {
+    if (!values.length) return null;
+    const g = document.createElement('div');
+    g.className = 'filter-group';
+    g.innerHTML = `<span class="filter-group-label">${esc(label)}</span>`;
+    const chips = document.createElement('div');
+    chips.className = 'filter-chips';
+    for (const v of values) chips.appendChild(chip(key, v, labelFor(v), dotFor ? dotFor(v) : null));
+    g.appendChild(chips);
+    return g;
+  };
+
+  const titleCase = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const gMuse = group('Muse', 'muse', muses, (m) => titleCase(m), museHex);
+  const gType = group('comet-collab', 'type', types, (t) => TYPE_LABEL[t] || titleCase(t));
+  const gStatus = group('Status', 'status', statuses, (s) => STATUS_LABEL[s] || titleCase(s));
+  [gMuse, gType, gStatus].forEach((g) => g && panel.appendChild(g));
+
+  // geo: a free text box (substring over locations[]) — A-1 structured geo isn't built yet.
+  const geoWrap = document.createElement('div');
+  geoWrap.className = 'filter-group';
+  geoWrap.innerHTML = '<span class="filter-group-label">Place</span>';
+  const geoInput = document.createElement('input');
+  geoInput.type = 'search';
+  geoInput.className = 'filter-geo';
+  geoInput.placeholder = 'e.g. Berlin, Italy…';
+  geoInput.setAttribute('aria-label', 'Filter by place');
+  geoWrap.appendChild(geoInput);
+  panel.appendChild(geoWrap);
+
+  const footer = document.createElement('div');
+  footer.className = 'filter-footer';
+  footer.innerHTML = '<span class="filter-count"></span><button type="button" class="filter-clear" hidden>Clear all</button>';
+  panel.appendChild(footer);
+  const countEl = footer.querySelector('.filter-count');
+  const clearBtn = footer.querySelector('.filter-clear');
+
+  const isActive = () => facets.muse || facets.type || facets.status || facets.geo.trim();
+
+  const apply = () => {
+    const active = isActive();
+    // No filter → the session-random landing sample. Any filter → the true matching set (S-2).
+    const matched = active ? filterCampaigns(pool, facets) : pool;
+    const forGlobe = active ? matched.slice(0, CAMPAIGN_CAP) : sample(pool, CAMPAIGN_CAP, seed);
+    const items = buildItems(forGlobe);
+    globe.setItems(items);
+    renderList(active ? matched : allCampaigns);
+    countEl.textContent = active ? `${matched.length} match${matched.length === 1 ? '' : 'es'}` : '';
+    clearBtn.hidden = !active;
+    wrap.classList.toggle('is-open', !panel.hidden);
+  };
+
+  panel.addEventListener('click', (e) => {
+    const b = e.target.closest('.filter-chip');
+    if (!b) return;
+    const { group: key, value } = b.dataset;
+    facets[key] = facets[key] === value ? null : value; // single-select per group, toggle off
+    for (const sib of panel.querySelectorAll(`.filter-chip[data-group="${key}"]`)) {
+      sib.setAttribute('aria-pressed', String(sib.dataset.value === facets[key]));
+    }
+    apply();
+  });
+
+  let geoT;
+  geoInput.addEventListener('input', () => {
+    clearTimeout(geoT);
+    geoT = setTimeout(() => { facets.geo = geoInput.value; apply(); }, 180);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    facets.muse = facets.type = facets.status = null;
+    facets.geo = '';
+    geoInput.value = '';
+    for (const c of panel.querySelectorAll('.filter-chip')) c.setAttribute('aria-pressed', 'false');
+    apply();
+  });
+
+  const setOpen = (open) => {
+    panel.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    wrap.classList.toggle('is-open', open || isActive());
+  };
+  toggle.addEventListener('click', () => setOpen(panel.hidden));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) setOpen(false); });
+  // click anywhere outside the rail (pill + panel) closes the open panel
+  document.addEventListener('pointerdown', (e) => {
+    if (!panel.hidden && !wrap.contains(e.target)) setOpen(false);
+  });
 }
 
 // ── accessible list fallback (REQUIRED — screen reader / keyboard / reduced-motion

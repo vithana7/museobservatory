@@ -9,9 +9,10 @@ The landing page is a WebGL globe; each record is a static, shareable article.
 | Doc | What it is |
 |-----|------------|
 | [architecture.md](architecture.md) | **The current spec.** The 4-layer model, data flow, the backend rationale, and how the system is meant to scale. Start here. |
+| [frontend.md](frontend.md) | The views (globe + grid) and the selection layer (built + wired): how the globe scales, the filter UI, what's solid, and what's still open. |
 | [data-schema.md](data-schema.md) | The contracts: campaign frontmatter, `campaigns.json`, and the structured-geo schema. |
 | [decisions.md](decisions.md) | The decision log (ADR-lite). Every locked choice, with *why*. |
-| [roadmap.md](roadmap.md) | Build order + the questions that are still genuinely open. |
+| [questions.md](questions.md) | The living list of open questions + known things to sort. Locked answers move to `decisions.md`. |
 | [archive/](archive/) | History, not spec: the round-by-round build log and the living issue tracker. |
 
 ## Run it

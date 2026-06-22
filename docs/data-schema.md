@@ -62,7 +62,7 @@ images: []                         # bare filenames, same folder
 > bare string is still tolerated (wrapped into a 1-item list) but warns — author it as a list.
 >
 > **Target geo schema (decision A-1 — not yet built).** This is the *planned* shape,
-> tracked in [roadmap.md](roadmap.md) Step 1. Each place is currently a free string; A-1
+> tracked in [questions.md](questions.md). Each place is currently a free string; A-1
 > would make each a structured `{city, region, country, display}` so places are filterable.
 > When migrated, an entry becomes:
 >
@@ -142,7 +142,7 @@ The complete index — *every* campaign, no sampling/filtering at build time.
 > (next to the emit) — keep this example in step with it. `draft`/`filler` are omitted
 > entirely when not set (not emitted as `false`).
 >
-> **Still the target, not built (decision A-1, roadmap):** each `locations` entry is a free
+> **Still the target, not built (decision A-1):** each `locations` entry is a free
 > string; the structured per-place `{city, region, country, display}` schema below is the
 > *planned* shape for filtering, not the current emit.
 
@@ -168,5 +168,5 @@ The complete index — *every* campaign, no sampling/filtering at build time.
 
 ## Open schema questions
 
-Tracked in [roadmap.md](roadmap.md): the `filler` density-tile concept currently in
+Tracked in [questions.md](questions.md): the `filler` density-tile concept currently in
 `build.mjs` (a precursor to layer-3 sampling) needs reconciling with the selection layer.

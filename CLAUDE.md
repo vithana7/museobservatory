@@ -9,8 +9,9 @@ No backend server, no database, no auth.
 The current spec lives in `docs/` — read it before changing anything:
 - **`docs/architecture.md`** — the 4-layer model, data flow, backend/frontend rationale. Start here.
 - **`docs/data-schema.md`** — frontmatter + `campaigns.json` contracts + structured geo.
+- **`docs/frontend.md`** — the views (globe + grid) + the selection layer (layer 3) + securing plan.
 - **`docs/decisions.md`** — every locked decision, with *why*.
-- **`docs/roadmap.md`** — build order + open questions.
+- **`docs/questions.md`** — the living list of open questions + things still to sort.
 - **`docs/archive/`** — history (8 rounds of globe iteration) + the living issue tracker. Not current spec.
 
 ## Run
@@ -24,7 +25,7 @@ The current spec lives in `docs/` — read it before changing anything:
 
 ```
 LAYER 4 · VIEWS      globe · grid · record pages        ← artistic polish
-LAYER 3 · SELECTION  session-random sample + filters    ← the scaling engine (not built yet)
+LAYER 3 · SELECTION  session-random sample + filters    ← the scaling engine (built + wired)
 LAYER 2 · INDEX      campaigns.json (compiled)          ← single source of truth
 LAYER 1 · DATA       markdown frontmatter               ← bedrock
 ```
@@ -38,7 +39,7 @@ Layers 1–3 are pure data/logic (no WebGL, testable, device-independent). Build
 - **Globe device-polish is frozen** until layers 1–3 are solid (decision G-D).
 - **Markdown is the source of truth.** Don't introduce a server/DB; if editing-by-file
   becomes the bottleneck, add a git-CMS (Decap/Tina), not Strapi (decision B-1).
-- **Do not commit unless asked.** Working branch: `memo-edits-1906`.
+- **Do not commit unless asked.** Working branch: `main`.
 - **Verify empirically** — headless Chrome (SwiftShader) + the `?`-gated dev hooks for the
   globe; Safari is eyeballed by Memo (no screencapture on this host).
 - **Keep docs fresh:** after meaningful changes, run `/doc-minder` to reconcile `docs/` with the code.

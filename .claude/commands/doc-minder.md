@@ -16,8 +16,9 @@ never change `src/` here; only the docs.
 
 - `docs/architecture.md` — 4-layer model, data flow, backend/frontend rationale, scaling.
 - `docs/data-schema.md` — frontmatter + `campaigns.json` contracts + structured geo.
+- `docs/frontend.md` — views (globe + grid) + the selection layer (layer 3) + securing plan.
 - `docs/decisions.md` — the decision log (ADR-lite), with *why*.
-- `docs/roadmap.md` — build order + open questions.
+- `docs/questions.md` — the living list of open questions + known things to sort.
 - `docs/archive/` — history; **read-only**, do not edit (except appending finished rounds).
 - `CLAUDE.md` (root) — the short orientation; keep it in sync with the docs.
 
@@ -37,7 +38,8 @@ Compare the docs against the live code + content. Check, at minimum:
   `src/webgl/*`? New/renamed/deleted files?
 - **Decisions:** are any decisions in `docs/decisions.md` now contradicted by the code
   (e.g. a "frozen" thing was changed, a "deferred" thing was built)?
-- **Roadmap:** are any "open questions" now resolved in code, or any "not built" items now built?
+- **Questions:** are any "open questions" in `docs/questions.md` now resolved in code, or any
+  "not built" items now built? (Resolved ones move to `decisions.md` with their *why*.)
 - **Stale references:** grep the docs for file paths, function names, and flags; flag any
   that no longer exist (see the OBS-8 class of stale-comment drift in the audit).
 - **Commands/run:** does `CLAUDE.md` / `docs/README.md` still describe the real
@@ -54,7 +56,7 @@ Apply the fixes to the docs. Rules:
 - **Don't rewrite `docs/archive/`** — it's history. A superseded decision gets a note in
   the current docs, not a rewrite of the archive.
 - **Don't invent decisions.** If the code does something no decision covers, flag it as an
-  open question in `roadmap.md` rather than back-filling a decision.
+  open question in `questions.md` rather than back-filling a decision.
 - Keep each doc to its purpose (don't merge spec into history or vice versa).
 
 ### 4. Confirm

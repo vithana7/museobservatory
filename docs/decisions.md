@@ -5,6 +5,47 @@
 > first. Earlier per-round build decisions live in
 > [archive/build-history.md](archive/build-history.md).
 
+## 2026-06-22 — Selection layer (layer 3) built + wired (Memo + Claude)
+
+Locked while building + wiring the selection module (`src/observatory/selection.js`,
+tested in `selection.test.mjs`; consumed by `observatory.js` `boot`/`maybeInitGlobe`/
+`initFilters`). The filter UI ships as a left-edge pill → facet panel (S-2 below).
+
+- **S-1 · Globe campaign cap = 42; muses leave the globe.** The globe is a fixed 42-vertex
+  icosahedron. Muses no longer ride the globe — they live solely in the filter as the
+  **"Muse"** facet — so all 42 vertices hold campaigns (`CAMPAIGN_CAP = 42`).
+  *Why:* past the vertex ceiling tiles collide (`i % count`); a fixed cap keeps the globe a
+  bounded render regardless of archive size (G-A/G-B). Pulling the 7 muse anchors out of the
+  render reclaims their vertices for campaigns and makes the globe purely Stardust/Horizon.
+  *Apply:* `sample()` defaults to 42. `buildItems()` now emits **campaign tiles only** (the
+  muse-anchor prepend + the muse flip-card branch were removed). The muse facet click-to-
+  filter idea is now realised *in the filter panel*, not on a globe tile.
+  *Supersedes:* the earlier S-1 (cap 35, muses-on-globe), which is no longer in effect.
+
+- **S-2 · Filter shows the TRUE matching set, never a re-sample.** Session-random sampling
+  is the *initial unfiltered landing state only*. Once any filter is active, show all
+  matching campaigns (up to the cap), in index order; clearing all filters restores the
+  same session sample (the seed is reused). Facets are **single-select per group** (re-click
+  to toggle off; picking a second value in a group replaces the first — mutual exclusion).
+  *Why:* random-sampling a filtered set could hide campaigns the user explicitly asked for
+  ("filter to Italy" dropping Italian campaigns) — Memo's red line.
+  *Apply:* `filterCampaigns()` returns the full ANDed match, uncapped; the caller caps to
+  `CAMPAIGN_CAP` for the globe and feeds the *same* set to the list so the two views agree.
+  Facets ANDed: muse/type/status exact (case-insensitive). **geo = a case-insensitive REGEX**
+  tested against *all* of a record's geo strings (`locations[]` + the joined `location`, plus
+  structured `city`/`region`/`country` when A-1 lands); an invalid pattern (half-typed `(`)
+  falls back to a literal substring so the filter never throws mid-keystroke.
+
+- **S-3 · Filter + zoom share one left rail; panel opens to the right.** Both controls reuse
+  the comet pill's beam-glow + liquid-glass look. The rail is vertically centred on the left
+  edge (clears the cocoex logo); the zoom pill sits below the filter pill with inline −/+
+  glyphs. The facet panel opens to the *right* of the filter pill (white liquid-glass body)
+  rather than pushing the zoom down.
+  *Why:* the original top-left filter overlapped the logo; a vertically-centred rail clears
+  it, and a right-opening panel keeps the zoom anchored.
+  *Apply:* markup in `index.html` (`.filter-wrap` rail), styles in `observatory.css`. UI
+  detail, not load-bearing — restyle freely.
+
 ## 2026-06-22 — Data/backend hardening (Memo + Claude)
 
 Making the content pipeline rock-solid for CRUD before any selection/view work.
@@ -111,7 +152,7 @@ together.
 
 - **A-4 · Sparse-set guard (open detail).** Below ~6 filtered campaigns the globe repeats
   them and looks broken. Rule TBD (present grid for that view, or pad with muse anchors).
-  *Status:* to finalise when building layer 3 — see [roadmap.md](roadmap.md).
+  *Status:* to finalise when building layer 3 — see [questions.md](questions.md).
 
 ### Tooling & hygiene
 
