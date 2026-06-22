@@ -1,0 +1,131 @@
+/* Muse Observatory — record page (Phase 1, minimal/correct).
+   Long-form, readable, self-contained. Brand tokens (tokens.css) are inlined
+   alongside this file at build. --accent is the muse hex, set on <body>.
+   Phase 2 owns the full visual design. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body.observatory-record {
+  margin: 0;
+  background: var(--color-offwhite, #FAFAFA);
+  color: #1a1a1a;
+  font-family: var(--font-canela, Georgia, serif);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding: clamp(24px, 6vw, 96px) clamp(20px, 6vw, 80px) clamp(64px, 12vh, 160px);
+}
+
+/* draft banner (dev preview only — drafts never reach a production build) */
+.record-draft-banner {
+  position: sticky;
+  top: 0;
+  margin: calc(-1 * clamp(24px, 6vw, 96px)) calc(-1 * clamp(20px, 6vw, 80px)) clamp(24px, 6vw, 96px);
+  padding: 10px 16px;
+  background: #ffe9a8;
+  border-bottom: 1px solid #d9b441;
+  color: #5a4500;
+  font-size: 14px;
+  text-align: center;
+}
+.record-draft-banner code { font-family: ui-monospace, monospace; }
+
+.record-back {
+  display: inline-block;
+  margin-bottom: clamp(24px, 5vw, 48px);
+  color: #555;
+  text-decoration: none;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.record-back:hover { color: var(--accent); }
+
+.record {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* header — accent rail above the eyebrow */
+.record-header { margin-bottom: clamp(32px, 6vw, 56px); }
+.record-header::before {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 4px;
+  margin-bottom: clamp(20px, 3vw, 28px);
+  background: var(--accent);
+  border-radius: 2px;
+}
+.record-eyebrow {
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.record-header h1 {
+  margin: 0;
+  font-weight: 700;
+  font-size: clamp(32px, 6vw, 64px);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+.record-meta {
+  margin: 16px 0 0;
+  color: #666;
+  font-size: clamp(15px, 1.6vw, 18px);
+}
+
+/* factual block — derived from frontmatter, present fields only */
+.record-facts {
+  margin: 0 0 clamp(36px, 6vw, 56px);
+  padding: clamp(20px, 3vw, 28px) clamp(20px, 3vw, 32px);
+  border: 1px solid #e2e2dc;
+  border-left: 3px solid var(--accent);
+  background: #fff;
+  border-radius: 4px;
+}
+.record-facts dl { margin: 0; display: grid; gap: 14px; }
+.record-facts .fact { display: grid; grid-template-columns: minmax(120px, 25%) 1fr; gap: 16px; }
+.record-facts dt {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+  padding-top: 3px;
+}
+.record-facts dd { margin: 0; font-size: clamp(15px, 1.7vw, 18px); }
+
+/* article body */
+.record-body { font-size: clamp(17px, 1.9vw, 20px); }
+.record-body h2 {
+  margin: clamp(40px, 6vw, 56px) 0 16px;
+  font-weight: 700;
+  font-size: clamp(22px, 3vw, 30px);
+  letter-spacing: -0.005em;
+}
+.record-body h2:first-child { margin-top: 0; }
+.record-body p { margin: 0 0 1.1em; }
+.record-body em { font-style: italic; }
+.record-body a { color: var(--accent); text-underline-offset: 2px; }
+.record-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 12px 0;
+}
+
+/* unverified [confirm] notes — flagged in dev preview */
+mark.confirm {
+  background: #fff1bf;
+  color: #6b5200;
+  padding: 0 4px;
+  border-radius: 2px;
+  font-size: 0.9em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+}

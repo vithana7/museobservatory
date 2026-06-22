@@ -1,0 +1,45 @@
+/* Design tokens — trimmed to what the Muse Observatory uses.
+   The 7 muse hexes are the canonical brand source (build.mjs reads them by
+   regex; observatory.js reads them via getComputedStyle, with a JS fallback). */
+:root {
+  --color-black: #000;
+  --color-white: #fff;
+  --color-offwhite: #FAFAFA;
+
+  /* The seven muses */
+  --lunes: #5783A6;
+  --ares: #D54D2E;
+  --rabu: #8CB07F;
+  --thunor: #F8D86A;
+  --shukra: #7F49A2;
+  --dosei: #5E47A1;
+  --solis: #D48348;
+
+  --font-canela: 'canela', Georgia, serif;
+
+  --font-h1-size: clamp(24px, 3vw, 48px);
+  --font-h1-height: clamp(28px, 3.2vw, 52px);
+  --font-h1-weight: 700;
+
+  --font-h2-size: clamp(14px, 1.5vw, 22px);
+  --font-h2-height: clamp(18px, 1.8vw, 26px);
+  --font-h2-weight: 400;
+
+  --font-lead-size: clamp(18px, 1.7vw, 26px);
+  --font-lead-height: clamp(26px, 2.4vw, 36px);
+  --font-lead-weight: 400;
+
+  --font-body-size: clamp(20px, 2.5vw, 36px);
+  --font-body-height: clamp(26px, 3vw, 42px);
+  --font-body-weight: 400;
+
+  --spacing-xs: clamp(0.25rem, 1vw, 0.5rem);
+  --spacing-sm: clamp(0.5rem, 2vw, 1rem);
+  --spacing-md: clamp(1rem, 3vw, 2rem);
+  --spacing-lg: clamp(2rem, 5vw, 4rem);
+  --spacing-xl: clamp(3rem, 8vw, 8rem);
+
+  --transition-fast: 0.15s ease-out;
+  --transition-medium: 0.3s ease-out;
+  --transition-slow: 0.5s ease-out;
+}

@@ -1,0 +1,2048 @@
+[
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+    "dpr": 1,
+    "sizes": [
+      "campaign-focus(482px)",
+      "muse-focus(241px)",
+      "back(145px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(482px) | muse(lunes)": "WINNER mml  b-1.5 (2.826)",
+      "campaign-focus(482px) | campaign-label": "WINNER mml  b-1.5 (6.055)",
+      "muse-focus(241px) | muse(lunes)": "WINNER LINEAR no-mip (3.821)",
+      "muse-focus(241px) | campaign-label": "WINNER LINEAR no-mip (8.677)",
+      "back(145px) | muse(lunes)": "WINNER LINEAR no-mip (5.288)",
+      "back(145px) | campaign-label": "WINNER LINEAR no-mip (11.852)"
+    },
+    "acutance": {
+      "campaign-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 2.122,
+      "campaign-focus(482px) | muse(lunes) | mml  b0": 1.707,
+      "campaign-focus(482px) | muse(lunes) | mml  b-1.5": 2.826,
+      "campaign-focus(482px) | muse(lunes) | LINEAR no-mip": 2.826,
+      "campaign-focus(482px) | muse(lunes) | mip-NEAREST b0": 1.732,
+      "campaign-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 1.732,
+      "campaign-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 1.732,
+      "campaign-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 4.739,
+      "campaign-focus(482px) | campaign-label | mml  b0": 3.903,
+      "campaign-focus(482px) | campaign-label | mml  b-1.5": 6.055,
+      "campaign-focus(482px) | campaign-label | LINEAR no-mip": 6.055,
+      "campaign-focus(482px) | campaign-label | mip-NEAREST b0": 3.955,
+      "campaign-focus(482px) | campaign-label | mip-NEAREST b-0.5": 3.955,
+      "campaign-focus(482px) | campaign-label | mml b0 maxLod1.0": 3.955,
+      "muse-focus(241px) | muse(lunes) | CUR  mml b-0.5 aniso16": 2.626,
+      "muse-focus(241px) | muse(lunes) | mml  b0": 2.512,
+      "muse-focus(241px) | muse(lunes) | mml  b-1.5": 3.219,
+      "muse-focus(241px) | muse(lunes) | LINEAR no-mip": 3.821,
+      "muse-focus(241px) | muse(lunes) | mip-NEAREST b0": 2.537,
+      "muse-focus(241px) | muse(lunes) | mip-NEAREST b-0.5": 2.537,
+      "muse-focus(241px) | muse(lunes) | mml b0 maxLod1.0": 2.902,
+      "muse-focus(241px) | campaign-label | CUR  mml b-0.5 aniso16": 6.101,
+      "muse-focus(241px) | campaign-label | mml  b0": 5.679,
+      "muse-focus(241px) | campaign-label | mml  b-1.5": 7.474,
+      "muse-focus(241px) | campaign-label | LINEAR no-mip": 8.677,
+      "muse-focus(241px) | campaign-label | mip-NEAREST b0": 5.746,
+      "muse-focus(241px) | campaign-label | mip-NEAREST b-0.5": 5.746,
+      "muse-focus(241px) | campaign-label | mml b0 maxLod1.0": 6.792,
+      "back(145px) | muse(lunes) | CUR  mml b-0.5 aniso16": 3.878,
+      "back(145px) | muse(lunes) | mml  b0": 3.773,
+      "back(145px) | muse(lunes) | mml  b-1.5": 4.205,
+      "back(145px) | muse(lunes) | LINEAR no-mip": 5.288,
+      "back(145px) | muse(lunes) | mip-NEAREST b0": 3.763,
+      "back(145px) | muse(lunes) | mip-NEAREST b-0.5": 4.027,
+      "back(145px) | muse(lunes) | mml b0 maxLod1.0": 4.363,
+      "back(145px) | campaign-label | CUR  mml b-0.5 aniso16": 8.302,
+      "back(145px) | campaign-label | mml  b0": 7.476,
+      "back(145px) | campaign-label | mml  b-1.5": 9.552,
+      "back(145px) | campaign-label | LINEAR no-mip": 11.852,
+      "back(145px) | campaign-label | mip-NEAREST b0": 7.209,
+      "back(145px) | campaign-label | mip-NEAREST b-0.5": 8.847,
+      "back(145px) | campaign-label | mml b0 maxLod1.0": 9.942
+    },
+    "_at": "2026-06-20T11:47:41.461Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (1.347)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (2.677)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b-1.5 (2.261)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b-1.5 (4.656)",
+      "back(289px) | muse(lunes)": "WINNER LINEAR no-mip (3.027)",
+      "back(289px) | campaign-label": "WINNER LINEAR no-mip (6.435)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 1.32,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 1.32,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 2.677,
+      "campaign-focus(964px) | campaign-label | mml  b0": 2.628,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 2.677,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 2.677,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 2.628,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.868,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 1.665,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 2.261,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 2.261,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 1.692,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 1.692,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 1.692,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 3.939,
+      "muse-focus(482px) | campaign-label | mml  b0": 3.529,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 4.656,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 4.656,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 3.581,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 3.581,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 3.581,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 2.355,
+      "back(289px) | muse(lunes) | mml  b0": 2.198,
+      "back(289px) | muse(lunes) | mml  b-1.5": 2.838,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 3.027,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 2.173,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 2.53,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 2.53,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 5.086,
+      "back(289px) | campaign-label | mml  b0": 4.662,
+      "back(289px) | campaign-label | mml  b-1.5": 6.088,
+      "back(289px) | campaign-label | LINEAR no-mip": 6.435,
+      "back(289px) | campaign-label | mip-NEAREST b0": 4.556,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 5.452,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.452
+    },
+    "_at": "2026-06-20T11:52:04.471Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (1.347)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (2.677)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b-1.5 (2.261)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b-1.5 (4.656)",
+      "back(289px) | muse(lunes)": "WINNER LINEAR no-mip (3.027)",
+      "back(289px) | campaign-label": "WINNER LINEAR no-mip (6.435)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 1.32,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 1.32,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 2.677,
+      "campaign-focus(964px) | campaign-label | mml  b0": 2.628,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 2.677,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 2.677,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 2.628,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.868,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 1.665,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 2.261,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 2.261,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 1.692,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 1.692,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 1.692,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 3.939,
+      "muse-focus(482px) | campaign-label | mml  b0": 3.529,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 4.656,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 4.656,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 3.581,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 3.581,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 3.581,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 2.355,
+      "back(289px) | muse(lunes) | mml  b0": 2.198,
+      "back(289px) | muse(lunes) | mml  b-1.5": 2.838,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 3.027,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 2.173,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 2.53,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 2.53,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 5.086,
+      "back(289px) | campaign-label | mml  b0": 4.662,
+      "back(289px) | campaign-label | mml  b-1.5": 6.088,
+      "back(289px) | campaign-label | LINEAR no-mip": 6.435,
+      "back(289px) | campaign-label | mip-NEAREST b0": 4.556,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 5.452,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.452
+    },
+    "_at": "2026-06-20T11:54:04.537Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (1.347)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (2.677)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b-1.5 (2.261)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b-1.5 (4.656)",
+      "back(289px) | muse(lunes)": "WINNER LINEAR no-mip (3.027)",
+      "back(289px) | campaign-label": "WINNER LINEAR no-mip (6.435)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 1.32,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 1.32,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 2.677,
+      "campaign-focus(964px) | campaign-label | mml  b0": 2.628,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 2.677,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 2.677,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 2.628,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.868,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 1.665,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 2.261,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 2.261,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 1.692,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 1.692,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 1.692,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 3.939,
+      "muse-focus(482px) | campaign-label | mml  b0": 3.529,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 4.656,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 4.656,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 3.581,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 3.581,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 3.581,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 2.355,
+      "back(289px) | muse(lunes) | mml  b0": 2.198,
+      "back(289px) | muse(lunes) | mml  b-1.5": 2.838,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 3.027,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 2.173,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 2.53,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 2.53,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 5.086,
+      "back(289px) | campaign-label | mml  b0": 4.662,
+      "back(289px) | campaign-label | mml  b-1.5": 6.088,
+      "back(289px) | campaign-label | LINEAR no-mip": 6.435,
+      "back(289px) | campaign-label | mip-NEAREST b0": 4.556,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 5.452,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.452
+    },
+    "_at": "2026-06-20T11:54:09.441Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (1.347)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (2.677)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b-1.5 (2.261)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b-1.5 (4.656)",
+      "back(289px) | muse(lunes)": "WINNER LINEAR no-mip (3.027)",
+      "back(289px) | campaign-label": "WINNER LINEAR no-mip (6.435)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 1.32,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 1.32,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 2.677,
+      "campaign-focus(964px) | campaign-label | mml  b0": 2.628,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 2.677,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 2.677,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 2.628,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.868,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 1.665,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 2.261,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 2.261,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 1.692,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 1.692,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 1.692,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 3.939,
+      "muse-focus(482px) | campaign-label | mml  b0": 3.529,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 4.656,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 4.656,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 3.581,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 3.581,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 3.581,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 2.355,
+      "back(289px) | muse(lunes) | mml  b0": 2.198,
+      "back(289px) | muse(lunes) | mml  b-1.5": 2.838,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 3.027,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 2.173,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 2.53,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 2.53,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 5.086,
+      "back(289px) | campaign-label | mml  b0": 4.662,
+      "back(289px) | campaign-label | mml  b-1.5": 6.088,
+      "back(289px) | campaign-label | LINEAR no-mip": 6.435,
+      "back(289px) | campaign-label | mip-NEAREST b0": 4.556,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 5.452,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.452
+    },
+    "_at": "2026-06-20T11:57:10.754Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+    "dpr": 1,
+    "sizes": [
+      "campaign-focus(482px)",
+      "muse-focus(241px)",
+      "back(145px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(482px) | muse(lunes)": "WINNER mml  b-1.5 (2.826)",
+      "campaign-focus(482px) | campaign-label": "WINNER mml  b-1.5 (6.055)",
+      "muse-focus(241px) | muse(lunes)": "WINNER LINEAR no-mip (3.821)",
+      "muse-focus(241px) | campaign-label": "WINNER LINEAR no-mip (8.677)",
+      "back(145px) | muse(lunes)": "WINNER LINEAR no-mip (5.288)",
+      "back(145px) | campaign-label": "WINNER LINEAR no-mip (11.852)"
+    },
+    "acutance": {
+      "campaign-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 2.122,
+      "campaign-focus(482px) | muse(lunes) | mml  b0": 1.707,
+      "campaign-focus(482px) | muse(lunes) | mml  b-1.5": 2.826,
+      "campaign-focus(482px) | muse(lunes) | LINEAR no-mip": 2.826,
+      "campaign-focus(482px) | muse(lunes) | mip-NEAREST b0": 1.732,
+      "campaign-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 1.732,
+      "campaign-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 1.732,
+      "campaign-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 4.739,
+      "campaign-focus(482px) | campaign-label | mml  b0": 3.903,
+      "campaign-focus(482px) | campaign-label | mml  b-1.5": 6.055,
+      "campaign-focus(482px) | campaign-label | LINEAR no-mip": 6.055,
+      "campaign-focus(482px) | campaign-label | mip-NEAREST b0": 3.955,
+      "campaign-focus(482px) | campaign-label | mip-NEAREST b-0.5": 3.955,
+      "campaign-focus(482px) | campaign-label | mml b0 maxLod1.0": 3.955,
+      "muse-focus(241px) | muse(lunes) | CUR  mml b-0.5 aniso16": 2.626,
+      "muse-focus(241px) | muse(lunes) | mml  b0": 2.512,
+      "muse-focus(241px) | muse(lunes) | mml  b-1.5": 3.219,
+      "muse-focus(241px) | muse(lunes) | LINEAR no-mip": 3.821,
+      "muse-focus(241px) | muse(lunes) | mip-NEAREST b0": 2.537,
+      "muse-focus(241px) | muse(lunes) | mip-NEAREST b-0.5": 2.537,
+      "muse-focus(241px) | muse(lunes) | mml b0 maxLod1.0": 2.902,
+      "muse-focus(241px) | campaign-label | CUR  mml b-0.5 aniso16": 6.101,
+      "muse-focus(241px) | campaign-label | mml  b0": 5.679,
+      "muse-focus(241px) | campaign-label | mml  b-1.5": 7.474,
+      "muse-focus(241px) | campaign-label | LINEAR no-mip": 8.677,
+      "muse-focus(241px) | campaign-label | mip-NEAREST b0": 5.746,
+      "muse-focus(241px) | campaign-label | mip-NEAREST b-0.5": 5.746,
+      "muse-focus(241px) | campaign-label | mml b0 maxLod1.0": 6.792,
+      "back(145px) | muse(lunes) | CUR  mml b-0.5 aniso16": 3.878,
+      "back(145px) | muse(lunes) | mml  b0": 3.773,
+      "back(145px) | muse(lunes) | mml  b-1.5": 4.205,
+      "back(145px) | muse(lunes) | LINEAR no-mip": 5.288,
+      "back(145px) | muse(lunes) | mip-NEAREST b0": 3.763,
+      "back(145px) | muse(lunes) | mip-NEAREST b-0.5": 4.027,
+      "back(145px) | muse(lunes) | mml b0 maxLod1.0": 4.363,
+      "back(145px) | campaign-label | CUR  mml b-0.5 aniso16": 8.302,
+      "back(145px) | campaign-label | mml  b0": 7.476,
+      "back(145px) | campaign-label | mml  b-1.5": 9.552,
+      "back(145px) | campaign-label | LINEAR no-mip": 11.852,
+      "back(145px) | campaign-label | mip-NEAREST b0": 7.209,
+      "back(145px) | campaign-label | mip-NEAREST b-0.5": 8.847,
+      "back(145px) | campaign-label | mml b0 maxLod1.0": 9.942
+    },
+    "_at": "2026-06-20T12:02:05.594Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (1.347)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (2.677)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b-1.5 (2.261)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b-1.5 (4.656)",
+      "back(289px) | muse(lunes)": "WINNER LINEAR no-mip (3.027)",
+      "back(289px) | campaign-label": "WINNER LINEAR no-mip (6.435)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 1.32,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 1.32,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 2.677,
+      "campaign-focus(964px) | campaign-label | mml  b0": 2.628,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 2.677,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 2.677,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 2.628,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.868,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 1.665,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 2.261,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 2.261,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 1.692,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 1.692,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 1.692,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 3.939,
+      "muse-focus(482px) | campaign-label | mml  b0": 3.529,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 4.656,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 4.656,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 3.581,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 3.581,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 3.581,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 2.355,
+      "back(289px) | muse(lunes) | mml  b0": 2.198,
+      "back(289px) | muse(lunes) | mml  b-1.5": 2.838,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 3.027,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 2.173,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 2.53,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 2.53,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 5.086,
+      "back(289px) | campaign-label | mml  b0": 4.662,
+      "back(289px) | campaign-label | mml  b-1.5": 6.088,
+      "back(289px) | campaign-label | LINEAR no-mip": 6.435,
+      "back(289px) | campaign-label | mip-NEAREST b0": 4.556,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 5.452,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.452
+    },
+    "_at": "2026-06-20T12:04:15.784Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+    "dpr": 1,
+    "maxTextureSize": 8192,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.3,
+      "grainStd": 20.4
+    },
+    "_at": "2026-06-20T16:10:17.882Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "maxTextureSize": 16384,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.9,
+      "grainStd": 12.7
+    },
+    "_at": "2026-06-20T16:13:02.686Z"
+  },
+  {
+    "tag": "probe3",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "CELL": 1024,
+    "default": {
+      "label": "default(scale2.0)",
+      "scale": 2,
+      "cssW": 1440,
+      "cssH": 757,
+      "focusedR_css": 51,
+      "deviceDia": 203,
+      "magnified": false,
+      "cellRatio": 0.2
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(scale1.2)",
+      "scale": 1.2,
+      "cssW": 1440,
+      "cssH": 757,
+      "focusedR_css": 43,
+      "deviceDia": 174,
+      "magnified": false,
+      "cellRatio": 0.17
+    },
+    "_at": "2026-06-20T16:16:52.380Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "maxTextureSize": 16384,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.9,
+      "grainStd": 12.7
+    },
+    "_at": "2026-06-20T16:26:13.573Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (1.347)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (2.677)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b-1.5 (2.261)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b-1.5 (4.656)",
+      "back(289px) | muse(lunes)": "WINNER LINEAR no-mip (3.027)",
+      "back(289px) | campaign-label": "WINNER LINEAR no-mip (6.435)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 1.32,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 1.347,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 1.32,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 2.677,
+      "campaign-focus(964px) | campaign-label | mml  b0": 2.628,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 2.677,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 2.677,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 2.677,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 2.628,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.868,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 1.665,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 2.261,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 2.261,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 1.692,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 1.692,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 1.692,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 3.939,
+      "muse-focus(482px) | campaign-label | mml  b0": 3.529,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 4.656,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 4.656,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 3.581,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 3.581,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 3.581,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 2.355,
+      "back(289px) | muse(lunes) | mml  b0": 2.198,
+      "back(289px) | muse(lunes) | mml  b-1.5": 2.838,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 3.027,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 2.173,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 2.53,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 2.53,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 5.086,
+      "back(289px) | campaign-label | mml  b0": 4.662,
+      "back(289px) | campaign-label | mml  b-1.5": 6.088,
+      "back(289px) | campaign-label | LINEAR no-mip": 6.435,
+      "back(289px) | campaign-label | mip-NEAREST b0": 4.556,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 5.452,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.452
+    },
+    "_at": "2026-06-20T16:26:14.546Z"
+  },
+  {
+    "tag": "probe3",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "CELL": 1024,
+    "default": {
+      "label": "default(scale2.0)",
+      "scale": 2,
+      "error": "no active tile"
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(scale1.2)",
+      "scale": 1.2,
+      "error": "no active tile"
+    },
+    "_at": "2026-06-20T16:27:42.571Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (0.428)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (1.177)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b0 (0.591)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b0 (1.491)",
+      "back(289px) | muse(lunes)": "WINNER mml  b0 (1.755)",
+      "back(289px) | campaign-label": "WINNER mip-NEAREST b0 (5.627)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 0.428,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 1.177,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 1.177,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 1.177,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.499,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 0.591,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 0.591,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 1.275,
+      "muse-focus(482px) | campaign-label | mml  b0": 1.491,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 1.271,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 1.271,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 1.491,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.241,
+      "back(289px) | muse(lunes) | mml  b0": 1.755,
+      "back(289px) | muse(lunes) | mml  b-1.5": 0.569,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 0.569,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 1.736,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 0.569,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 1.755,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 3.31,
+      "back(289px) | campaign-label | mml  b0": 5.239,
+      "back(289px) | campaign-label | mml  b-1.5": 1.459,
+      "back(289px) | campaign-label | LINEAR no-mip": 1.459,
+      "back(289px) | campaign-label | mip-NEAREST b0": 5.627,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 1.459,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.239
+    },
+    "_at": "2026-06-20T16:27:44.356Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "maxTextureSize": 16384,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.9,
+      "grainStd": 12.7
+    },
+    "_at": "2026-06-20T16:27:45.121Z"
+  },
+  {
+    "tag": "probe3",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "CELL": 1024,
+    "default": {
+      "label": "default(scale2.0)",
+      "scale": 2,
+      "error": "no active tile"
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(scale1.2)",
+      "scale": 1.2,
+      "error": "no active tile"
+    },
+    "_at": "2026-06-20T16:28:46.598Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (0.428)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (1.177)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b0 (0.591)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b0 (1.491)",
+      "back(289px) | muse(lunes)": "WINNER mml  b0 (1.755)",
+      "back(289px) | campaign-label": "WINNER mip-NEAREST b0 (5.627)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 0.428,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 1.177,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 1.177,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 1.177,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.499,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 0.591,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 0.591,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 1.275,
+      "muse-focus(482px) | campaign-label | mml  b0": 1.491,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 1.271,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 1.271,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 1.491,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.241,
+      "back(289px) | muse(lunes) | mml  b0": 1.755,
+      "back(289px) | muse(lunes) | mml  b-1.5": 0.569,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 0.569,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 1.736,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 0.569,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 1.755,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 3.31,
+      "back(289px) | campaign-label | mml  b0": 5.239,
+      "back(289px) | campaign-label | mml  b-1.5": 1.459,
+      "back(289px) | campaign-label | LINEAR no-mip": 1.459,
+      "back(289px) | campaign-label | mip-NEAREST b0": 5.627,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 1.459,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.239
+    },
+    "_at": "2026-06-20T16:28:47.805Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "maxTextureSize": 16384,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.9,
+      "grainStd": 12.7
+    },
+    "_at": "2026-06-20T16:28:49.009Z"
+  },
+  {
+    "tag": "probe3",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "CELL": 1024,
+    "default": {
+      "label": "default(scale2.0)",
+      "scale": 2,
+      "error": "no active tile"
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(scale1.2)",
+      "scale": 1.2,
+      "error": "no active tile"
+    },
+    "_at": "2026-06-20T16:29:48.571Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (0.428)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (1.177)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b0 (0.591)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b0 (1.491)",
+      "back(289px) | muse(lunes)": "WINNER mml  b0 (1.755)",
+      "back(289px) | campaign-label": "WINNER mip-NEAREST b0 (5.627)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 0.428,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 1.177,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 1.177,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 1.177,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.499,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 0.591,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 0.591,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 1.275,
+      "muse-focus(482px) | campaign-label | mml  b0": 1.491,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 1.271,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 1.271,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 1.491,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.241,
+      "back(289px) | muse(lunes) | mml  b0": 1.755,
+      "back(289px) | muse(lunes) | mml  b-1.5": 0.569,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 0.569,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 1.736,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 0.569,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 1.755,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 3.31,
+      "back(289px) | campaign-label | mml  b0": 5.239,
+      "back(289px) | campaign-label | mml  b-1.5": 1.459,
+      "back(289px) | campaign-label | LINEAR no-mip": 1.459,
+      "back(289px) | campaign-label | mip-NEAREST b0": 5.627,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 1.459,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.239
+    },
+    "_at": "2026-06-20T16:35:58.531Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "maxTextureSize": 16384,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.9,
+      "grainStd": 12.7
+    },
+    "_at": "2026-06-20T16:35:59.216Z"
+  },
+  {
+    "tag": "probe3",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "CELL": 1024,
+    "default": {
+      "label": "default(scale2.0)",
+      "scale": 2,
+      "error": "no active tile"
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(scale1.2)",
+      "scale": 1.2,
+      "error": "no active tile"
+    },
+    "_at": "2026-06-20T16:36:02.337Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (0.428)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (1.177)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b0 (0.591)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b0 (1.491)",
+      "back(289px) | muse(lunes)": "WINNER mml  b0 (1.755)",
+      "back(289px) | campaign-label": "WINNER mip-NEAREST b0 (5.627)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 0.428,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 1.177,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 1.177,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 1.177,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.499,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 0.591,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 0.591,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 1.275,
+      "muse-focus(482px) | campaign-label | mml  b0": 1.491,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 1.271,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 1.271,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 1.491,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.241,
+      "back(289px) | muse(lunes) | mml  b0": 1.755,
+      "back(289px) | muse(lunes) | mml  b-1.5": 0.569,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 0.569,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 1.736,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 0.569,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 1.755,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 3.31,
+      "back(289px) | campaign-label | mml  b0": 5.239,
+      "back(289px) | campaign-label | mml  b-1.5": 1.459,
+      "back(289px) | campaign-label | LINEAR no-mip": 1.459,
+      "back(289px) | campaign-label | mip-NEAREST b0": 5.627,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 1.459,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.239
+    },
+    "_at": "2026-06-20T16:36:04.677Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "maxTextureSize": 16384,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.9,
+      "grainStd": 12.7
+    },
+    "_at": "2026-06-20T16:36:05.462Z"
+  },
+  {
+    "tag": "probe3",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "CELL": 1024,
+    "default": {
+      "label": "default(scale2.0)",
+      "scale": 2,
+      "error": "no active tile"
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(scale1.2)",
+      "scale": 1.2,
+      "error": "no active tile"
+    },
+    "_at": "2026-06-20T16:36:08.567Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (0.428)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (1.177)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b0 (0.591)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b0 (1.491)",
+      "back(289px) | muse(lunes)": "WINNER mml  b0 (1.755)",
+      "back(289px) | campaign-label": "WINNER mip-NEAREST b0 (5.627)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 0.428,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 1.177,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 1.177,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 1.177,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.499,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 0.591,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 0.591,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 1.275,
+      "muse-focus(482px) | campaign-label | mml  b0": 1.491,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 1.271,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 1.271,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 1.491,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.241,
+      "back(289px) | muse(lunes) | mml  b0": 1.755,
+      "back(289px) | muse(lunes) | mml  b-1.5": 0.569,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 0.569,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 1.736,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 0.569,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 1.755,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 3.31,
+      "back(289px) | campaign-label | mml  b0": 5.239,
+      "back(289px) | campaign-label | mml  b-1.5": 1.459,
+      "back(289px) | campaign-label | LINEAR no-mip": 1.459,
+      "back(289px) | campaign-label | mip-NEAREST b0": 5.627,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 1.459,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.239
+    },
+    "_at": "2026-06-20T16:36:59.183Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "maxTextureSize": 16384,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.9,
+      "grainStd": 12.7
+    },
+    "_at": "2026-06-20T16:36:59.822Z"
+  },
+  {
+    "tag": "probe3",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "CELL": 1024,
+    "default": {
+      "label": "default(scale2.0)",
+      "scale": 2,
+      "error": "no active tile"
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(scale1.2)",
+      "scale": 1.2,
+      "error": "no active tile"
+    },
+    "_at": "2026-06-20T16:38:00.251Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (0.428)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (1.177)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b0 (0.591)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b0 (1.491)",
+      "back(289px) | muse(lunes)": "WINNER mml  b0 (1.755)",
+      "back(289px) | campaign-label": "WINNER mip-NEAREST b0 (5.627)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 0.428,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 1.177,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 1.177,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 1.177,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.499,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 0.591,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 0.591,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 1.275,
+      "muse-focus(482px) | campaign-label | mml  b0": 1.491,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 1.271,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 1.271,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 1.491,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.241,
+      "back(289px) | muse(lunes) | mml  b0": 1.755,
+      "back(289px) | muse(lunes) | mml  b-1.5": 0.569,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 0.569,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 1.736,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 0.569,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 1.755,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 3.31,
+      "back(289px) | campaign-label | mml  b0": 5.239,
+      "back(289px) | campaign-label | mml  b-1.5": 1.459,
+      "back(289px) | campaign-label | LINEAR no-mip": 1.459,
+      "back(289px) | campaign-label | mip-NEAREST b0": 5.627,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 1.459,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.239
+    },
+    "_at": "2026-06-20T16:38:01.333Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "maxTextureSize": 16384,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.9,
+      "grainStd": 12.7
+    },
+    "_at": "2026-06-20T16:38:02.680Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (0.428)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (1.177)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b0 (0.591)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b0 (1.491)",
+      "back(289px) | muse(lunes)": "WINNER mml  b0 (1.755)",
+      "back(289px) | campaign-label": "WINNER mip-NEAREST b0 (5.627)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 0.428,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 1.177,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 1.177,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 1.177,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.499,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 0.591,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 0.591,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 1.275,
+      "muse-focus(482px) | campaign-label | mml  b0": 1.491,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 1.271,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 1.271,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 1.491,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.241,
+      "back(289px) | muse(lunes) | mml  b0": 1.755,
+      "back(289px) | muse(lunes) | mml  b-1.5": 0.569,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 0.569,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 1.736,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 0.569,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 1.755,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 3.31,
+      "back(289px) | campaign-label | mml  b0": 5.239,
+      "back(289px) | campaign-label | mml  b-1.5": 1.459,
+      "back(289px) | campaign-label | LINEAR no-mip": 1.459,
+      "back(289px) | campaign-label | mip-NEAREST b0": 5.627,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 1.459,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.239
+    },
+    "_at": "2026-06-20T16:38:04.074Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "maxTextureSize": 16384,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.9,
+      "grainStd": 12.7
+    },
+    "_at": "2026-06-20T16:38:04.580Z"
+  },
+  {
+    "tag": "probe3",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "CELL": 1024,
+    "default": {
+      "label": "default(scale2.0)",
+      "scale": 2,
+      "error": "no active tile"
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(scale1.2)",
+      "scale": 1.2,
+      "error": "no active tile"
+    },
+    "_at": "2026-06-20T16:39:01.302Z"
+  },
+  {
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "sizes": [
+      "campaign-focus(964px)",
+      "muse-focus(482px)",
+      "back(289px)"
+    ],
+    "atlasSize": 4,
+    "fonts": {
+      "readyFired": true,
+      "canelaBefore": true,
+      "canelaAfter": true
+    },
+    "aniso": {
+      "supported": true,
+      "max": 16
+    },
+    "winners": {
+      "campaign-focus(964px) | muse(lunes)": "WINNER CUR  mml b-0.5 aniso16 (0.428)",
+      "campaign-focus(964px) | campaign-label": "WINNER CUR  mml b-0.5 aniso16 (1.177)",
+      "muse-focus(482px) | muse(lunes)": "WINNER mml  b0 (0.591)",
+      "muse-focus(482px) | campaign-label": "WINNER mml  b0 (1.491)",
+      "back(289px) | muse(lunes)": "WINNER mml  b0 (1.755)",
+      "back(289px) | campaign-label": "WINNER mip-NEAREST b0 (5.627)"
+    },
+    "acutance": {
+      "campaign-focus(964px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml  b-1.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | LINEAR no-mip": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b0": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mip-NEAREST b-0.5": 0.428,
+      "campaign-focus(964px) | muse(lunes) | mml b0 maxLod1.0": 0.428,
+      "campaign-focus(964px) | campaign-label | CUR  mml b-0.5 aniso16": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mml  b-1.5": 1.177,
+      "campaign-focus(964px) | campaign-label | LINEAR no-mip": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b0": 1.177,
+      "campaign-focus(964px) | campaign-label | mip-NEAREST b-0.5": 1.177,
+      "campaign-focus(964px) | campaign-label | mml b0 maxLod1.0": 1.177,
+      "muse-focus(482px) | muse(lunes) | CUR  mml b-0.5 aniso16": 0.499,
+      "muse-focus(482px) | muse(lunes) | mml  b0": 0.591,
+      "muse-focus(482px) | muse(lunes) | mml  b-1.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | LINEAR no-mip": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b0": 0.498,
+      "muse-focus(482px) | muse(lunes) | mip-NEAREST b-0.5": 0.498,
+      "muse-focus(482px) | muse(lunes) | mml b0 maxLod1.0": 0.591,
+      "muse-focus(482px) | campaign-label | CUR  mml b-0.5 aniso16": 1.275,
+      "muse-focus(482px) | campaign-label | mml  b0": 1.491,
+      "muse-focus(482px) | campaign-label | mml  b-1.5": 1.271,
+      "muse-focus(482px) | campaign-label | LINEAR no-mip": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b0": 1.271,
+      "muse-focus(482px) | campaign-label | mip-NEAREST b-0.5": 1.271,
+      "muse-focus(482px) | campaign-label | mml b0 maxLod1.0": 1.491,
+      "back(289px) | muse(lunes) | CUR  mml b-0.5 aniso16": 1.241,
+      "back(289px) | muse(lunes) | mml  b0": 1.755,
+      "back(289px) | muse(lunes) | mml  b-1.5": 0.569,
+      "back(289px) | muse(lunes) | LINEAR no-mip": 0.569,
+      "back(289px) | muse(lunes) | mip-NEAREST b0": 1.736,
+      "back(289px) | muse(lunes) | mip-NEAREST b-0.5": 0.569,
+      "back(289px) | muse(lunes) | mml b0 maxLod1.0": 1.755,
+      "back(289px) | campaign-label | CUR  mml b-0.5 aniso16": 3.31,
+      "back(289px) | campaign-label | mml  b0": 5.239,
+      "back(289px) | campaign-label | mml  b-1.5": 1.459,
+      "back(289px) | campaign-label | LINEAR no-mip": 1.459,
+      "back(289px) | campaign-label | mip-NEAREST b0": 5.627,
+      "back(289px) | campaign-label | mip-NEAREST b-0.5": 1.459,
+      "back(289px) | campaign-label | mml b0 maxLod1.0": 5.239
+    },
+    "_at": "2026-06-20T16:39:02.896Z"
+  },
+  {
+    "tag": "probe2",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "maxTextureSize": 16384,
+    "note": "4096² is the current production atlas (12 items × CELL 1024). edges<32 or cornerMarker=false ⇒ that size is silently degraded on this browser.",
+    "canvasTests": {
+      "2048x2048": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "3072x3072": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "4096x4096": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      },
+      "8192x8192": {
+        "edges2D": 63,
+        "cornerMarker": true,
+        "edgesGL": 63,
+        "maxEdges": 32
+      }
+    },
+    "grain": {
+      "svgLoaded": true,
+      "grainMean": 186.9,
+      "grainStd": 12.7
+    },
+    "_at": "2026-06-20T16:39:03.361Z"
+  },
+  {
+    "tag": "probe3",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3.1 Safari/605.1.15",
+    "dpr": 2,
+    "CELL": 1024,
+    "default": {
+      "label": "default(scale2.0)",
+      "scale": 2,
+      "error": "no active tile"
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(scale1.2)",
+      "scale": 1.2,
+      "error": "no active tile"
+    },
+    "_at": "2026-06-20T16:40:02.009Z"
+  },
+  {
+    "tag": "probe4",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+    "metric": "symbol-edge acutance (mean |Δluma|; higher=sharper)",
+    "default": {
+      "label": "default(2.0)",
+      "scale": 2,
+      "dpr": 1,
+      "focusedR_css": 51,
+      "box": {
+        "bw": 102,
+        "bh": 102
+      },
+      "results": {
+        "mml b0": {
+          "meanAll": 13.064,
+          "top5": 123.943,
+          "samples": 6906
+        },
+        "mml b-0.5": {
+          "meanAll": 13.365,
+          "top5": 145.44,
+          "samples": 6906
+        },
+        "mml b-1.5": {
+          "meanAll": 13.509,
+          "top5": 171.508,
+          "samples": 6906
+        },
+        "mml b-10": {
+          "meanAll": 13.509,
+          "top5": 171.508,
+          "samples": 6906
+        },
+        "linear": {
+          "meanAll": 13.509,
+          "top5": 171.508,
+          "samples": 6906
+        },
+        "mmlNearest": {
+          "meanAll": 13.363,
+          "top5": 141.923,
+          "samples": 6906
+        }
+      }
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(1.2)",
+      "scale": 1.2,
+      "dpr": 1,
+      "focusedR_css": 43,
+      "box": {
+        "bw": 86,
+        "bh": 86
+      },
+      "results": {
+        "mml b0": {
+          "meanAll": 15.014,
+          "top5": 130.262,
+          "samples": 4924
+        },
+        "mml b-0.5": {
+          "meanAll": 15.091,
+          "top5": 150.526,
+          "samples": 4924
+        },
+        "mml b-1.5": {
+          "meanAll": 15.31,
+          "top5": 169.132,
+          "samples": 4924
+        },
+        "mml b-10": {
+          "meanAll": 15.31,
+          "top5": 169.132,
+          "samples": 4924
+        },
+        "linear": {
+          "meanAll": 15.31,
+          "top5": 169.132,
+          "samples": 4924
+        },
+        "mmlNearest": {
+          "meanAll": 15.31,
+          "top5": 169.132,
+          "samples": 4924
+        }
+      }
+    },
+    "_at": "2026-06-20T19:25:36.116Z"
+  },
+  {
+    "tag": "halo",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+    "desktop_2_0": {
+      "scale": 2,
+      "W": 1400,
+      "H": 757,
+      "halfW": 700,
+      "equatorProj": 1081,
+      "maxAllTile": 1147,
+      "maxFrontTile": 1147
+    },
+    "zoomedOut_3_6": {
+      "scale": 3.6,
+      "W": 1400,
+      "H": 757,
+      "halfW": 700,
+      "equatorProj": 1081,
+      "maxAllTile": 1091,
+      "maxFrontTile": 1091
+    },
+    "zoomedIn_1_2": {
+      "scale": 1.2,
+      "W": 1400,
+      "H": 757,
+      "halfW": 700,
+      "equatorProj": 1081,
+      "maxAllTile": 1299,
+      "maxFrontTile": 1299
+    },
+    "_at": "2026-06-20T19:40:15.312Z"
+  },
+  {
+    "tag": "probe4",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.124.2 Chrome/148.0.7778.97 Electron/42.2.0 Safari/537.36",
+    "metric": "symbol-edge acutance (mean |Δluma|; higher=sharper)",
+    "default": {
+      "label": "default(2.0)",
+      "scale": 2,
+      "dpr": 2,
+      "focusedR_css": 29,
+      "box": {
+        "bw": 116,
+        "bh": 116
+      },
+      "results": {
+        "mml b0": {
+          "meanAll": 11.023,
+          "top5": 95.492,
+          "samples": 8945
+        },
+        "mml b-0.5": {
+          "meanAll": 11.473,
+          "top5": 113.387,
+          "samples": 8945
+        },
+        "mml b-1.5": {
+          "meanAll": 11.738,
+          "top5": 133.378,
+          "samples": 8945
+        },
+        "mml b-10": {
+          "meanAll": 11.738,
+          "top5": 133.378,
+          "samples": 8945
+        },
+        "linear": {
+          "meanAll": 11.738,
+          "top5": 133.378,
+          "samples": 8945
+        },
+        "mmlNearest": {
+          "meanAll": 11.469,
+          "top5": 112.037,
+          "samples": 8945
+        }
+      }
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(1.2)",
+      "scale": 1.2,
+      "dpr": 2,
+      "focusedR_css": 60,
+      "box": {
+        "bw": 238,
+        "bh": 238
+      },
+      "results": {
+        "mml b0": {
+          "meanAll": 8.726,
+          "top5": 43.993,
+          "samples": 37649
+        },
+        "mml b-0.5": {
+          "meanAll": 8.726,
+          "top5": 43.993,
+          "samples": 37649
+        },
+        "mml b-1.5": {
+          "meanAll": 8.726,
+          "top5": 43.993,
+          "samples": 37649
+        },
+        "mml b-10": {
+          "meanAll": 8.726,
+          "top5": 43.993,
+          "samples": 37649
+        },
+        "linear": {
+          "meanAll": 8.726,
+          "top5": 43.993,
+          "samples": 37649
+        },
+        "mmlNearest": {
+          "meanAll": 8.726,
+          "top5": 43.993,
+          "samples": 37649
+        }
+      }
+    },
+    "_at": "2026-06-21T10:39:57.902Z"
+  },
+  {
+    "tag": "probe4",
+    "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.124.2 Chrome/148.0.7778.97 Electron/42.2.0 Safari/537.36",
+    "metric": "symbol-edge acutance (mean |Δluma|; higher=sharper)",
+    "default": {
+      "label": "default(2.0)",
+      "scale": 2,
+      "dpr": 2,
+      "focusedR_css": 36,
+      "box": {
+        "bw": 144,
+        "bh": 144
+      },
+      "results": {
+        "mml b0": {
+          "meanAll": 9.525,
+          "top5": 92.966,
+          "samples": 13784
+        },
+        "mml b-0.5": {
+          "meanAll": 9.588,
+          "top5": 106.661,
+          "samples": 13784
+        },
+        "mml b-1.5": {
+          "meanAll": 9.774,
+          "top5": 117.863,
+          "samples": 13784
+        },
+        "mml b-10": {
+          "meanAll": 9.774,
+          "top5": 117.863,
+          "samples": 13784
+        },
+        "linear": {
+          "meanAll": 9.774,
+          "top5": 117.863,
+          "samples": 13784
+        },
+        "mmlNearest": {
+          "meanAll": 9.774,
+          "top5": 117.863,
+          "samples": 13784
+        }
+      }
+    },
+    "zoomedIn": {
+      "label": "zoomed-in(1.2)",
+      "scale": 1.2,
+      "dpr": 2,
+      "focusedR_css": 31,
+      "box": {
+        "bw": 124,
+        "bh": 124
+      },
+      "results": {
+        "mml b0": {
+          "meanAll": 10.132,
+          "top5": 114.63,
+          "samples": 10229
+        },
+        "mml b-0.5": {
+          "meanAll": 10.255,
+          "top5": 130.574,
+          "samples": 10229
+        },
+        "mml b-1.5": {
+          "meanAll": 10.255,
+          "top5": 130.574,
+          "samples": 10229
+        },
+        "mml b-10": {
+          "meanAll": 10.255,
+          "top5": 130.574,
+          "samples": 10229
+        },
+        "linear": {
+          "meanAll": 10.255,
+          "top5": 130.574,
+          "samples": 10229
+        },
+        "mmlNearest": {
+          "meanAll": 10.255,
+          "top5": 130.574,
+          "samples": 10229
+        }
+      }
+    },
+    "_at": "2026-06-21T10:40:19.054Z"
+  }
+]

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The Muse Observatory — cocoex's archive of Stardust and Horizon campaigns, charted as a globe of the seven muses.">
+  <meta name="theme-color" content="#000000">
+  <title>Muse Observatory — cocoex</title>
+  <link rel="icon" href="/assets/images/logowhite.png" type="image/png">
+  <link rel="preconnect" href="https://use.typekit.net">
+  <link rel="preconnect" href="https://p.typekit.net" crossorigin>
+  <link rel="stylesheet" href="https://use.typekit.net/afs8ors.css">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Muse Observatory — cocoex">
+  <meta property="og:description" content="The archive of cocoex's Stardust and Horizon campaigns, charted as a globe of the seven muses.">
+  <meta property="og:image" content="/assets/images/logowhite.png">
+</head>
+<body class="observatory">
+  <a class="observatory-back" href="/"><img src="/assets/images/cocoex-text.png" alt="cocoex"></a>
+
+  <!-- Cosmic backdrop (behind the globe; shown only when the globe is active).
+       Cloud = intro cosmic-noise nebula; halo = the atmosphere hugging the sphere;
+       both sit under the starfield (screen-blended) so the nebula + glow read. -->
+  <canvas id="observatory-cloud" aria-hidden="true"></canvas>
+  <div id="observatory-halo" aria-hidden="true"></div>
+  <canvas id="observatory-starfield" aria-hidden="true"></canvas>
+
+  <!-- The globe (decorative; the accessible source of truth is the list below) -->
+  <canvas id="observatory-globe" aria-hidden="true"></canvas>
+
+  <!-- Zoom control (draggable; reuses the comet pill's beam-glow + liquid-glass look) -->
+  <div class="zoom-wrap">
+    <div id="observatory-zoom" class="zoom-pill beam-glow" role="slider"
+         aria-label="Zoom the globe" aria-valuemin="0" aria-valuemax="100" aria-valuenow="33">
+      <span class="pill-glass" aria-hidden="true"></span>
+      <span id="observatory-zoom-thumb" class="zoom-thumb" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <!-- Tile flip-card: tap a tile → it flips to its details (name + cause + description) -->
+  <div id="observatory-flip" hidden>
+    <div class="tile-flip-card">
+      <div class="tile-flip-inner">
+        <div class="tile-flip-front" aria-hidden="true"></div>
+        <div class="tile-flip-back"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accessible / reduced-motion / no-WebGL2 fallback: the real campaign list -->
+  <main id="observatory-list" class="observatory-list" aria-label="Campaign archive">
+    <h1 class="observatory-list-title">Muse Observatory</h1>
+    <p class="observatory-list-intro">The archive of cocoex's Stardust and Horizon campaigns.</p>
+    <ul class="observatory-list-items"><!-- built from campaigns.json by observatory.js --></ul>
+  </main>
+
+  <script type="module" src="/src/observatory/observatory.js"></script>
+</body>
+</html>

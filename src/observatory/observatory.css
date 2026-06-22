@@ -1,0 +1,573 @@
+/* Muse Observatory — index page (globe shell + accessible list fallback).
+   Brand tokens come from tokens.css (imported alongside this in observatory.js).
+   Phase 3: minimal-correct list fallback + globe canvas scaffolding. Full visual
+   polish (and the globe-vs-list visibility logic) lands as the globe is wired. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body.observatory {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--color-black, #000);
+  color: var(--color-white, #fff);
+  font-family: var(--font-canela, Georgia, serif);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+.observatory-back {
+  position: fixed;
+  top: clamp(16px, 3vw, 28px);
+  left: clamp(16px, 3vw, 28px);
+  z-index: 10;
+  display: block;
+  line-height: 0;          /* no descender gap under the wordmark */
+}
+.observatory-back img {
+  display: block;
+  height: clamp(16px, 2vw, 22px);
+  width: auto;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+.observatory-back:hover img { opacity: 1; }
+.observatory-back:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+/* Mobile: the wordmark goes top-CENTRE (the zoom pill lives bottom-centre on mobile, so the
+   top middle is free and reads as the masthead). Desktop keeps it top-left. */
+@media (max-width: 767px) {
+  .observatory-back { left: 50%; transform: translateX(-50%); }
+}
+
+/* fixed full-screen backdrop layers — all shown only with the globe (body.globe-active).
+   Cloud (z0) = intro cosmic-noise nebula, brightened so it actually reads → halo (z1) =
+   the neutral cosmic atmosphere hugging the sphere → starfield (z2) → globe (z3). The
+   starfield shader writes OPAQUE black, so `mix-blend-mode: screen` lets the cloud + halo
+   show through it (screen with black = identity, white stars stay bright). The globe is
+   alpha:true so the backdrop shows through the gaps between tiles. The opacity transition
+   is here so the flip's dim (body.flip-open) fades both ways. */
+#observatory-cloud,
+#observatory-halo,
+#observatory-starfield,
+#observatory-globe {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  transition: opacity 0.4s ease;
+}
+#observatory-cloud {
+  z-index: 0;
+  filter: brightness(2.4) contrast(1.05);   /* the source nebula is near-black — lift it */
+}
+/* Neutral cosmic atmosphere: a soft WHITE/grey glow ATTACHED to the globe's circumference.
+   --halo-r is the sphere's on-screen radius in px, written every frame by observatory.js
+   (globe.getSphereScreenRadius) so the bright ring hugs the silhouette and shrinks/grows
+   with the zoom instead of floating in a fixed background. Kept achromatic on purpose — a
+   tinted halo wrongly implies a muse colour (round 4). The ring sits AT --halo-r and
+   feathers OUTWARD; the interior stays clear so the tiles read. */
+#observatory-halo {
+  z-index: 1;
+  --halo-r: 30vmin; /* fallback before the first frame sets px */
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0) calc(var(--halo-r) - 10px),
+      rgba(255, 255, 255, 0.11) var(--halo-r),
+      rgba(232, 236, 245, 0.06) calc(var(--halo-r) + 9vmin),
+      rgba(255, 255, 255, 0) calc(var(--halo-r) + 26vmin));
+  pointer-events: none;
+}
+/* Galaxy texture: fractal-noise (feTurbulence) clouds composited over the halo glow so the
+   atmosphere reads as a grainy nebula, not a smooth ring (Memo's ask). White wisps on transparent
+   (feColorMatrix → luminance alpha), screen-blended, and masked to the SAME ring band so the
+   texture only shows where the glow lives. Achromatic on purpose (a tint would imply a muse hue). */
+#observatory-halo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.018' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.55 0.55 0.55 0 -0.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 42vmin 42vmin;
+  background-repeat: repeat;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%,
+      transparent calc(var(--halo-r) - 9vmin),
+      #000 var(--halo-r),
+      #000 calc(var(--halo-r) + 7vmin),
+      transparent calc(var(--halo-r) + 25vmin));
+  mask-image: radial-gradient(circle at 50% 50%,
+      transparent calc(var(--halo-r) - 9vmin),
+      #000 var(--halo-r),
+      #000 calc(var(--halo-r) + 7vmin),
+      transparent calc(var(--halo-r) + 25vmin));
+}
+#observatory-starfield {
+  z-index: 2;
+  mix-blend-mode: screen;   /* composite stars over the cloud + halo below */
+}
+#observatory-globe {
+  z-index: 3;
+  touch-action: none;     /* the globe claims drags; page itself doesn't scroll */
+}
+body.globe-active { overflow: hidden; }
+body.globe-active #observatory-cloud,
+body.globe-active #observatory-halo,
+body.globe-active #observatory-starfield,
+body.globe-active #observatory-globe { display: block; }
+
+/* When the globe is active the list is hidden VISUALLY but kept in the
+   accessibility tree (keyboard + screen-reader path; the canvas is aria-hidden).
+   This is the sr-only clip pattern — not display:none, which would drop it. */
+body.globe-active .observatory-list {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── accessible list fallback ───────────────────────────────────────────────── */
+.observatory-list {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(72px, 12vh, 140px) clamp(20px, 6vw, 48px) clamp(64px, 12vh, 140px);
+}
+.observatory-list-title {
+  margin: 0 0 8px;
+  font-weight: 700;
+  font-size: clamp(32px, 6vw, 56px);
+  letter-spacing: -0.01em;
+}
+.observatory-list-intro {
+  margin: 0 0 clamp(32px, 6vw, 56px);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: clamp(16px, 1.8vw, 20px);
+}
+.observatory-list-items { list-style: none; margin: 0; padding: 0; }
+
+.observatory-list-link {
+  --accent: var(--color-white, #fff);
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.5vw, 20px);
+  padding: clamp(16px, 2.5vw, 22px) 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: inherit;
+  text-decoration: none;
+  transition: padding-left 0.2s ease, background 0.2s ease;
+}
+a.observatory-list-link:hover { padding-left: 14px; }
+
+.observatory-list-chip {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px -2px var(--accent);
+}
+.observatory-list-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.observatory-list-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.observatory-list-name {
+  font-size: clamp(19px, 2.4vw, 26px);
+  font-weight: 700;
+  line-height: 1.15;
+}
+.observatory-list-meta { font-size: 14px; color: rgba(255, 255, 255, 0.5); }
+
+.observatory-list-go {
+  margin-left: auto;
+  color: var(--accent);
+  font-size: 20px;
+  opacity: 0.7;
+}
+.observatory-list-soon {
+  margin-left: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+a.observatory-list-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── zoom control — draggable pill (ported beam-glow rim + liquid-glass body from
+      base.css/comet.css; tuned for this dark page) ──────────────────────────────── */
+/* Mobile (base): bottom-centre. Desktop: top-right, mirroring the cocoex wordmark
+   (top-left). Shown only with the globe; subtle until hovered/used. */
+.zoom-wrap {
+  position: fixed;
+  bottom: clamp(16px, 4vh, 28px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  display: none;
+  align-items: center;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+@media (min-width: 768px) {
+  .zoom-wrap {
+    top: clamp(16px, 3vw, 28px);   /* same vertical offset as .observatory-back */
+    bottom: auto;
+    left: auto;
+    right: clamp(16px, 3vw, 28px);
+    transform: none;
+  }
+}
+body.globe-active .zoom-wrap { display: flex; }
+.zoom-wrap:hover,
+.zoom-wrap:focus-within,
+.zoom-wrap:active { opacity: 1; }
+
+.zoom-pill {
+  position: relative;
+  width: clamp(84px, 11vw, 116px);
+  height: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50px;
+  cursor: pointer;
+  touch-action: pan-y;      /* horizontal drag is ours; vertical still scrolls */
+  user-select: none;
+  -webkit-user-select: none;
+}
+.zoom-thumb {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;     /* the pill handles the pointer */
+}
+.zoom-pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* ── @property + beam-glow rim (ported from base.css) ────────────────────────────── */
+@property --beam-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.beam-glow { position: relative; isolation: isolate; }
+.beam-glow::before,
+.beam-glow::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(from var(--beam-angle),
+    rgba(213, 77, 46, 0) 0deg,
+    #D54D2E 40deg, #D48348 60deg, #F8D86A 80deg,
+    #8CB07F 100deg, #5783A6 120deg, #5E47A1 140deg,
+    rgba(127, 73, 162, 0) 170deg,
+    transparent 360deg);
+  animation: beam-spin 5s linear infinite;
+}
+.beam-glow::before {
+  padding: 2px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  z-index: 1;
+}
+.beam-glow::after {
+  padding: 5px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  filter: blur(7px);
+  opacity: 0.55;
+  z-index: -1;
+}
+@keyframes beam-spin { to { --beam-angle: 360deg; } }
+
+/* ── liquid-glass body (ported from comet.css .pill-glass) ───────────────────────── */
+.pill-glass {
+  position: absolute;
+  inset: 0;
+  z-index: 0;               /* below the thumb */
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  background: conic-gradient(from var(--beam-angle),
+    #D54D2E, #D48348, #F8D86A, #8CB07F, #5783A6, #5E47A1, #7F49A2, #D54D2E);
+  animation: beam-spin 12s linear infinite;
+}
+.pill-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 45%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.72) 45%, rgba(255, 255, 255, 0.84) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.05);
+}
+.pill-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0.32;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 150px 150px;
+}
+
+/* Zoom pill: slope-y glass — brighter on the left, fading to the right (a direction
+   cue that replaces the dropped "in/out" labels). The 90deg layer rides on top of the
+   shared vertical frost. */
+.zoom-pill .pill-glass::before {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.45)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 45%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.72) 45%, rgba(255, 255, 255, 0.84) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beam-glow::before, .beam-glow::after, .pill-glass { animation: none; }
+}
+
+/* ── tile flip-card (tap a tile → flips to its black detail face) ─────────────────── */
+#observatory-flip {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.4s ease;
+}
+#observatory-flip[hidden] { display: none; }   /* hard-hide overrides the flex */
+#observatory-flip.is-open { background: rgba(0, 0, 0, 0.45); }
+
+/* The card is the GROW element (FLIP technique): it maps onto the source tile on open,
+   then releases to centre (it grows) while the inner shell turns — so it reads as the
+   tile itself flipping. ROUND 6: the final size is now set by JS PER OPEN, proportional
+   to the live on-screen tile (so the card "opens on the current zoom view" instead of a
+   fixed clamp that read as a detached big grow); the width below is only a pre-JS
+   fallback. The card stays opaque the whole time (only the backdrop fades). */
+.tile-flip-card {
+  width: 260px; /* fallback; observatory.js overrides per open (tile-proportional + floor) */
+  aspect-ratio: 1;
+  perspective: 1200px;
+  transform-origin: 50% 50%;
+  transition: transform 0.82s cubic-bezier(0.34, 1.56, 0.5, 1);
+}
+.tile-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  /* weighted back-out flip, matching the homepage orbit card (muse.css) */
+  transition: transform 0.82s cubic-bezier(0.34, 1.56, 0.5, 1);
+}
+#observatory-flip.is-open .tile-flip-inner { transform: rotateY(180deg); }
+
+.tile-flip-front,
+.tile-flip-back {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Safari backface-cull guard — a face is only culled with its own 3D transform (muse.css) */
+  transform: rotateY(0deg);
+}
+
+/* The popup/orbit feTurbulence film grain, shared by both faces. */
+.tile-flip-front::after,
+.tile-flip-back::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.18;           /* round 6: revert to the popup grain exactly (.muse-card-inside::after) */
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* front = the colour disc, identical to the tile (so the grow starts seamlessly) */
+.tile-flip-front {
+  background: var(--accent, #5783A6); /* fallback if color-mix unsupported */
+  background: radial-gradient(circle at 50% 38%,
+    var(--accent, #5783A6) 0%,
+    color-mix(in srgb, var(--accent, #5783A6) 70%, #000 30%) 100%);
+  box-shadow: 0 14px 50px rgba(0, 0, 0, 0.55);
+}
+.tile-flip-symbol {
+  position: relative;
+  z-index: 1;
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  /* engrave (dark below + light above + soft drop) — matches the orbit symbol */
+  filter:
+    drop-shadow(0 2px 1px rgba(0, 0, 0, 0.55))
+    drop-shadow(0 -1px 1px rgba(255, 255, 255, 0.35))
+    drop-shadow(0 6px 16px rgba(0, 0, 0, 0.35));
+}
+.tile-flip-front-label {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-canela);
+  font-weight: 700;
+  font-size: clamp(22px, 3.2vw, 32px);
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* front hero photo — mirrors the WebGL campaign tile (cover-fit + accent wash + label) so the
+   morph grows from the SAME image the tile shows (no disc↔photo swap on open). Round 8 / A. */
+.tile-flip-hero {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+}
+.tile-flip-hero-wash {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent, #5783A6);
+  opacity: 0.35;            /* matches tile-atlas.js HERO_TINT_ALPHA */
+}
+
+/* curved rim title (seal-style): the eyebrow runs along the inside top arc of the disc, freeing
+   the centre for the title + copy so nothing crosses the curve (round 8 / OBS-11). SVG textPath
+   built in observatory.js fillFlip(); font-size is set there (viewBox units → scales with card). */
+.tile-flip-rim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  overflow: visible;
+}
+.tile-flip-rim text {
+  font-family: var(--font-canela);
+  font-weight: 700;
+  letter-spacing: 0.45px;            /* viewBox units */
+  text-transform: uppercase;
+  fill: #fff;                        /* fallback if color-mix unsupported */
+  fill: color-mix(in srgb, var(--accent, #ffffff) 82%, #fff);
+}
+
+/* back = the orbit black CONCAVE disc (radial #1d1d1d→#000 + top sheen + inset shadows) —
+   copy held inside the inscribed square via generous padding so it never spills the curve. */
+.tile-flip-back {
+  transform: rotateY(180deg);
+  padding: clamp(28px, 13%, 58px);
+  text-align: center;
+  background:
+    radial-gradient(ellipse 90% 65% at 50% 20%, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0) 60%),
+    radial-gradient(circle at 50% 40%, #1d1d1d 0%, #000 100%);
+  box-shadow:
+    0 14px 50px rgba(0, 0, 0, 0.6),
+    inset 0 6px 16px rgba(0, 0, 0, 0.75),
+    inset 0 -4px 12px rgba(255, 255, 255, 0.05);
+}
+/* the grain vanishes under 'overlay' on black — screen blend so it reads (matches muse.css) */
+.tile-flip-back::after { mix-blend-mode: screen; opacity: 0.13; }
+
+.tile-flip-eyebrow {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent, #fff);
+}
+.tile-flip-name {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 8px;
+  font-family: var(--font-canela);
+  font-weight: 700;
+  font-size: clamp(18px, 2.6vw, 24px);
+  line-height: 1.08;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: #fff; /* fallback if color-mix unsupported */
+  color: color-mix(in srgb, var(--accent, #ffffff) 78%, #fff); /* muse hue, lifted for AA on black */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.tile-flip-desc {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 14px;
+  font-size: clamp(12px, 1.4vw, 14px);
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.72);
+  /* safety: a long summary can't overflow the disc's curve */
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tile-flip-action {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  padding: 7px 16px;
+  border: 1px solid var(--accent, #fff);
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+a.tile-flip-action:hover { background: var(--accent, #fff); color: #000; }
+.tile-flip-action--inert { opacity: 0.5; }
+
+/* While a flip is open, HIDE the globe entirely (opacity 0, was 0.22) so the real WebGL
+   tile can never show beside/behind the DOM card — the card + tile must read as ONE
+   object as it grows and shrinks (round 4: a screenshot showed two discs on close). The
+   backdrop layers stay faintly lit so the card sits in its atmosphere, not a black void. */
+body.flip-open #observatory-globe { opacity: 0; }
+body.flip-open #observatory-starfield,
+body.flip-open #observatory-cloud,
+body.flip-open #observatory-halo { opacity: 0.22; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-flip-card,
+  .tile-flip-inner { transition: none; }
+}
