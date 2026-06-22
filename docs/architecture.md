@@ -43,6 +43,10 @@ machine-readable facts; the markdown body = the narrative prose. Cause + colour 
 **dumb on purpose**: it emits the *complete* list and does no sampling or filtering —
 that is the client's job (layer 3). Markdown never reaches the browser.
 
+Identity is derived from the filename (decision D-1/D-2); validation is warn-only
+(`validateCampaign`, D-3) except the draft gate; the emitted shape is the `CampaignIndex`
+typedef and is pinned by `npm test` (`build.test.mjs`) so refactors can't silently change it.
+
 ### Layer 3 — Selection (the scaling engine) — *not yet built*
 
 A client-side module that sits between `campaigns.json` and the views:

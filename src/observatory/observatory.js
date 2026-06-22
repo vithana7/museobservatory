@@ -68,7 +68,7 @@ function buildItems(campaigns) {
     cause: c.cause,
     summary: c.summary,
     hex: c.hex,
-    hero: c.hero ? `/${c.hero}` : null,
+    hero: c.hero || null, // campaigns.json carries the root-absolute /assets/images/<slug>/<file> path (D-4)
     url: c.url,
     hasPage: c.hasPage,
     type: c.type,

@@ -7,9 +7,9 @@
 
 Foundation first; art last. Each step is verifiable before the next.
 
-1. **Schema (layer 1).** Migrate `location` to structured geo (A-1) in the 2 real
-   campaigns; update `build.mjs` to emit it; update `TEMPLATE.md` to guide Memo.
-   Fold in the hero fix (downscaled `heroes/` images) while touching frontmatter.
+1. **Data foundation (layer 1–2).** Close the schema + backend contract — the plan below.
+   *(Identity, validation, location-list, and asset convention are already done;
+   what remains is the asset fix, tests, and downscaling.)*
 2. **Selection layer (layer 3).** Build + test the client module: session-random sample,
    ANDed filters (muse/type/geo/status), sparse-set guard. Pure logic — unit-testable,
    no WebGL. *This is the scaling foundation.*
@@ -45,9 +45,30 @@ Confirm we don't want to auto-derive `display` from the structured fields.
 accessible list"). It's a primitive precursor to layer-3 sampling. Decide whether the
 selection layer subsumes it or keeps it.
 
-## Known issues / publish blockers
+## Data-foundation plan (closing the schema + backend tasks)
 
-Tracked in [archive/website-audit.md](archive/website-audit.md) (stable IDs OBS-1…13).
-The live publish blockers: **OBS-1/2/3** — the 70 MB footage folder + a 19 MB hero PNG +
-junk files shipping into `dist/`. Fix folds into build step 1 (heroes → downscaled
-`heroes/` dir; keep raw footage out of `public/`).
+Priority = correctness + safety. Stack stays hand-rolled: **no SSG, no zod, no TS** — the
+bespoke `build.mjs` is the right size for this site (evaluated + rejected alternatives).
+Only additions: `node:test` (no dep), a JSDoc typedef (no dep), and `sharp` (devDep, staged).
+
+**P0 — ship-blockers & correctness — DONE (2026-06-22)**
+- **P0.1 ✓ Asset contract reconciled (D-4).** Heroes moved to `public/assets/images/<slug>/`;
+  `build.mjs` resolves + existence-checks there and emits root-absolute `/assets/images/…`.
+- **P0.2 ✓ Raw footage gone.** `comet-collabs/` tree removed; referenced heroes downscaled.
+  `dist/` 76 MB → 8.2 MB (OBS-1/2/3 cleared).
+- **P0.3 ✓ Draft gate hardened.** Stateless `hasConfirmMarker()` for detection; `CONFIRM_RE`
+  `/g` kept only for the `marked` highlight. The one fail-closed gate (C1) can't drift.
+
+**P1 — safety net & tests — DONE (2026-06-22)**
+- **P1.1 ✓ `node:test` coverage** (`build.test.mjs`, `npm test`, no deps) — identity, draft
+  gate, muse join, location normalization, `hasPage`, and the exact `campaigns.json` keys.
+- **P1.2 ✓ Validation consolidated** into `validateCampaign()`; hero check fixed; duplicate-
+  slug guard added. Warn-only (D-3).
+- **P1.3 ✓ JSDoc `@typedef CampaignIndex`** next to the emit — no toolchain.
+
+**P2 — scale (after the foundation is locked)**
+- **P2.1 Automate hero downscaling with `sharp`** (build/prepare step) so authors can't ship
+  full-res by hand. *(M)*
+- **P2.2 Structured-geo (A-1)** — deferred; build only when filters need per-place facets.
+
+Full audit history: [archive/website-audit.md](archive/website-audit.md) (OBS-1…13).

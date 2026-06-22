@@ -23,11 +23,16 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(HERE, '../..');
 const CONTENT_DIR = path.join(ROOT, 'content/campaigns');
 const TOKENS_CSS = path.join(ROOT, 'src/styles/tokens.css');
+// Vite serves public/ at the domain root, so assets live under public/assets/images/
+// and are referenced at runtime as root-absolute /assets/images/<slug>/<file> (D-4).
+const PUBLIC_DIR = path.join(ROOT, 'public');
+const ASSETS_DIR = path.join(PUBLIC_DIR, 'assets/images');
 
 const MUSE_SLUGS = MUSES.map((m) => m.name.toLowerCase());
 
 // ── muse join (cause from MUSES, hex from tokens.css) ───────────────────────
-async function buildMuseMap() {
+// Exported for tests (lets a test build the same muse map the pipeline uses).
+export async function buildMuseMap() {
   const css = await fs.readFile(TOKENS_CSS, 'utf8');
   const map = {};
   for (const muse of MUSES) {
@@ -58,6 +63,19 @@ function isBlank(v) {
   return false;
 }
 
+// location is authored as a YAML list (one entry per place). Normalise to a clean
+// array + a " · "-joined display string. Tolerates a legacy single string (wraps it)
+// so old files don't break — warned about elsewhere if we want to nudge migration.
+const LOCATION_SEP = ' · ';
+function normalizeLocations(value) {
+  if (isBlank(value)) return { locations: [], display: null };
+  const list = (Array.isArray(value) ? value : [value])
+    .map((v) => (v == null ? '' : String(v).trim()))
+    .filter(Boolean);
+  if (!list.length) return { locations: [], display: null };
+  return { locations: list, display: list.join(LOCATION_SEP) };
+}
+
 // A body counts as "real content" once the HTML comments are stripped and
 // something remains (the upcoming stubs are comment-only → tile-only).
 function hasRealBody(markdownBody) {
@@ -83,46 +101,139 @@ function summarize(markdownBody, maxLen = 220) {
   return null;
 }
 
+// `[confirm]` / `[confirm: note]` markers flag an unfinished record (draft gate, C1).
+// Two regexes, deliberately separate:
+//   • CONFIRM_RE (/g) is for the marked highlight-replacement, which iterates matches and
+//     legitimately depends on the global flag (and mutates lastIndex while doing so).
+//   • hasConfirmMarker() is the DETECTION path: a fresh non-global regex per call so draft
+//     detection never reads or mutates shared regex state (stateless, can't drift).
 const CONFIRM_RE = /\[confirm:?([^\]]*)\]/gi;
+function hasConfirmMarker(text) {
+  return /\[confirm:?[^\]]*\]/i.test(text);
+}
+
+// ── filename is the authority for identity ──────────────────────────────────
+// Convention: TYPE + zero-padded number, e.g. STARDUST001.md, HORIZON002.md.
+// From the filename we derive type, number, and slug (the URL). type/number/slug
+// in frontmatter are redundant — warned about and ignored (filename always wins).
+const FILENAME_RE = /^(STARDUST|HORIZON)(\d{3})\.md$/;
+
+// → { type, number, slug } or null when the filename doesn't match the convention.
+function identityFromFilename(filename) {
+  const m = filename.match(FILENAME_RE);
+  if (!m) return null;
+  return {
+    type: m[1].toLowerCase(),          // STARDUST → stardust
+    number: parseInt(m[2], 10),        // "001" → 1
+    slug: filename.replace(/\.md$/, '').toLowerCase(), // STARDUST001 → stardust001 (the URL)
+  };
+}
+
+// ── validation (warn-only; never fails the build — D-3) ──────────────────────
+// All the per-campaign checks live here so the warning surface is in one place. The
+// build always completes; warnings are a to-fix checklist for the author, not a gate.
+// (Drafts are the one hard gate and are handled in parseCampaign, not here.)
+// `id` is identityFromFilename()'s result (null when off-pattern); `pageWorthy`/`museSlug`
+// are already-derived values so this never re-derives identity.
+function validateCampaign({ filename, meta, id, pageWorthy, museSlug }, warn) {
+  // Off-pattern filename → identity degraded to the basename.
+  if (!id) {
+    warn(`${filename}: filename doesn't match TYPE+NNN (e.g. STARDUST001.md) — identity degraded.`);
+  }
+  // Redundant identity fields in frontmatter: filename wins, nudge to remove.
+  for (const field of ['type', 'number', 'slug']) {
+    if (meta[field] != null && meta[field] !== '') {
+      warn(`${filename}: redundant frontmatter "${field}: ${meta[field]}" — derived from filename now, remove it.`);
+    }
+  }
+  // Unknown muse → treated as muse-less (neutral tile).
+  if (museSlug && !MUSE_SLUGS.includes(museSlug)) {
+    warn(`${filename}: unknown muse "${meta.muse}" — treated as muse-less.`);
+  }
+  // Page-worthy record with no title.
+  if (pageWorthy && isBlank(meta.title)) {
+    warn(`${filename}: page-worthy but missing "title".`);
+  }
+  // Unknown status.
+  if (!isBlank(meta.status) && !(meta.status in STATUS_ORDER)) {
+    warn(`${filename}: unknown status "${meta.status}" — expected ongoing | upcoming | closed.`);
+  }
+  // location authored as a bare string (tolerated, wrapped) instead of a YAML list (D-5).
+  if (meta.location != null && !Array.isArray(meta.location) && !isBlank(meta.location)) {
+    warn(`${filename}: "location" should be a YAML list (one entry per place) — got a string.`);
+  }
+}
+
+/**
+ * One record in `campaigns.json` — the lean index every surface (globe / grid /
+ * record pages / future ticker) consumes. Built by parseCampaign; emitted verbatim.
+ * @typedef {Object} CampaignIndex
+ * @property {string}   slug      Lowercased filename, also the URL path (D-1/D-2). e.g. "stardust001".
+ * @property {string|null} type   "stardust" | "horizon" (from filename); null if off-pattern.
+ * @property {number|null} number Parsed campaign number (from filename); null if off-pattern.
+ * @property {string|null} title  Frontmatter title.
+ * @property {string|null} muse   Muse slug if known, else null (unknown/blank → muse-less).
+ * @property {string|null} cause  Cause derived from the muse (MUSES map); null if muse-less.
+ * @property {string|null} hex    Brand hex derived from the muse (tokens.css); null if muse-less.
+ * @property {string|null} status "ongoing" | "upcoming" | "closed".
+ * @property {(number|string|null)} year Campaign year.
+ * @property {string[]}  locations The real place list (for filter/count later); [] if none.
+ * @property {string|null} location " · "-joined display string of `locations`; null if none.
+ * @property {string|null} hero    Root-absolute /assets/images/<slug>/<file>; null → muse-colour placeholder.
+ * @property {string|null} summary First prose paragraph, capped; null if no prose.
+ * @property {boolean}   hasPage   true → a record page exists at `url`; false → tile-only.
+ * @property {(true|undefined)} draft    true only when a page-worthy record is a held-back draft.
+ * @property {(true|undefined)} filler   true → globe-only density tile, skipped in the accessible list.
+ * @property {string|null} url     "/<slug>/" when hasPage; null otherwise.
+ */
 
 // ── parse one campaign file ─────────────────────────────────────────────────
-function parseCampaign(raw, filename, museMap) {
+// Exported for tests; the pipeline (generateObservatory) is the normal caller.
+export function parseCampaign(raw, filename, museMap, warn) {
   const { data: fm, content: body } = matter(raw);
   const meta = normalize(fm);
 
+  // Identity comes from the filename, never frontmatter. A non-matching filename
+  // still parses (warn, don't fail) by falling back to the basename as the slug.
+  const id = identityFromFilename(filename);
+  const type = id ? id.type : (meta.type || null);
+  const number = id ? id.number : (typeof meta.number === 'number' ? meta.number : null);
+  const slug = id ? id.slug : filename.replace(/\.md$/, '').toLowerCase();
+
   const museSlug = meta.muse ? String(meta.muse).toLowerCase() : null;
-  if (museSlug && !MUSE_SLUGS.includes(museSlug)) {
-    console.warn(`[observatory] ${filename}: unknown muse "${meta.muse}" — treated as muse-less.`);
-  }
   const joined = museSlug && MUSE_SLUGS.includes(museSlug) ? museMap[museSlug] : null;
 
   const pageWorthy = meta.page !== false && hasRealBody(body);
   // C1: a record carrying unresolved [confirm] markers is a DRAFT — previewable
   // in dev, but never written to dist and never linked from the index.
-  const draft = meta.draft === true || CONFIRM_RE.test(raw);
-  CONFIRM_RE.lastIndex = 0;
+  const draft = meta.draft === true || hasConfirmMarker(raw);
 
-  const slug = meta.slug || filename.replace(/\.md$/, '');
   const hasPage = pageWorthy && !draft;
 
-  // Index record (campaigns.json) — the lean subset every surface needs.
+  // All per-campaign warnings funnel through one place (warn-only — D-3).
+  validateCampaign({ filename, meta, id, pageWorthy, museSlug }, warn);
+
+  const { locations, display: locationDisplay } = normalizeLocations(meta.location);
+
+  /** @type {CampaignIndex} — the lean subset every surface needs. */
   const index = {
     slug,
-    type: meta.type || null,
-    number: typeof meta.number === 'number' ? meta.number : null,
+    type,
+    number,
     title: meta.title || null,
     muse: museSlug && MUSE_SLUGS.includes(museSlug) ? museSlug : null,
     cause: joined ? joined.cause : null,
     hex: joined ? joined.hex : null,
     status: meta.status || null,
     year: isBlank(meta.year) ? null : meta.year,
-    location: isBlank(meta.location) ? null : meta.location,
-    // hero: a bare filename resolves under assets/images/campaigns/; a value containing a
-    // "/" is treated as a path under assets/images/ (so footage can live in its own folder,
-    // e.g. comet-collabs/campaign-footage/Horizon001/DJI_0537-1024x768.jpg).
-    hero: isBlank(meta.hero)
-      ? null
-      : (meta.hero.includes('/') ? `assets/images/${meta.hero}` : `assets/images/campaigns/${meta.hero}`),
+    // locations = the real list (filter/count later); location = " · "-joined display
+    // string so views drop it in directly without re-implementing the join.
+    locations,
+    location: locationDisplay,
+    // hero: a bare filename, resolved into the campaign's own folder (named the slug).
+    // Emitted root-absolute (/assets/images/<slug>/<hero>) — public/ is served at the
+    // domain root by Vite, matching how logowhite.png/muse symbols are referenced (D-4).
+    hero: isBlank(meta.hero) ? null : `/assets/images/${slug}/${meta.hero}`,
     summary: summarize(body),
     hasPage,
     draft: pageWorthy && draft ? true : undefined,
@@ -133,7 +244,7 @@ function parseCampaign(raw, filename, museMap) {
     url: hasPage ? `/${slug}/` : null,
   };
 
-  return { slug, meta, body, pageWorthy, draft, joined, index };
+  return { filename, slug, meta, body, pageWorthy, draft, joined, index };
 }
 
 // Sort: ongoing → upcoming → closed, then type, then number.
@@ -157,10 +268,45 @@ export async function generateObservatory({ includeDrafts = false } = {}) {
     .filter((f) => f.endsWith('.md') && f !== 'TEMPLATE.md')
     .sort();
 
+  const warnings = [];
+  const warn = (msg) => warnings.push(msg);
+
   const parsed = [];
   for (const file of files) {
     const raw = await fs.readFile(path.join(CONTENT_DIR, file), 'utf8');
-    parsed.push(parseCampaign(raw, file, museMap));
+    parsed.push(parseCampaign(raw, file, museMap, warn));
+  }
+
+  // Cross-campaign + filesystem checks (warn-only — D-3). Per-file checks already
+  // ran in validateCampaign(); these need the whole set or disk access.
+
+  // Duplicate-slug guard: two files producing the same slug would collide in the
+  // index + on disk (one record page overwrites the other) — silent data loss.
+  const seen = new Map();
+  for (const p of parsed) {
+    if (seen.has(p.slug)) {
+      warn(`${p.slug}: duplicate slug — "${p.filename}" and "${seen.get(p.slug)}" both resolve to /${p.slug}/.`);
+    } else {
+      seen.set(p.slug, p.filename);
+    }
+  }
+
+  // Hero existence check: a set hero pointing at a missing file would render a
+  // broken <img> at runtime with no other signal. Resolved under public/assets/images/
+  // <slug>/ (D-4) — the same folder the emitted /assets/images/<slug>/<file> URL maps to.
+  for (const p of parsed) {
+    if (isBlank(p.meta.hero)) continue;
+    const rel = `${p.slug}/${p.meta.hero}`;
+    try {
+      await fs.access(path.join(ASSETS_DIR, rel));
+    } catch {
+      warn(`${p.slug}: hero "${p.meta.hero}" not found at public/assets/images/${rel}.`);
+    }
+  }
+
+  if (warnings.length) {
+    console.warn(`\n[observatory] ${warnings.length} warning(s):`);
+    for (const w of warnings) console.warn(`  • ${w}`);
   }
 
   const index = parsed.map((p) => p.index).sort(sortCampaigns);

@@ -5,6 +5,58 @@
 > first. Earlier per-round build decisions live in
 > [archive/build-history.md](archive/build-history.md).
 
+## 2026-06-22 — Data/backend hardening (Memo + Claude)
+
+Making the content pipeline rock-solid for CRUD before any selection/view work.
+
+- **D-1 · Filename is the identity authority.** `type`, `number`, `slug` are derived
+  from the filename (`STARDUST001.md` → `stardust` / `1` / `stardust001`), never authored
+  in frontmatter. Pattern: `(STARDUST|HORIZON)\d{3}`.
+  *Why:* identity lived in three places (filename + frontmatter `slug` + the number/type
+  re-encoded in the filename) with nothing enforcing agreement — a silent-drift footgun.
+  One authority means rename-the-file is the *only* way to retype/renumber, and the URL
+  moves with it automatically.
+  *Apply:* new campaigns are named `TYPE+NNN.md`; never add `type`/`number`/`slug` to
+  frontmatter (the build warns + ignores if you do).
+
+- **D-2 · URL = lowercased filename.** `STARDUST001.md` serves at `/stardust001/`. The
+  human-readable tail (`-cantine-volpi`) is dropped from the slug.
+  *Why:* the slug must be 100% derivable from the filename with zero sync; a free-text tail
+  reintroduces a second editable field. Uppercase on disk reads as a clear ID; lowercase
+  URL stays web-conventional.
+  *Apply:* the old `/stardust-001-cantine-volpi/` form is gone. No redirects built — the
+  site isn't live yet, so there are no inbound links to preserve. Add redirects only if we
+  ever rename a *published* slug.
+
+- **D-4 · Assets live in `public/assets/images/<slug>/`; footage originals stay out.**
+  Web-sized images served at `/assets/images/<slug>/<file>`; `hero` is a bare filename
+  resolved there. Full-res originals are **not** committed or shipped.
+  *Why:* the slug already names the campaign — making it the folder name removes the only
+  remaining path-sync footgun, and `public/` is what Vite serves at root. The 70 MB of
+  full-res footage currently in `public/` is placeholder material and the live publish
+  blocker (OBS-1/2/3); shipping downscaled web images keeps `dist/` small.
+  *Apply:* move referenced heroes into `public/assets/images/<slug>/`; downscale before
+  they land; keep raw originals in a separate store, never the repo. Build resolves +
+  existence-checks under `public/assets/images/<slug>/`.
+
+- **D-5 · `location` is a list; build emits array + joined display.** Authored as a YAML
+  list (one entry per place); `campaigns.json` carries `locations: [...]` and a `" · "`
+  joined `location` string.
+  *Why:* multi-place events (HORIZON002: Berlin·Krefeld·Salzburg·Tortona) can't live in one
+  freeform string and still be counted/filtered. The array is the truth; the display string
+  spares every view from re-joining.
+  *Apply:* always a list, even for one place. A bare string is tolerated (wrapped) but warns.
+  This is the *list* shape; the per-place *structured-geo* upgrade (A-1) is still deferred.
+
+- **D-3 · Validation warns, never fails (drafts excepted).** Off-pattern filename, unknown
+  muse/status, missing hero file, redundant identity fields, page-worthy-without-title →
+  grouped warnings at build end; the build still completes.
+  *Why:* Memo previews work-in-progress constantly; a hard fail would block iteration. The
+  warnings are a to-fix checklist, not a gate. The single hard gate stays the draft/
+  `[confirm]` rule (C1) — unfinished records never reach `dist/`.
+  *Apply:* don't promote these warnings to errors without Memo's call; if a strict CI gate
+  is ever wanted, add it as a separate `--strict` build flag, not the default.
+
 ## 2026-06-22 — Foundation review (Memo + Claude)
 
 Sparring session that re-validated the target, goal, and architecture before building

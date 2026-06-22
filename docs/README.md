@@ -19,6 +19,7 @@ The landing page is a WebGL globe; each record is a static, shareable article.
 ```bash
 ./dev.sh           # dev server (hot-reload) — for working
 ./dev.sh preview   # production build + preview — "what actually ships"
+npm test           # node:test — locks the build's campaigns.json output (no deps)
 ```
 
 ## Keeping docs fresh
