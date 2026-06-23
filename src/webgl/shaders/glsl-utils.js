@@ -62,6 +62,21 @@ export const STAR_FIELD = `
   }
 `;
 
+// Cheap ordered/triangular dither for fullscreen near-black gradients. The cosmic backdrop
+// outputs brightness values around 0.003–0.05 into an 8-bit RGBA backbuffer; Chrome dithers
+// it (smooth), Safari does NOT (visible banding that reads as grain). A hash-based triangular
+// dither in roughly [-0.5,0.5] LSB breaks the bands without reading as static. Apply as
+// `col += dither(gl_FragCoord.xy) / 255.0;` right before the final clamp/write. Keep it at
+// ~one 8-bit step — over-applying makes visible static (round 5 failure mode).
+export const DITHER = `
+  float dither(vec2 fragCoord) {
+    // triangular PDF noise: difference of two uniform hashes → values in ~[-0.5, 0.5]
+    float a = fract(sin(dot(fragCoord, vec2(127.1, 311.7))) * 43758.5453);
+    float b = fract(sin(dot(fragCoord + 17.0, vec2(269.5, 183.3))) * 43758.5453);
+    return (a + b) - 1.0;
+  }
+`;
+
 export const VERTEX_QUAD = `
   attribute vec2 a_position;
   void main() {

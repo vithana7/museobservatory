@@ -19,7 +19,7 @@ function inlineCss() {
   return `${tokens}\n${record}`;
 }
 
-const esc = (s) =>
+export const esc = (s) =>
   String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const blank = (v) => v == null || v === '';

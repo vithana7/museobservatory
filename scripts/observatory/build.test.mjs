@@ -10,7 +10,26 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCampaign, buildMuseMap, generateObservatory } from './build.mjs';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { parseCampaign, buildMuseMap, generateObservatory, ROOT } from './build.mjs';
+
+// generateObservatory reads real content/campaigns/ — to exercise the page render
+// (marked → DOMPurify → [confirm] highlight) on a controlled body, drop a temp .md file
+// in, build with includeDrafts (so a [confirm] draft is rendered too), grab its page,
+// then remove the fixture. Slug well outside the real number range to avoid any clash.
+const CONTENT_DIR = path.join(ROOT, 'content/campaigns');
+async function renderBodyPage(body, filename = 'STARDUST900.md') {
+  const file = path.join(CONTENT_DIR, filename);
+  await fs.writeFile(file, `---\ntitle: Sanitize Fixture\n---\n${body}`);
+  try {
+    const { pages } = await generateObservatory({ includeDrafts: true });
+    const slug = filename.replace(/\.md$/, '').toLowerCase();
+    return pages.find((p) => p.slug === slug)?.html ?? '';
+  } finally {
+    await fs.rm(file, { force: true });
+  }
+}
 
 // A real muse map (cause from MUSES, hex from tokens.css) so the join is tested for real.
 const museMap = await buildMuseMap();
@@ -171,6 +190,27 @@ test('hasPage: real prose body → page-worthy with a url', () => {
 test('hasPage: page:false forces tile-only even with prose', () => {
   const { index } = parse(md('title: A\npage: false', '## Body\nprose'), 'STARDUST001.md');
   assert.equal(index.hasPage, false);
+});
+
+// ── (g) markdown body is sanitized (DOMPurify) + [confirm] note is escaped ───────
+test('sanitize: a <script> in the body is stripped from the rendered page', async () => {
+  const html = await renderBodyPage('## Body\n\n<script>alert(1)</script>\n\nsafe prose');
+  assert.ok(!html.includes('<script'), 'script tag must be removed by DOMPurify');
+});
+
+test('sanitize: [confirm:<b>x</b>] renders with the note escaped inside the mark', async () => {
+  const html = await renderBodyPage('## Body\n\nfact: [confirm:<b>x</b>]');
+  // the angle brackets in the note are HTML-escaped …
+  assert.ok(html.includes('&lt;b&gt;x&lt;/b&gt;'), 'confirm note angle brackets must be escaped');
+  // … and never appear as a literal live tag inside the confirm mark.
+  assert.ok(!/<mark class="confirm">\[confirm:<b>/.test(html), 'no live <b> tag in the confirm mark');
+});
+
+test('sanitize: a normal markdown body still yields expected tags', async () => {
+  const html = await renderBodyPage('## A Heading\n\nsome **bold** prose.');
+  assert.ok(html.includes('<h2'), 'heading survives');
+  assert.ok(html.includes('<p>'), 'paragraph survives');
+  assert.ok(html.includes('<strong>'), 'bold survives');
 });
 
 // ── pipeline smoke: real content builds + every record matches the typedef keys ─

@@ -51,6 +51,15 @@
         <span id="observatory-zoom-thumb" class="zoom-thumb" aria-hidden="true"></span>
       </div>
     </div>
+
+    <!-- Globe ↔ list view toggle (G-C): switch to the accessible list as a sighted peer.
+         Naturally absent in reduced-motion / no-WebGL2 mode (the whole rail is hidden
+         until .globe-active, which only the globe path adds). -->
+    <button id="observatory-view-toggle" class="view-pill beam-glow" type="button"
+            aria-pressed="false" aria-label="Toggle list view">
+      <span class="pill-glass" aria-hidden="true"></span>
+      <span class="view-pill-label">List</span>
+    </button>
   </div>
 
   <!-- Tile flip-card: tap a tile → it flips to its details (name + cause + description) -->

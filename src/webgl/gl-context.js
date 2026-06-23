@@ -44,8 +44,13 @@ export function bindFullscreenQuad(gl, program) {
     new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
     gl.STATIC_DRAW
   );
-  gl.enableVertexAttribArray(loc);
-  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  // getAttribLocation returns -1 when `a_position` is optimized out (e.g. an unused
+  // attribute in a stripped shader); enableVertexAttribArray(-1)/vertexAttribPointer(-1,…)
+  // throw INVALID_VALUE. Skip the wiring in that case — the buffer is still bound.
+  if (loc !== -1) {
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  }
   return buffer;
 }
 

@@ -14,7 +14,7 @@ import './observatory.css';
 import { Globe } from './globe.js';
 import { createStarfield } from '../webgl/starfield.js';
 import { createIntroStarfield } from '../webgl/intro-starfield.js';
-import { CAMPAIGN_CAP, makeSeed, sample, filterCampaigns } from './selection.js';
+import { CAMPAIGN_CAP, makeSeed, sample, filterCampaigns, applySparseGuard } from './selection.js';
 
 const CAMPAIGNS_URL = '/campaigns.json';
 
@@ -143,6 +143,7 @@ function maybeInitGlobe(landing, allCampaigns) {
   initZoomControl(globe);
   initFlip(canvas, globe);
   initFilters(globe, allCampaigns);
+  initViewToggle(globe);
 
   // dev-only: ?flipdemo=N auto-opens the flip for items[N] (or the first hero campaign) after
   // settle, with a synthetic source rect — lets headless Chrome screenshot the OPEN END state
@@ -461,6 +462,41 @@ function initFlip(canvas, globe) {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFlip(); });
 }
 
+// ── globe ↔ list view toggle (G-C) ──────────────────────────────────────────────
+//    Switches the page between the WebGL globe and the accessible list as a first-class
+//    sighted peer. ONE source of truth (setListView) used by both the toggle button and
+//    the sparse-set guard (A-4, which force-shows the list when a filter matches too few).
+//    The button is found by id internally so apply() can call this without threading it.
+function setListView(on, globe) {
+  const btn = document.getElementById('observatory-view-toggle');
+  document.body.classList.toggle('list-view', on);
+  if (on) {
+    globe?.freeze();
+    if (btn) {
+      btn.setAttribute('aria-pressed', 'true');
+      const label = btn.querySelector('.view-pill-label');
+      if (label) label.textContent = 'Globe';
+    }
+  } else {
+    globe?.thaw();
+    // the canvas was display:none → re-measure on the way back (mirrors maybeInitGlobe).
+    globe?.resize();
+    if (btn) {
+      btn.setAttribute('aria-pressed', 'false');
+      const label = btn.querySelector('.view-pill-label');
+      if (label) label.textContent = 'List';
+    }
+  }
+}
+
+function initViewToggle(globe) {
+  const btn = document.getElementById('observatory-view-toggle');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    setListView(!document.body.classList.contains('list-view'), globe);
+  });
+}
+
 // ── filter control: a left-edge pill → a panel of facets that narrow the globe ──────
 //    No filter → the session-random sample (S-2 landing state). Any filter active →
 //    the TRUE matching set, capped at CAMPAIGN_CAP for the globe (S-2). The list always
@@ -549,6 +585,10 @@ function initFilters(globe, allCampaigns) {
     countEl.textContent = active ? `${matched.length} match${matched.length === 1 ? '' : 'es'}` : '';
     clearBtn.hidden = !active;
     wrap.classList.toggle('is-open', !panel.hidden);
+    // A-4: too few matches makes the globe repeat tiles + look broken — force the list
+    // (the agreed fallback is show-the-list, not pad the globe). We never forcibly switch
+    // BACK when matches are plentiful, so the user's chosen view is respected otherwise.
+    if (active && applySparseGuard(matched).sparse) setListView(true, globe);
   };
 
   panel.addEventListener('click', (e) => {

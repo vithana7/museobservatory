@@ -1,4 +1,4 @@
-import { SIMPLEX_NOISE, STAR_FIELD } from './glsl-utils.js';
+import { SIMPLEX_NOISE, STAR_FIELD, DITHER } from './glsl-utils.js';
 
 // Intro cosmic-noise starfield + a muse-spectrum "big bang" RIPPLE burst.
 // The pulse moment (u_pulse 0→1, fired when the constellation explodes) now drives a
@@ -15,6 +15,7 @@ export const INTRO_FRAG = `
 
   ${SIMPLEX_NOISE}
   ${STAR_FIELD}
+  ${DITHER}
 
   // Smooth palette across the 7 muse hues (Ares→Solis→Thunor→Rabu→Lunes→Shukra→Dosei).
   vec3 museTint(float t) {
@@ -82,6 +83,8 @@ export const INTRO_FRAG = `
       col += vec3(env * env * exp(-r * 3.0) * 0.12);
     }
 
+    // Ordered dither (one 8-bit LSB) to break Safari near-black banding before the 8-bit write.
+    col += dither(gl_FragCoord.xy) / 255.0;
     gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
   }
 `;
@@ -150,6 +153,7 @@ export const STARFIELD_FRAG = `
   uniform float u_intensity;
 
   ${STAR_FIELD}
+  ${DITHER}
 
   void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution.xy;
@@ -157,6 +161,8 @@ export const STARFIELD_FRAG = `
     float brightness = clamp(starLight * u_intensity, 0.0, 1.0);
     vec3 color = mix(u_bgColor, u_starColor, brightness);
     color = mix(color, vec3(1.0) - color, u_invert);
-    gl_FragColor = vec4(color, 1.0);
+    // Ordered dither (one 8-bit LSB) to break Safari near-black banding before the 8-bit write.
+    color += dither(gl_FragCoord.xy) / 255.0;
+    gl_FragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
   }
 `;

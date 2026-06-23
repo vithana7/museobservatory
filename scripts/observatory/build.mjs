@@ -16,8 +16,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import matter from 'gray-matter';
 import { marked } from 'marked';
+import DOMPurify from 'isomorphic-dompurify';
 import { MUSES } from '../../src/data.js';
-import { renderRecordPage } from './record-template.mjs';
+import { renderRecordPage, esc } from './record-template.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(HERE, '../..');
@@ -317,8 +318,12 @@ export async function generateObservatory({ includeDrafts = false } = {}) {
   for (const p of parsed) {
     if (!p.pageWorthy) continue;
     if (p.draft && !includeDrafts) continue;
-    const bodyHtml = String(marked.parse(p.body))
-      .replace(CONFIRM_RE, (_, t) => `<mark class="confirm">[confirm:${t}]</mark>`);
+    // Sanitize the markdown-rendered HTML (build-time, never shipped) so an authored
+    // body can't smuggle <script>/onclick/etc. into a static record page. DOMPurify's
+    // default profile already allows standard marked output (p, a, h1-6, lists, code,
+    // blockquote, …). THEN inject the [confirm] highlight with the note text ESCAPED.
+    const bodyHtml = DOMPurify.sanitize(String(marked.parse(p.body)))
+      .replace(CONFIRM_RE, (_, t) => `<mark class="confirm">[confirm:${esc(t)}]</mark>`);
     pages.push({ slug: p.slug, html: renderRecordPage({ meta: p.meta, joined: p.joined, bodyHtml, draft: p.draft }) });
   }
 

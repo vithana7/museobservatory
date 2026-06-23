@@ -58,7 +58,10 @@ body.observatory {
 }
 #observatory-cloud {
   z-index: 0;
-  filter: brightness(1.5) contrast(0.95) blur(2px);   /* lift the near-black nebula, but softly — blur smooths the grain */
+  /* Softened (brightness 1.5→1.25, blur 2px→3px) to reduce Safari near-black banding: the
+     big brightness lift stretched the tiny near-black values wide and exaggerated the bands;
+     more blur further smooths residual banding (the in-shader dither is the core fix). */
+  filter: brightness(1.25) contrast(0.95) blur(3px);
   opacity: 0.7;
 }
 /* Neutral cosmic atmosphere: a soft WHITE/grey glow ATTACHED to the globe's circumference.
@@ -110,6 +113,27 @@ body.globe-active .observatory-list {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* Sighted globe ↔ list toggle (G-C). When list-view is on we REVERSE the a11y clip
+   above (restore normal document flow + scrolling) and hide the globe + cosmic backdrop
+   so the list reads as the full view. The .filter-wrap rail stays reachable so the user
+   can switch back / keep filtering. */
+body.globe-active.list-view .observatory-list {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  padding: clamp(72px, 12vh, 140px) clamp(20px, 6vw, 48px) clamp(64px, 12vh, 140px);
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  white-space: normal;
+}
+body.list-view { overflow: auto; }
+body.globe-active.list-view #observatory-globe,
+body.globe-active.list-view #observatory-starfield,
+body.globe-active.list-view #observatory-cloud,
+body.globe-active.list-view #observatory-halo { display: none; }
 
 /* ── accessible list fallback ───────────────────────────────────────────────── */
 .observatory-list {
@@ -203,7 +227,7 @@ a.observatory-list-link:focus-visible {
   font-size: 13px;
   line-height: 1;
   font-weight: 700;
-  color: #111;
+  color: rgba(255, 255, 255, 0.85);   /* light −/+ glyphs read on the dark pill */
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
@@ -296,12 +320,15 @@ a.observatory-list-link:focus-visible {
   position: absolute;
   inset: 0;
   border-radius: inherit;
+  /* DARK glass frost: near-opaque charcoal layers keep the pill body dark (and mask the
+     muse-spectrum conic base below so it doesn't read as bright rainbow), with a faint top
+     light sheen for the glass look. The spinning beam-glow rim stays the brand colour. */
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 45%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.72) 45%, rgba(255, 255, 255, 0.84) 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 45%),
+    linear-gradient(180deg, rgba(28, 28, 30, 0.86) 0%, rgba(18, 18, 20, 0.78) 45%, rgba(26, 26, 28, 0.86) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    inset 0 -3px 6px rgba(0, 0, 0, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.35);
 }
 .pill-glass::after {
   content: "";
@@ -318,10 +345,12 @@ a.observatory-list-link:focus-visible {
    cue that replaces the dropped "in/out" labels). The 90deg layer rides on top of the
    shared vertical frost. */
 .zoom-pill .pill-glass::before {
+  /* Dark glass + a subtle left→right light slope (brighter sheen left, fading right) as the
+     direction cue, in the dark palette. */
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.45)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 45%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.72) 45%, rgba(255, 255, 255, 0.84) 100%);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 45%),
+    linear-gradient(180deg, rgba(28, 28, 30, 0.86) 0%, rgba(18, 18, 20, 0.78) 45%, rgba(26, 26, 28, 0.86) 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -381,9 +410,39 @@ body.globe-active .filter-wrap { display: flex; }
 .filter-pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .filter-pill .pill-glass { opacity: 0.85; }
 
+/* View toggle pill (G-C) — same glass/beam-glow look as the filter pill. */
+.view-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(84px, 11vw, 116px);   /* match the filter/zoom pill width */
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50px;
+  background: transparent;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  flex: none;
+}
+.view-pill-label {
+  position: relative;
+  z-index: 2;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.view-pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.view-pill .pill-glass { opacity: 0.85; }
+
 /* The panel opens to the RIGHT of the filter pill (anchored to its top edge) so it sticks
-   beside the pill rather than pushing the zoom down. White liquid-glass body to match the
-   pill aesthetic. Scrolls internally if the facet list ever outgrows the rail. */
+   beside the pill rather than pushing the zoom down. Dark liquid-glass body to match the
+   dark pill aesthetic. Scrolls internally if the facet list ever outgrows the rail. */
 .filter-panel {
   position: absolute;
   top: 0;
@@ -392,15 +451,16 @@ body.globe-active .filter-wrap { display: flex; }
   max-height: 80vh;
   overflow-y: auto;
   padding: 18px 18px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 18px;
+  /* Dark translucent glass to match the dark pills (was white liquid-glass). */
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.55), transparent 45%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.78) 45%, rgba(255, 255, 255, 0.88) 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 45%),
+    linear-gradient(180deg, rgba(22, 22, 24, 0.92) 0%, rgba(14, 14, 16, 0.86) 45%, rgba(20, 20, 22, 0.92) 100%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  color: #111;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #eee;
   display: flex;
   flex-direction: column;
 }
@@ -414,7 +474,7 @@ body.globe-active .filter-wrap { display: flex; }
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #555;
+  color: rgba(255, 255, 255, 0.55);
 }
 .filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .filter-chip {
@@ -424,18 +484,19 @@ body.globe-active .filter-wrap { display: flex; }
   padding: 4px 10px;
   font-size: 11px;
   line-height: 1.2;
-  color: #222;
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #eee;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50px;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
-.filter-chip:hover { background: rgba(0, 0, 0, 0.1); }
+.filter-chip:hover { background: rgba(255, 255, 255, 0.16); }
 .filter-chip[aria-pressed="true"] {
-  background: #111;
-  color: #fff;
-  border-color: #111;
+  /* INVERTED on the dark panel: a bright chip pops as the selected state. */
+  background: #fff;
+  color: #111;
+  border-color: #fff;
 }
 .filter-chip-dot {
   width: 8px;
@@ -448,23 +509,23 @@ body.globe-active .filter-wrap { display: flex; }
   width: 100%;
   padding: 6px 10px;
   font-size: 12px;
-  color: #111;
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #eee;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
 }
-.filter-geo::placeholder { color: rgba(0, 0, 0, 0.4); }
-.filter-geo:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+.filter-geo::placeholder { color: rgba(255, 255, 255, 0.4); }
+.filter-geo:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .filter-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 12px;
 }
-.filter-count { font-size: 11px; color: #555; }
+.filter-count { font-size: 11px; color: rgba(255, 255, 255, 0.55); }
 .filter-clear {
   font-size: 11px;
-  color: #111;
+  color: rgba(255, 255, 255, 0.9);
   background: none;
   border: none;
   text-decoration: underline;

@@ -402,6 +402,18 @@ export class Globe {
     cancelAnimationFrame(this.#rafId);
     if (this._onVis) document.removeEventListener('visibilitychange', this._onVis);
     this.control?.dispose();
+    // Release the GL resources we created (textures/buffers/program/VAO) so a disposed
+    // globe doesn't leak GPU memory. Window/document listener teardown is deliberately
+    // NOT built — no in-place re-init exists today (that's speculative SPA plumbing).
+    const gl = this.gl;
+    if (gl) {
+      gl.deleteTexture(this.tex);
+      gl.deleteTexture(this.noiseTex);
+      gl.deleteBuffer(this.instMatrixBuffer);
+      gl.deleteBuffer(this.instColorBuffer);
+      gl.deleteProgram(this.program);
+      gl.deleteVertexArray(this.vao);
+    }
   }
 
   resize() {

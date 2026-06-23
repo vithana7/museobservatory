@@ -5,6 +5,41 @@
 > first. Earlier per-round build decisions live in
 > [archive/build-history.md](archive/build-history.md).
 
+## 2026-06-23 — Hardening fixes: sparse guard, view toggle, build-time sanitize (Memo + Claude)
+
+Closing out the open A-4 / G-C questions and adding a build-time XSS guard.
+
+- **A-4 · Sparse-set fallback = show the LIST, never pad the globe.** When a filter matches
+  fewer than the threshold (`applySparseGuard`, default 6), the globe would repeat tiles and
+  look broken, so we force the list view instead. We do NOT pad with placeholder/muse tiles.
+  We also never forcibly switch BACK to the globe when matches are plentiful — the user's
+  chosen view is respected once they've toggled.
+  *Why:* padding fabricates archive entries that aren't real matches (dishonest); the list is
+  already the honest, complete view of the matched set, so falling back to it is truthful.
+  *Apply:* `observatory.js` `initFilters` `apply()` calls `setListView(true, globe)` when
+  `active && applySparseGuard(matched).sparse`. Detection stays in `selection.js`.
+
+- **G-C · Sighted globe ↔ list toggle built.** A third pill in the `.filter-wrap` rail
+  (`#observatory-view-toggle`) flips the page between the WebGL globe and the accessible
+  list as a first-class sighted peer. `body.list-view` reverses the a11y clip (restores
+  document flow + scroll) and hides the globe + cosmic backdrop; the rail stays reachable.
+  *Why:* the list was rendered + kept in sync but only reachable as an a11y-only clipped
+  sliver — the "first-class peer" decision (G-C) was half-done.
+  *Apply:* `setListView(on, globe)` is the ONE source of truth (freeze/thaw + resize on
+  return, aria-pressed + label swap); used by both the toggle and the A-4 fallback. The pill
+  is naturally absent in reduced-motion / no-WebGL2 mode (the rail is hidden until
+  `.globe-active`, only added on the globe path).
+
+- **SEC-1 · Build-time HTML sanitization (DOMPurify).** Markdown bodies are sanitized with
+  `isomorphic-dompurify` (default profile) AFTER `marked.parse` and BEFORE the `[confirm]`
+  highlight injection; the `[confirm]` note text is HTML-escaped. DOMPurify is a **devDep,
+  build-time only** — same model as `marked`/`gray-matter`, never shipped to the client.
+  *Why:* an authored markdown body could otherwise smuggle `<script>`/event handlers into a
+  static record page. Sanitizing at build keeps the client bundle parser-free.
+  *Apply:* `scripts/observatory/build.mjs` `generateObservatory()`; `esc` is now exported
+  from `record-template.mjs` and reused. Verified the parser/sanitizer don't leak into
+  `dist/assets/*.js`.
+
 ## 2026-06-22 — Selection layer (layer 3) built + wired (Memo + Claude)
 
 Locked while building + wiring the selection module (`src/observatory/selection.js`,
@@ -150,9 +185,9 @@ together.
   *Why:* layers 1–3 are device-independent pure logic; getting them solid + tested first
   means the visual layer can't destabilise the foundation.
 
-- **A-4 · Sparse-set guard (open detail).** Below ~6 filtered campaigns the globe repeats
-  them and looks broken. Rule TBD (present grid for that view, or pad with muse anchors).
-  *Status:* to finalise when building layer 3 — see [questions.md](questions.md).
+- **A-4 · Sparse-set guard.** Below ~6 filtered campaigns the globe repeats them and looks
+  broken. *Resolved 2026-06-23:* the fallback is **show the list, never pad** — see the
+  2026-06-23 section above.
 
 ### Tooling & hygiene
 

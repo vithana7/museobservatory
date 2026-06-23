@@ -9,17 +9,9 @@
 
 The module is **built + wired + tested** (see [frontend.md](frontend.md) and S-1/S-2/S-3
 in [decisions.md](decisions.md)). The cap/muses and filter↔sample questions are resolved
-(cap 42, muses moved into the filter; filter = the true set). What's still open:
-
-- **Q · Sparse-set guard (A-4).** Below ~6 matching campaigns the globe repeats tiles and
-  looks broken. `applySparseGuard()` *detects* it (threshold default 6) but the **fallback
-  is undecided** — present the grid for that view, or pad? The policy is stubbed behind the
-  one function so it can change without touching callers.
-
-- **Q · Sighted globe↔list toggle (G-C).** The list is rendered + kept in sync with the
-  filtered set, but while the globe is active it's CSS-clipped to an a11y-only sliver — a
-  sighted user can't switch to it. The "first-class peer" decision is half-done; the toggle
-  UI isn't built.
+(cap 42, muses moved into the filter; filter = the true set). A-4 (sparse-set fallback =
+show the list, never pad) and G-C (sighted globe↔list toggle) are now resolved + built —
+see the 2026-06-23 section in [decisions.md](decisions.md). What's still open:
 
 - **Q · The `filler` tile concept.** `build.mjs` still has a `filler` notion ("globe-only
   density tile, skipped in the accessible list") — a primitive precursor to layer-3
@@ -46,6 +38,7 @@ in [decisions.md](decisions.md)). The cap/muses and filter↔sample questions ar
   compile, then relies on `linkProgram` to fail — returns `null` correctly but double-logs.
   Tighten to bail on the first null shader. Smell, not a bug; see [frontend.md](frontend.md).
 
-- **Q · `dispose()` GL resource cleanup.** `dispose()` cancels the rAF and listeners but
-  doesn't `gl.delete*` textures/buffers. Harmless under full-page navigation; would matter
-  only if a future SPA re-inits the globe in-place.
+- **Q · `dispose()` listener teardown.** `dispose()` now `gl.delete*`s the textures/buffers/
+  program/VAO (done 2026-06-23). Window/document listener teardown (`initZoomControl`/
+  `initFilters`/`maybeInitGlobe`) is explicitly DEFERRED — no in-place re-init exists today,
+  so it's speculative SPA plumbing; build it only if a future SPA re-inits the globe in-place.
