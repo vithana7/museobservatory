@@ -21,6 +21,9 @@ The current spec lives in `docs/` — read it before changing anything:
 ./dev.sh preview   # production build + preview ("what actually ships")
 ```
 
+Deploys to GitHub Pages (`vithana7.github.io/museobservatory/`) via
+`.github/workflows/deploy.yml` on push to `main` — static `dist/`, no backend (DEPLOY-1).
+
 ## The 4-layer mental model
 
 ```

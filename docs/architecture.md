@@ -56,8 +56,8 @@ between `campaigns.json` and the views:
   shows a bounded subset ("you happen to be on these", not the whole archive).
 - **Filters** — `filterCampaigns(campaigns, { muse, type, geo, status })`, ANDed; returns
   the **true** matching set (not a re-sample). geo is a regex over all geo fields.
-- **Sparse-set guard** — `applySparseGuard(matches, threshold)`, detection-only for now
-  (the fallback policy is still open, A-4).
+- **Sparse-set guard** — `applySparseGuard(matches, threshold)`; on a sparse match the
+  filter forces the list view rather than padding the globe (A-4, resolved).
 
 It is wired in `observatory.js`: `boot()` samples the landing set, `initFilters()` builds
 the filter UI and swaps `globe.setItems()` + the list on every facet change. This is what
@@ -69,8 +69,9 @@ the locked semantics (S-1/S-2/S-3) in [decisions.md](decisions.md).
 - **Globe** (`src/observatory/globe.js` et al.) — WebGL2, ported from reactbits'
   InfiniteMenu. Renders whatever subset layer 3 hands it via `setItems`. The "wow" view.
 - **Grid/list** — the accessible, scannable peer. Rendered unconditionally and kept in
-  sync with the filtered set; still CSS-clipped to an a11y-only sliver while the globe is
-  active (no sighted globe↔list toggle yet — see [questions.md](questions.md)).
+  sync with the filtered set. A first-class sighted peer: the `.filter-wrap` rail has a
+  globe↔list toggle (`body.list-view`), and a sparse filter match auto-falls-back to it
+  (G-C / A-4, see [decisions.md](decisions.md)).
 - **Record pages** — generated static HTML, one per campaign.
 
 ## Data flow
@@ -141,6 +142,21 @@ session-random initially, filtered thereafter, capped at `CAMPAIGN_CAP = 42` (mu
 in the filter, not on the globe — S-1). The archive can grow to thousands while the globe
 stays a fixed ≤42-tile, fixed-cost render. This is why layer 3 is the foundation, not the
 globe.
+
+## Deployment — static output to GitHub Pages
+
+The build is static-output, so there is no runtime backend to host: `vite build` runs the
+markdown pipeline at build time and emits `dist/` (HTML/JS/CSS + `campaigns.json` + record
+pages). A GitHub Actions workflow (`.github/workflows/deploy.yml`) runs `npm ci` → `npm test`
+→ `npm run build` → deploys `dist/` to GitHub Pages on every push to `main`. The site lives
+at `vithana7.github.io/museobservatory/`.
+
+Because it deploys under a **project subpath**, Vite's `base` is conditional —
+`/museobservatory/` when the workflow sets `GITHUB_PAGES=1`, `/` for local dev and the
+custom domain. Paths Vite can't rewrite (they live in JSON/JS, not HTML) are re-rooted at
+runtime against `import.meta.env.BASE_URL`; the record-page template takes `base` threaded
+from the Vite plugin. See DEPLOY-1 in [decisions.md](decisions.md). (Enabling Pages itself is
+a repo-admin toggle, not in the repo.)
 
 ## What is NOT in scope (deliberately)
 

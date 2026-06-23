@@ -75,8 +75,9 @@ analogue of `build.test.mjs`). Three exports:
   geo is a case-insensitive **regex** over all geo fields (`geoFields()` collects
   `locations[]` + `location` + future structured `city`/`region`/`country`), with a
   literal-substring fallback when the pattern is invalid.
-- `applySparseGuard(matches, threshold = 6)` — detection only (`{ items, sparse, threshold }`);
-  the A-4 fallback policy is still open (see below).
+- `applySparseGuard(matches, threshold = 6)` — returns `{ items, sparse, threshold }`. The
+  A-4 fallback is **resolved**: when a filter match is sparse, `initFilters` `apply()` forces
+  the list view (`setListView(true, globe)`) — never pads the globe (decisions A-4, 2026-06-23).
 
 Wired in `observatory.js`: `boot()` samples the landing set and calls `maybeInitGlobe()`;
 `initFilters()` derives facet options from the live data, builds the filter UI, and on
@@ -89,32 +90,29 @@ See S-1/S-2/S-3 in [decisions.md](decisions.md): cap 42 (muses in the filter, no
 globe); filter = the true ANDed set, never a re-sample, single-select per group; geo regex;
 filter + zoom share one left rail with the panel opening to the right.
 
-### Still open
-
-- **Sparse-set guard (A-4):** below ~6 matches the globe repeats tiles and looks broken.
-  `applySparseGuard` *detects* it; the fallback (show the grid, or pad) is unfinalised.
-
-## The grid/list — first-class in code, second-class on screen
+## The grid/list — a first-class peer (globe ↔ list toggle built)
 
 `renderList()` (`observatory.js`) runs **unconditionally** on boot and emits real semantic
 markup: `<a href="/slug/">` for page-worthy campaigns, `<div>` for drafts. It is
-keyboard-reachable, screen-reader-sane, and now re-rendered with the filtered set so it
+keyboard-reachable, screen-reader-sane, and re-rendered with the filtered set so it
 mirrors the globe.
 
-**But there is still no visible way to switch to it while the globe is up.** When the globe
-is active the list is CSS-clipped to a 1px a11y-only sliver (`observatory.css`), kept in the
-accessibility tree but invisible to sighted users. The list becomes the real experience
-*only* when WebGL2 is unavailable or `prefers-reduced-motion` is set (`maybeInitGlobe`). So
-the decision to make it a first-class peer (G-C) is **half-done**: the code is there, the
-sighted globe↔list toggle UI is not.
+A third pill in the `.filter-wrap` rail (`#observatory-view-toggle`) now flips the page
+between the WebGL globe and the list as a first-class sighted peer (G-C, 2026-06-23).
+`body.list-view` reverses the a11y clip — restoring document flow + scroll — and hides the
+globe + cosmic backdrop while the rail stays reachable. `setListView(on, globe)` is the one
+source of truth (freeze/thaw + resize-on-return, aria-pressed + label swap) and is shared by
+both the toggle and the A-4 sparse fallback. When WebGL2 is unavailable or
+`prefers-reduced-motion` is set, the list is the experience and the rail (hence the toggle)
+is naturally absent (`maybeInitGlobe`).
 
 ## Navigation & UX — honest verdict
 
-**Improving.** The filters landed this session; the remaining gaps:
+**Solid.** Filters and the view toggle both landed; the remaining note:
 
-1. **No view toggle (globe ↔ list).** Sighted users on a modern browser still can't reach
-   the list view. Now the top remaining UX gap (filters are no longer the gap).
-2. **Filters now exist** (was the prior top blocker). A left-rail pill opens a facet panel
+1. **View toggle exists** (globe ↔ list, G-C). Sighted users on a modern browser can flip to
+   the list from the rail; the former top UX gap is closed.
+2. **Filters exist** (was the prior top blocker). A left-rail pill opens a facet panel
    (Muse / comet-collab / Status chips + a Place regex box); selecting a facet narrows the
    globe + list to the true matching set (S-2). Single-select per group with toggle-off.
 3. **Full-page navigation tears state.** Record pages are separate static HTML; clicking
@@ -134,10 +132,11 @@ source, both are overstated:
 
 - **The rAF loop already pauses when hidden.** `#frame` skips animate+render while
   `document.hidden` and only reschedules (`globe.js:365`); `dispose()` cancels the rAF and
-  removes the visibilitychange listener (`:400`). Under full-page navigation the browser
-  tears down the whole JS context anyway — **there is no cross-navigation leak.** The only
-  real (minor) gap: `dispose()` doesn't `gl.delete*` textures/buffers — irrelevant today,
-  would matter only in a future SPA that re-inits the globe in-place.
+  removes the visibilitychange listener. Under full-page navigation the browser
+  tears down the whole JS context anyway — **there is no cross-navigation leak.** `dispose()`
+  now also `gl.delete*`s the textures/buffers/program/VAO (done 2026-06-23); the only
+  remaining deferred item is window/document listener teardown, speculative SPA plumbing
+  since no in-place re-init exists today (see [questions.md](questions.md)).
 - **`createProgram` (`globe.js:32`) is a smell, not a crash.** If a shader fails to
   compile it skips the attach, then `linkProgram` fails and the function returns `null`
   (`:42`) — it does not silently link garbage. Worth tightening (bail on first null) but
@@ -145,23 +144,21 @@ source, both are overstated:
 
 ## Open questions (carry-overs)
 
-- **A-4 sparse-set guard:** threshold (~6?) and fallback (show grid, or pad). Detected by
-  `applySparseGuard`; policy unfinalised — see [questions.md](questions.md).
-- **Sighted globe↔list toggle:** the list is still a11y-only while the globe is up; G-C
-  (list as first-class peer) is half-done.
 - **Q3 `filler` tiles:** the build's `filler` notion vs. selection-layer sampling — does
   one subsume the other? (still open — see [questions.md](questions.md).)
+- **`createProgram` hardening / listener teardown:** minor smells, deferred — see
+  [questions.md](questions.md).
 
 ## What's done vs. next
 
-**Done (this session):** the selection layer is built, tested (`npm test` green), and wired
-— sample on landing, ANDed filters → true matching set, geo regex, single-select facets,
-muses moved off the globe into the filter, filter + zoom on one left rail. The old
-Milestone-1 "lock the selection layer" plan is complete; its decisions live in
-[decisions.md](decisions.md) (S-1/S-2/S-3).
+**Done:** the selection layer is built, tested (`npm test` green), and wired — sample on
+landing, ANDed filters → true matching set, geo regex, single-select facets, muses moved off
+the globe into the filter, filter + zoom on one left rail (S-1/S-2/S-3). The sighted
+globe↔list toggle (G-C) and the sparse fallback (A-4) are built; build-time HTML
+sanitization (SEC-1) and the Safari near-black dither (X-1) landed; GitHub Pages deploy with
+a subpath-safe `base` (DEPLOY-1) is wired. Decisions in [decisions.md](decisions.md).
 
 **Next (not yet built):**
-- A sighted **globe↔list view toggle** (close the G-C gap).
-- **Finalise the A-4 sparse-set fallback** (currently detection-only).
 - **Structured geo (A-1)** when filters need per-place facets — `geoFields()` already folds
   `city`/`region`/`country` in, so the regex matcher picks them up with no caller change.
+- **Q3 `filler` tiles:** decide whether layer-3 sampling subsumes the build's `filler` notion.

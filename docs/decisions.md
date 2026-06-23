@@ -40,6 +40,36 @@ Closing out the open A-4 / G-C questions and adding a build-time XSS guard.
   from `record-template.mjs` and reused. Verified the parser/sanitizer don't leak into
   `dist/assets/*.js`.
 
+- **X-1 · Cross-browser fix = in-shader ordered dither (not a CSS-only patch).** Safari
+  rendered the near-black cosmic backdrop visibly grainier/banded than Chrome. Root cause:
+  8-bit backbuffer banding in the near-black gradients (brightness ~0.003–0.05), which
+  Chrome dithers and Safari does not — amplified by the cloud's CSS `brightness()` lift and
+  stacked `mix-blend-mode`. Fix: a shared GLSL `DITHER` chunk adds ±1 LSB ordered dither
+  before the 8-bit write in `INTRO_FRAG`/`STARFIELD_FRAG`, and the cloud filter is softened
+  (`brightness(1.5→1.25)`, `blur(2→3px)`).
+  *Why:* the banding is a quantization artefact at the GPU write, so the durable fix lives in
+  the shader (device-independent), not in a per-browser CSS hack. The control system also
+  went dark-glass (filter/zoom/view pills + panel) so it reads on the dark backdrop.
+  *Apply:* `src/webgl/shaders/glsl-utils.js` exports `DITHER`; `intro-frag.js` applies it.
+  Verify in BOTH Safari (Memo eyeballs) and headless Chrome. This is a one-off cross-browser
+  correctness fix, NOT a reopening of the frozen globe device-polish (G-D still holds).
+
+- **DEPLOY-1 · GitHub Pages via Actions; base is conditional for the project subpath.** The
+  site deploys to `vithana7.github.io/museobservatory/` through a GitHub Actions workflow
+  (`.github/workflows/deploy.yml`: `npm ci` → `npm test` → `npm run build` → deploy `dist/`).
+  Vite `base` is `/museobservatory/` when `GITHUB_PAGES=1` (the workflow sets it) and `/`
+  otherwise (local dev + the custom domain).
+  *Why:* the build is static-output, so Pages needs no runtime — it serves `dist/`. A project
+  repo without a custom domain serves under `/<repo>/`, so a hardcoded `base:'/'` would 404
+  every asset; making it conditional keeps local dev and a future custom-domain move at root.
+  The `npm test` gate means a content/markdown change that breaks a test blocks the deploy
+  rather than shipping broken.
+  *Apply:* paths Vite can't rewrite (they live in JSON/JS, not HTML) are re-rooted at runtime
+  against `import.meta.env.BASE_URL` — `observatory.js` maps `campaigns.json` `url`/`hero`
+  via `withBase()`; the record-page template takes `base` (back-link + favicon) threaded from
+  the Vite plugin's `config.base`. **Enabling Pages itself (Settings → Pages → Source: GitHub
+  Actions) is an admin toggle, not in the repo** — a collaborator can't flip it.
+
 ## 2026-06-22 — Selection layer (layer 3) built + wired (Memo + Claude)
 
 Locked while building + wiring the selection module (`src/observatory/selection.js`,
