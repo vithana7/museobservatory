@@ -16,7 +16,13 @@ import { createStarfield } from '../webgl/starfield.js';
 import { createIntroStarfield } from '../webgl/intro-starfield.js';
 import { CAMPAIGN_CAP, makeSeed, sample, filterCampaigns, applySparseGuard } from './selection.js';
 
-const CAMPAIGNS_URL = '/campaigns.json';
+// BASE_URL is '/' in dev and '/museobservatory/' on the GitHub Pages subpath build (always
+// trailing-slashed). campaigns.json bakes root-absolute paths (/campaigns.json, /<slug>/,
+// /assets/...) which Vite's base can't rewrite (they live in JSON/JS, not HTML) — so we
+// re-root them at runtime against BASE_URL.
+const BASE = import.meta.env.BASE_URL;
+const withBase = (p) => (p ? BASE + p.replace(/^\//, '') : p);
+const CAMPAIGNS_URL = withBase('/campaigns.json');
 
 // Canonical muse hexes (from tokens.css). Hardcoded so the globe never depends on
 // getComputedStyle('--<muse>') resolving in time — on Safari the imported CSS var
@@ -41,6 +47,8 @@ async function boot() {
     const res = await fetch(CAMPAIGNS_URL, { cache: 'no-store' });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     campaigns = await res.json();
+    // Re-root the baked root-absolute paths onto BASE_URL (subpath-safe on GitHub Pages).
+    campaigns = campaigns.map((c) => ({ ...c, url: withBase(c.url), hero: withBase(c.hero) }));
   } catch (err) {
     console.error('[observatory] failed to load campaigns.json:', err);
     return; // the static list intro stays; nothing else to show

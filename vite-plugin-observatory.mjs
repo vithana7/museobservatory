@@ -19,6 +19,7 @@ const RECORD_CSS = path.join(HERE, 'src/observatory/record.css');
 export default function observatory() {
   let outDir = path.join(HERE, 'dist');
   let isBuild = false;
+  let base = '/';
 
   return {
     name: 'observatory',
@@ -26,6 +27,7 @@ export default function observatory() {
     configResolved(config) {
       outDir = path.resolve(config.root, config.build.outDir);
       isBuild = config.command === 'build';
+      base = config.base; // '/' in dev, '/museobservatory/' on the Pages subpath build
     },
 
     // ── dev: serve generated artifacts + live-reload on content edits ────────
@@ -50,7 +52,7 @@ export default function observatory() {
 
         let out;
         try {
-          out = await generateObservatory({ includeDrafts: true });
+          out = await generateObservatory({ includeDrafts: true, base });
         } catch (err) {
           res.statusCode = 500;
           res.setHeader('Content-Type', 'text/plain');
@@ -78,7 +80,7 @@ export default function observatory() {
     // ── build: write artifacts into dist/ ───────────────────────────────────
     async closeBundle() {
       if (!isBuild) return; // dev server also fires this hook — skip there
-      const out = await generateObservatory({ includeDrafts: false });
+      const out = await generateObservatory({ includeDrafts: false, base });
       await fs.mkdir(outDir, { recursive: true });
       await fs.writeFile(path.join(outDir, 'campaigns.json'), out.campaignsJson);
       for (const page of out.pages) {

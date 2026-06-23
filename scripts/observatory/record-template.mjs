@@ -73,10 +73,11 @@ function renderFacts(meta) {
 }
 
 /**
- * @param {{ meta: object, joined: {cause,hex}|null, bodyHtml: string, draft: boolean }} args
+ * @param {{ meta: object, joined: {cause,hex}|null, bodyHtml: string, draft: boolean, base?: string }} args
+ *        base = Vite's base path ('/' or '/museobservatory/'); always trailing-slashed.
  * @returns {string} full <!doctype html> document
  */
-export function renderRecordPage({ meta, joined, bodyHtml, draft }) {
+export function renderRecordPage({ meta, joined, bodyHtml, draft, base = '/' }) {
   const accent = joined?.hex || 'var(--color-black)';
   const typeLabel = meta.type === 'horizon' ? 'Horizon' : 'Stardust';
   const numLabel = blank(meta.number) ? '' : ` ${String(meta.number).padStart(3, '0')}`;
@@ -97,14 +98,14 @@ export function renderRecordPage({ meta, joined, bodyHtml, draft }) {
 <title>${esc(meta.title || meta.slug)} — cocoex Observatory</title>
 <meta name="description" content="${esc(desc)}">
 <meta name="robots" content="${draft ? 'noindex' : 'index, follow'}">
-<link rel="icon" href="/assets/images/logowhite.png" type="image/png">
+<link rel="icon" href="${base}assets/images/logowhite.png" type="image/png">
 <link rel="preconnect" href="https://use.typekit.net">
 <link rel="stylesheet" href="https://use.typekit.net/afs8ors.css">
 <style>${inlineCss()}</style>
 </head>
 <body class="observatory-record" style="--accent:${accent}">
 ${draftBanner}
-<a class="record-back" href="/">← Observatory</a>
+<a class="record-back" href="${base}">← Observatory</a>
 <article class="record">
 <header class="record-header">
 <p class="record-eyebrow">${esc(eyebrow)}</p>

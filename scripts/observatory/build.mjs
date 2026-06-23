@@ -259,11 +259,12 @@ function sortCampaigns(a, b) {
 
 /**
  * Generate the observatory artifacts in memory.
- * @param {{ includeDrafts?: boolean }} opts  includeDrafts=true (dev) emits draft
- *        record pages for preview; false (build) skips them so they stay unpublished.
+ * @param {{ includeDrafts?: boolean, base?: string }} opts  includeDrafts=true (dev) emits
+ *        draft record pages for preview; false (build) skips them. base is Vite's base path
+ *        ('/' dev, '/museobservatory/' on the Pages subpath build) for record-page links.
  * @returns {{ campaignsJson: string, pages: {slug,html}[], summary: object }}
  */
-export async function generateObservatory({ includeDrafts = false } = {}) {
+export async function generateObservatory({ includeDrafts = false, base = '/' } = {}) {
   const museMap = await buildMuseMap();
   const files = (await fs.readdir(CONTENT_DIR))
     .filter((f) => f.endsWith('.md') && f !== 'TEMPLATE.md')
@@ -324,7 +325,7 @@ export async function generateObservatory({ includeDrafts = false } = {}) {
     // blockquote, …). THEN inject the [confirm] highlight with the note text ESCAPED.
     const bodyHtml = DOMPurify.sanitize(String(marked.parse(p.body)))
       .replace(CONFIRM_RE, (_, t) => `<mark class="confirm">[confirm:${esc(t)}]</mark>`);
-    pages.push({ slug: p.slug, html: renderRecordPage({ meta: p.meta, joined: p.joined, bodyHtml, draft: p.draft }) });
+    pages.push({ slug: p.slug, html: renderRecordPage({ meta: p.meta, joined: p.joined, bodyHtml, draft: p.draft, base }) });
   }
 
   const summary = {

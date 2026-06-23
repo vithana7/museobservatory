@@ -4,8 +4,9 @@ import observatory from './vite-plugin-observatory.mjs';
 
 export default defineConfig({
   root: '.',
-  // Hosted at the domain root (muse-observatory.xyz). The observatory IS the site.
-  base: '/',
+  // Root '/' for the custom domain (muse-observatory.xyz) and local dev; the GitHub Pages
+  // workflow sets GITHUB_PAGES=1 to serve under the project subpath instead.
+  base: process.env.GITHUB_PAGES ? '/museobservatory/' : '/',
   plugins: [observatory()],
   build: {
     target: 'es2018',
