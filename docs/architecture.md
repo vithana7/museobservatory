@@ -62,7 +62,7 @@ between `campaigns.json` and the views:
 It is wired in `observatory.js`: `boot()` samples the landing set, `initFilters()` builds
 the filter UI and swaps `globe.setItems()` + the list on every facet change. This is what
 lets the archive grow without limit while the globe stays a fixed, performant size. See
-the locked semantics (S-1/S-2/S-3) in [decisions.md](decisions.md).
+the locked semantics (S-1/S-2) in [decisions.md](decisions.md).
 
 ### Layer 4 — Views
 

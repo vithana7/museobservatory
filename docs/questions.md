@@ -39,6 +39,6 @@ see the 2026-06-23 section in [decisions.md](decisions.md). What's still open:
   Tighten to bail on the first null shader. Smell, not a bug; see [frontend.md](frontend.md).
 
 - **Q · `dispose()` listener teardown.** `dispose()` now `gl.delete*`s the textures/buffers/
-  program/VAO (done 2026-06-23). Window/document listener teardown (`initZoomControl`/
+  program/VAO (done 2026-06-23). Window/document listener teardown (`initGlobeZoom`/
   `initFilters`/`maybeInitGlobe`) is explicitly DEFERRED — no in-place re-init exists today,
   so it's speculative SPA plumbing; build it only if a future SPA re-inits the globe in-place.

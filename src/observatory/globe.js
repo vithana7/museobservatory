@@ -435,7 +435,7 @@ export class Globe {
       m: mat4.create(), r: mat4.create(), s: mat4.create(),
       back: vec3.fromValues(0, 0, -this.SPHERE_RADIUS),
     });
-    const baseScale = 0.25;
+    const baseScale = 0.275;   // +10% (Memo: bigger circles, less negative space — verify no halo bleed)
     const SCALE_INTENSITY = 0.6;
     const orient = this.control.orientation;
 
@@ -585,6 +585,19 @@ export class Globe {
     const e = proj(this.SPHERE_RADIUS, 0, 0);
     if (!c || !e) return null;
     return Math.hypot(e[0] - c[0], e[1] - c[1]);
+  }
+
+  // Public: the sphere centre's on-screen position in CSS px (projection of the origin).
+  // The halo is centred at the viewport centre, so comparing this against
+  // (clientWidth/2, clientHeight/2) exposes any globe↔halo OFFSET — the heart of the
+  // Safari misalignment (the ?viewprobe reads it; the alignment fix can anchor to it).
+  getSphereScreenCenter() {
+    const vp = mat4.multiply(mat4.create(), this.camera.matrices.projection, this.camera.matrices.view);
+    const cssW = this.gl.canvas.clientWidth;
+    const cssH = this.gl.canvas.clientHeight;
+    const clip = vec4.transformMat4(vec4.create(), [0, 0, 0, 1], vp);
+    if (clip[3] <= 0) return null;
+    return { cx: (clip[0] / clip[3] * 0.5 + 0.5) * cssW, cy: (1 - (clip[1] / clip[3] * 0.5 + 0.5)) * cssH };
   }
 
   // Public: the active (centre-snapped) tile's on-screen circle in CSS px → { cx, cy, r }.

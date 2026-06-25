@@ -91,7 +91,7 @@ function maybeInitGlobe(landing, allCampaigns) {
   const canWebGL2 = (() => {
     try { return !!document.createElement('canvas').getContext('webgl2'); } catch { return false; }
   })();
-  if (prefersReduced || !canWebGL2) return; // list remains the experience
+  if (prefersReduced || !canWebGL2) { document.body.classList.add('list-only'); return; } // list IS the experience (inverse styling)
 
   const canvas = document.getElementById('observatory-globe');
   if (!canvas) return;
@@ -110,7 +110,7 @@ function maybeInitGlobe(landing, allCampaigns) {
   // mobile sits closer (camera too far at the desktop default on a narrow viewport).
   // Round 8 — one default for all devices: the focused-tile screen size as a fraction of the
   // viewport's SMALLER dimension depends only on scale, not orientation (the projection math
-  // cancels), so mobile + desktop share the zoom range. 1.5 sits mid-range (see initZoomControl).
+  // cancels), so mobile + desktop share the zoom range. 1.6 sits mid-range (see initGlobeZoom).
   let defaultScale = 1.6;
   const scaleOverride = parseFloat(new URLSearchParams(location.search).get('scale'));
   if (Number.isFinite(scaleOverride)) defaultScale = scaleOverride; // dev: ?scale=X preview a zoom level
@@ -145,13 +145,18 @@ function maybeInitGlobe(landing, allCampaigns) {
   // .globe-active, so the size read during construction was 0×0 (→ NaN aspect →
   // nothing rasterises). resize() after it's visible gives a real viewport.
   document.body.classList.add('globe-active');
+  // Lock page scroll while the globe is the view. We do this on <html> (the viewport scroller)
+  // rather than body overflow — toggling overflow on the propagating <body> didn't re-enable
+  // scrolling on Safari when switching to list-view. setListView clears it for the list.
+  document.documentElement.style.overflow = 'hidden';
   globe.resize();
   globe.start();
   globe.loadAtlas();
-  initZoomControl(globe);
+  initGlobeZoom(globe);
   initFlip(canvas, globe);
   initFilters(globe, allCampaigns);
   initViewToggle(globe);
+  initPillColours();
 
   // dev-only: ?flipdemo=N auto-opens the flip for items[N] (or the first hero campaign) after
   // settle, with a synthetic source rect — lets headless Chrome screenshot the OPEN END state
@@ -168,6 +173,44 @@ function maybeInitGlobe(landing, allCampaigns) {
       document.title = msg;
       console.info('[observatory]', msg);
     }, 1800);
+  }
+  // dev: ?viewprobe overlays a LIVE corner readout of the canvas↔viewport↔halo metrics so the
+  // Safari "tiles spill past the halo" misalignment can be diagnosed by comparison (Memo runs
+  // it in Safari; Chrome is read headless). The key tells: sphere CENTRE vs viewport centre
+  // (offset) and getSphereScreenRadius vs clientWidth (scale). Updates as the address bar /
+  // window moves. Inert without the query param.
+  if (params.has('viewprobe')) {
+    const box = document.createElement('div');
+    box.id = 'observatory-viewprobe';
+    box.setAttribute('aria-hidden', 'true');
+    box.style.cssText = 'position:fixed;right:8px;top:8px;z-index:9999;max-width:46vw;padding:8px 10px;'
+      + 'font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre;color:#0f0;'
+      + 'background:rgba(0,0,0,0.82);border:1px solid #0f0;border-radius:6px;pointer-events:none;';
+    document.body.appendChild(box);
+    const read = () => {
+      const c = globe.gl.canvas;
+      const rect = c.getBoundingClientRect();
+      const vv = window.visualViewport;
+      const ctr = globe.getSphereScreenCenter?.();
+      const rad = globe.getSphereScreenRadius?.();
+      const haloR = parseFloat(getComputedStyle(halo || document.body).getPropertyValue('--halo-r')) || 0;
+      const lines = [
+        `dpr            ${window.devicePixelRatio}`,
+        `window.inner   ${window.innerWidth} x ${window.innerHeight}`,
+        `visualViewport ${vv ? `${Math.round(vv.width)} x ${Math.round(vv.height)} off=${Math.round(vv.offsetLeft)},${Math.round(vv.offsetTop)} scale=${vv.scale.toFixed(2)}` : 'n/a'}`,
+        `canvas.client  ${c.clientWidth} x ${c.clientHeight}`,
+        `canvas.rect    ${rect.width.toFixed(0)} x ${rect.height.toFixed(0)} @ ${rect.left.toFixed(0)},${rect.top.toFixed(0)}`,
+        `drawingBuffer  ${globe.gl.drawingBufferWidth} x ${globe.gl.drawingBufferHeight}`,
+        `sphere centre  ${ctr ? `${ctr.cx.toFixed(0)},${ctr.cy.toFixed(0)}` : 'null'}`,
+        `viewport ctr   ${(c.clientWidth / 2).toFixed(0)},${(c.clientHeight / 2).toFixed(0)}`,
+        `centre offset  Δx=${ctr ? (ctr.cx - c.clientWidth / 2).toFixed(0) : '?'} Δy=${ctr ? (ctr.cy - c.clientHeight / 2).toFixed(0) : '?'}`,
+        `sphere radius  ${rad ? rad.toFixed(0) : 'null'}  (halo-r=${haloR.toFixed(0)}, fit=${HALO_FIT})`,
+        `scale          ${globe.scaleFactor.toFixed(2)}`,
+      ];
+      box.textContent = 'VIEWPROBE\n' + lines.join('\n');
+    };
+    setInterval(read, 400);
+    read();
   }
   // homepage "Explore campaigns" deep-link: ?focus=stardust|horizon orients the globe so a campaign
   // of that programme is the centre tile (prefer one with a record page → a real "Explore" target).
@@ -200,73 +243,29 @@ function maybeInitGlobe(landing, allCampaigns) {
   });
 }
 
-// ── zoom control: a draggable pill (comet-pill aesthetic) → globe.setScale ───────
-// Continuous, not a 2-state toggle: the thumb fraction maps to the camera scale.
-function initZoomControl(globe) {
-  const pill = document.getElementById('observatory-zoom');
-  const thumb = document.getElementById('observatory-zoom-thumb');
-  if (!pill || !thumb) return;
+// ── globe zoom: gesture-only (scroll-wheel + two-finger pinch → globe.setScale) ───────
+// The visible zoom slider was retired (decision: zoom is a quiet convenience, not a control);
+// these gestures stay because they're free + natural. `frac` (0 = most zoomed-in) maps to scale.
+function initGlobeZoom(globe) {
+  // Bounds clamp the focused tile's on-screen size: MIN = camera closest = tile looms biggest
+  // (most zoomed IN); MAX = comfortable, not tiny. Orientation-independent, so one range fits all.
+  const MIN = 1.3, MAX = 2.1;
+  let frac = Math.max(0, Math.min(1, ((globe.scaleFactor || 2.0) - MIN) / (MAX - MIN)));
+  const apply = () => { frac = Math.max(0, Math.min(1, frac)); globe.setScale(MIN + frac * (MAX - MIN)); };
 
-  // Round 8 — bounds clamp the focused TILE's on-screen size (Memo: the centred circle must stay
-  // fully in frame at max zoom-IN, and not get too small at max zoom-OUT). Smaller scale = camera
-  // closer = the front tile looms BIGGER, so MIN = most zoomed in. The size-as-fraction-of-vmin is
-  // orientation-independent (math cancels), so ONE range covers mobile + desktop. Screenshot-tuned:
-  // at MIN a centred campaign tile ≈ 0.82·vmin (in frame, margin); at MAX ≈ 0.55·vmin (comfortable).
-  const MIN = 1.3; // most zoomed in — focused tile fully inside the frame
-  const MAX = 2.1; // most zoomed out — comfortable, not tiny
-  const PAD = 2;   // matches .zoom-thumb left inset in observatory.css
-  // start the thumb at the globe's actual default scale (desktop 2.0 / mobile 1.35)
-  let frac = ((globe.scaleFactor || 2.0) - MIN) / (MAX - MIN);
-  let pid = null;
-
-  const travel = () => Math.max(1, pill.clientWidth - thumb.offsetWidth - PAD * 2);
-  const place = () => {
-    frac = Math.max(0, Math.min(1, frac)); // never let the thumb leave the track
-    thumb.style.transform = `translateY(-50%) translateX(${frac * travel()}px)`;
-  };
-  const apply = () => {
-    globe.setScale(MIN + frac * (MAX - MIN));
-    pill.setAttribute('aria-valuenow', String(Math.round(frac * 100)));
-  };
-  const fromClientX = (clientX) => {
-    const r = pill.getBoundingClientRect();
-    const x = clientX - r.left - PAD - thumb.offsetWidth / 2;
-    frac = Math.max(0, Math.min(1, x / travel()));
-    place();
-    apply();
-  };
-
-  pill.addEventListener('pointerdown', (e) => {
-    pid = e.pointerId;
-    try { pill.setPointerCapture(pid); } catch { /* ok */ }
-    fromClientX(e.clientX);
-    e.preventDefault();
-  });
-  pill.addEventListener('pointermove', (e) => {
-    if (pid != null) { fromClientX(e.clientX); e.preventDefault(); }
-  });
-  const end = () => { if (pid != null) { try { pill.releasePointerCapture(pid); } catch { /* ok */ } pid = null; } };
-  pill.addEventListener('pointerup', end);
-  pill.addEventListener('pointercancel', end);
-
-  pill.tabIndex = 0;
-  pill.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { frac = Math.max(0, frac - 0.05); place(); apply(); e.preventDefault(); }
-    else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { frac = Math.min(1, frac + 0.05); place(); apply(); e.preventDefault(); }
-  });
-
-  // scroll-to-zoom (Google-Maps style): the wheel nudges the same frac the pill owns.
-  // deltaY > 0 (scroll down / pinch in) → zoom OUT (frac → 1 = MAX); up → zoom IN.
+  // scroll-to-zoom (Google-Maps style); deltaY > 0 (scroll down / trackpad pinch in) → zoom OUT.
   // Mac trackpad pinch arrives as wheel+ctrlKey, so it's handled for free.
   window.addEventListener('wheel', (e) => {
+    // Only own the wheel on the live globe. In list-view the globe is hidden and the document
+    // must scroll — bailing here lets the page scroll instead of the wheel being eaten by zoom.
     if (!document.body.classList.contains('globe-active')) return;
+    if (document.body.classList.contains('list-view')) return;
     e.preventDefault();
     frac += Math.max(-0.1, Math.min(0.1, e.deltaY * 0.0015));
-    place();
     apply();
   }, { passive: false });
 
-  // pinch-to-zoom (touch): two fingers on the globe canvas drive the SAME frac as the pill/wheel.
+  // pinch-to-zoom (touch): two fingers on the globe canvas drive the SAME frac as the wheel.
   // Suppresses Arcball rotate while two pointers are down (globe.control.paused). Round 8 / OBS-13.
   const canvas = globe.canvas;
   if (canvas) {
@@ -285,7 +284,6 @@ function initZoomControl(globe) {
       if (pts.size === 2 && baseDist > 0) {
         // fingers apart (ratio > 1) → zoom IN (frac → 0 = MIN); together → zoom OUT (frac → 1 = MAX)
         frac = Math.max(0, Math.min(1, baseFrac - Math.log2(spread() / baseDist) * 0.9));
-        place();
         apply();
         e.preventDefault();
       }
@@ -298,15 +296,6 @@ function initZoomControl(globe) {
     canvas.addEventListener('pointerup', drop);
     canvas.addEventListener('pointercancel', drop);
   }
-
-  // Defer the first placement to a double rAF: the pill only gets its laid-out
-  // (flex) width once .globe-active has applied + the browser has done a layout
-  // pass. Running place() synchronously read clientWidth ≈ 0 on Safari → travel()
-  // was wrong → the thumb flew off the pill on first paint (it self-corrected on
-  // the first interaction, which recomputes from getBoundingClientRect).
-  apply();
-  requestAnimationFrame(() => requestAnimationFrame(place));
-  window.addEventListener('resize', place);
 }
 
 // ── tile flip-card: tap the centred tile → a DOM card flips (front disc → black
@@ -324,7 +313,7 @@ function typeNumber(item) {
 function rimSvg(text) {
   const t = String(text).toUpperCase();
   const R = 43; // arc radius in viewBox units (card-relative; viewBox is 0 0 100 100)
-  const fs = Math.max(3.6, Math.min(6.2, (Math.PI * R * 0.9) / (Math.max(1, t.length) * 0.62)));
+  const fs = Math.max(3.0, Math.min(5.0, (Math.PI * R * 0.9) / (Math.max(1, t.length) * 0.62)));
   return `<svg class="tile-flip-rim" viewBox="0 0 100 100" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true">
     <path id="tile-rim-path" fill="none" d="M ${50 - R},50 A ${R},${R} 0 0 1 ${50 + R},50"/>
     <text text-anchor="middle" font-size="${fs.toFixed(2)}"><textPath href="#tile-rim-path" xlink:href="#tile-rim-path" startOffset="50%">${esc(t)}</textPath></text>
@@ -349,7 +338,7 @@ function fillFlip(item) {
   if (item.hero) front.classList.add('has-hero');
 
   const action = item.url
-    ? `<a class="tile-flip-action" href="${esc(item.url)}">Explore →</a>`
+    ? `<a class="tile-flip-action" href="${esc(item.url)}">Explore</a>`
     : '<span class="tile-flip-action tile-flip-action--inert">Soon</span>';
   const rim = [typeWord, item.cause, item.year].filter(Boolean).join(' · ');
   back.innerHTML = rimSvg(rim) + `
@@ -367,6 +356,13 @@ let flipGlobe = null;
 // size to the tile → tiny cards when zoomed out + the "detached" feel. Round 8 splits the two:
 // big final size, exact-tile origin.) Capped so it never exceeds a small viewport.
 const FLIP_MAX_PX = 560;
+// The WebGL disc renders LARGER than getActiveTileScreen()'s flat-quad radius: the shader spherises
+// the quad and the centre tile bulges toward the camera (globe-shaders.js). This is the SAME
+// magnification the tap hit-test compensates for (rect.r * 1.6 in initFlip). The flip morph must use
+// the VISIBLE radius so the card grows from / lands ON the real disc — sizing to raw rect.r made the
+// card ~half the tile, which read as two nested discs on close. Eyeball-tune (raise if a tile ring
+// peeks at the end of close; lower if the card overshoots the disc).
+const DISC_VISIBLE_K = 1.7;
 function flipCardSize() {
   const vmin = Math.min(window.innerWidth, window.innerHeight);
   const target = vmin * 0.82;
@@ -393,7 +389,12 @@ function openFlip(item, rect, globe) {
   const finalSize = flipCardSize();
   card.style.width = finalSize + 'px';
 
-  document.body.classList.add('flip-open');             // hide the WebGL tile (no double disc)
+  // Hide the WebGL tile INSTANTLY (kill its 0.4s opacity fade) so it can't ghost under the growing
+  // card — mirrors the instant reveal on close. Only the card paints during the grow.
+  const g = document.getElementById('observatory-globe');
+  if (g) g.style.transition = 'none';
+  document.body.classList.add('flip-open');
+  if (g) { void g.offsetWidth; g.style.transition = ''; }   // restore so close can reveal it instantly too
   if (globe) {
     globe.freeze();                                     // hold the tile still → close lands on it
     globe.canvas.style.pointerEvents = 'none';
@@ -401,7 +402,7 @@ function openFlip(item, rect, globe) {
 
   const vpCx = window.innerWidth / 2;
   const vpCy = window.innerHeight / 2;
-  const s = Math.max(0.04, (rect.r * 2) / finalSize);
+  const s = Math.max(0.04, (rect.r * DISC_VISIBLE_K * 2) / finalSize);
   card.style.transition = 'none';
   card.style.transform = `translate(${(rect.cx - vpCx).toFixed(1)}px, ${(rect.cy - vpCy).toFixed(1)}px) scale(${s.toFixed(4)})`;
   wrap.hidden = false;
@@ -420,20 +421,31 @@ function closeFlip() {
   const card = wrap?.querySelector('.tile-flip-card');
   if (!wrap || wrap.hidden) return;
   wrap.classList.remove('is-open');                      // flip back to front + fade backdrop
-  if (card && flipRect) {                                // shrink back onto the SAME (frozen) tile
+  // Shrink back onto the LIVE (still-frozen) tile — recompute its rect so we land where the tile
+  // actually is, not a stale open-time position.
+  const rect = flipGlobe?.getActiveTileScreen?.() || flipRect;
+  if (card && rect) {
     const finalSize = parseFloat(card.style.width) || flipCardSize();
     const vpCx = window.innerWidth / 2;
     const vpCy = window.innerHeight / 2;
-    const s = Math.max(0.04, (flipRect.r * 2) / finalSize);
+    const s = Math.max(0.04, (rect.r * DISC_VISIBLE_K * 2) / finalSize);
     card.style.transition = '';
-    card.style.transform = `translate(${(flipRect.cx - vpCx).toFixed(1)}px, ${(flipRect.cy - vpCy).toFixed(1)}px) scale(${s.toFixed(4)})`;
+    card.style.transform = `translate(${(rect.cx - vpCx).toFixed(1)}px, ${(rect.cy - vpCy).toFixed(1)}px) scale(${s.toFixed(4)})`;
   }
+  // The globe tile stays HIDDEN + frozen for the whole shrink (body.flip-open → globe opacity 0):
+  // only the card paints, so there's no second disc to double-ring against. It's revealed in done().
   const done = () => {
     card?.removeEventListener('transitionend', onEnd);
     clearTimeout(timer);
-    wrap.hidden = true;
-    if (card) { card.style.transition = 'none'; card.style.transform = ''; card.style.width = ''; } // reset → next open recomputes
+    // Reveal the tile INSTANTLY (kill the 0.4s opacity fade) so it's already on-screen the moment the
+    // card hides — the card ended at the tile's real size + position (DISC_VISIBLE_K), so the hand-off
+    // is invisible. Reveal-then-hide in one synchronous task → a single paint, no gap, no overlap.
+    const g = document.getElementById('observatory-globe');
+    if (g) g.style.transition = 'none';
     document.body.classList.remove('flip-open');
+    if (g) { void g.offsetWidth; g.style.transition = ''; }   // restore so the OPEN still fades the tile out
+    wrap.hidden = true;                                        // hide the card now the tile is under it
+    if (card) { card.style.transition = 'none'; card.style.transform = ''; card.style.width = ''; } // reset → next open recomputes
     if (flipGlobe) { flipGlobe.thaw(); flipGlobe.canvas.style.pointerEvents = ''; }
     flipRect = null;
     flipGlobe = null;
@@ -478,6 +490,8 @@ function initFlip(canvas, globe) {
 function setListView(on, globe) {
   const btn = document.getElementById('observatory-view-toggle');
   document.body.classList.toggle('list-view', on);
+  // Scroll-lock lives on <html>: clear it for the list (document scrolls), re-lock for the globe.
+  document.documentElement.style.overflow = on ? '' : 'hidden';
   if (on) {
     globe?.freeze();
     if (btn) {
@@ -502,6 +516,26 @@ function initViewToggle(globe) {
   if (!btn) return;
   btn.addEventListener('click', () => {
     setListView(!document.body.classList.contains('list-view'), globe);
+  });
+}
+
+// ── per-pill muse colour ──────────────────────────────────────────────────────────────────
+// The two control pills (Filter + List) carry a soft drifting muse-gradient glass. Shuffle the 7
+// muses, then hand each pill a 3-muse window OFFSET from the next so the pills span cools + warms
+// (a fixed full-palette sweep read as always-warm — the cool hues sat dark under the frost). A
+// random drift phase/speed keeps them out of sync.
+function initPillColours() {
+  const glasses = [...document.querySelectorAll('.filter-wrap .pill-glass')];
+  if (!glasses.length) return;
+  const museKeys = Object.keys(MUSE_HEX);
+  for (let i = museKeys.length - 1; i > 0; i--) {            // Fisher–Yates shuffle
+    const j = Math.floor(Math.random() * (i + 1));
+    [museKeys[i], museKeys[j]] = [museKeys[j], museKeys[i]];
+  }
+  glasses.forEach((g, i) => {
+    [0, 1, 2].forEach((k) => g.style.setProperty(`--m${k + 1}`, MUSE_HEX[museKeys[(i * 2 + k) % museKeys.length]]));
+    g.style.animationDelay = `-${(Math.random() * 22).toFixed(1)}s`;
+    g.style.animationDuration = `${(18 + Math.random() * 10).toFixed(1)}s`;
   });
 }
 
@@ -539,7 +573,18 @@ function initFilters(globe, allCampaigns) {
     b.dataset.group = group;
     b.dataset.value = value;
     b.setAttribute('aria-pressed', 'false');
-    b.innerHTML = (dotHex ? `<span class="filter-chip-dot" style="--chip:${esc(dotHex)}"></span>` : '') + `<span>${esc(label)}</span>`;
+    // Muse chips carry the masked muse glyph (the list-page marker) tinted to the muse hue;
+    // type/status chips are text-only. --chip on the BUTTON drives both the glyph tint and the
+    // selected-state underline (custom props inherit down, not up).
+    let marker = '';
+    if (dotHex) {
+      b.style.setProperty('--chip', dotHex);
+      if (group === 'muse') {
+        b.style.setProperty('--glyph', `url('${esc(withBase('/assets/images/muse/' + value + '-white.png'))}')`);
+        marker = '<span class="filter-chip-glyph" aria-hidden="true"></span>';
+      }
+    }
+    b.innerHTML = marker + `<span>${esc(label)}</span>`;
     return b;
   };
 
@@ -658,9 +703,14 @@ function renderList(campaigns) {
     const num = typeof c.number === 'number' ? ` ${String(c.number).padStart(3, '0')}` : '';
     const eyebrow = [`${typeLabel}${num}`, c.cause, c.status].filter(Boolean).join(' · ');
     const meta = [c.year, c.location].filter(Boolean).join(' · ');
+    // The muse glyph (tinted to the muse hex via a CSS mask) replaces the plain colour dot;
+    // campaigns without a muse keep the neutral dot. withBase() keeps the path subpath-safe.
+    const marker = c.muse
+      ? `<span class="observatory-list-glyph" style="--glyph:url('${esc(withBase('/assets/images/muse/' + c.muse + '-white.png'))}')" aria-hidden="true"></span>`
+      : '<span class="observatory-list-chip" aria-hidden="true"></span>';
 
     inner.innerHTML = `
-      <span class="observatory-list-chip" aria-hidden="true"></span>
+      ${marker}
       <span class="observatory-list-text">
         <span class="observatory-list-eyebrow">${esc(eyebrow)}</span>
         <span class="observatory-list-name">${esc(c.title || c.slug)}</span>

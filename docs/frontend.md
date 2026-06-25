@@ -86,9 +86,10 @@ globe and list always agree. Clearing all filters restores the original session 
 
 ### Locked semantics
 
-See S-1/S-2/S-3 in [decisions.md](decisions.md): cap 42 (muses in the filter, not on the
-globe); filter = the true ANDed set, never a re-sample, single-select per group; geo regex;
-filter + zoom share one left rail with the panel opening to the right.
+See S-1/S-2 in [decisions.md](decisions.md): cap 42 (muses in the filter, not on the
+globe); filter = the true ANDed set, never a re-sample, single-select per group; geo regex.
+The rail composition (S-3) was reworked — Filter + List pills, gesture-only zoom — see the
+2026-06-25 section.
 
 ## The grid/list — a first-class peer (globe ↔ list toggle built)
 
@@ -97,25 +98,29 @@ markup: `<a href="/slug/">` for page-worthy campaigns, `<div>` for drafts. It is
 keyboard-reachable, screen-reader-sane, and re-rendered with the filtered set so it
 mirrors the globe.
 
-A third pill in the `.filter-wrap` rail (`#observatory-view-toggle`) now flips the page
-between the WebGL globe and the list as a first-class sighted peer (G-C, 2026-06-23).
-`body.list-view` reverses the a11y clip — restoring document flow + scroll — and hides the
-globe + cosmic backdrop while the rail stays reachable. `setListView(on, globe)` is the one
-source of truth (freeze/thaw + resize-on-return, aria-pressed + label swap) and is shared by
-both the toggle and the A-4 sparse fallback. When WebGL2 is unavailable or
-`prefers-reduced-motion` is set, the list is the experience and the rail (hence the toggle)
-is naturally absent (`maybeInitGlobe`).
+The `.filter-wrap` rail now holds **two always-visible pills — Filter and List**
+(`#observatory-view-toggle`). The List pill flips the page between the WebGL globe and the
+list as a first-class sighted peer (G-C); one tap, no menu to open. `body.list-view` reverses
+the a11y clip — restoring document flow + scroll — and hides the globe + cosmic backdrop while
+the rail stays reachable. `setListView(on, globe)` is the one source of truth (freeze/thaw +
+resize-on-return, aria-pressed + label swap) and is shared by both the toggle and the A-4
+sparse fallback. When WebGL2 is unavailable or `prefers-reduced-motion` is set, the list is
+the experience and the rail is naturally absent (`maybeInitGlobe`).
 
 ## Navigation & UX — honest verdict
 
-**Solid.** Filters and the view toggle both landed; the remaining note:
+**Solid.** The control rail is two always-visible pills; filters + the view toggle landed:
 
-1. **View toggle exists** (globe ↔ list, G-C). Sighted users on a modern browser can flip to
-   the list from the rail; the former top UX gap is closed.
-2. **Filters exist** (was the prior top blocker). A left-rail pill opens a facet panel
-   (Muse / comet-collab / Status chips + a Place regex box); selecting a facet narrows the
-   globe + list to the true matching set (S-2). Single-select per group with toggle-off.
-3. **Full-page navigation tears state.** Record pages are separate static HTML; clicking
+1. **Two control pills — Filter + List** (left rail on desktop; a bottom-centred horizontal
+   row on mobile). The List pill flips globe↔list (G-C) in one tap — always reachable, no menu
+   to open. (An interim coin-split menu was tried and retired; see the 2026-06-25 decision.)
+2. **Filters** — the Filter pill opens a facet panel (Muse / comet-collab / Status chips + a
+   Place regex box), styled as a scaled-down echo of the list page (off-white brand card);
+   selecting a facet narrows the globe + list to the true matching set (S-2). Single-select
+   per group with toggle-off.
+3. **Zoom is gesture-only** — pinch + scroll-wheel drive `globe.setScale` (`initGlobeZoom`);
+   the draggable zoom slider was retired (it duplicated the gestures and cluttered the rail).
+4. **Full-page navigation tears state.** Record pages are separate static HTML; clicking
    "Explore" is a real navigation, and returning re-boots the page (fresh sample, globe
    reset, list re-render). Acceptable for now (no SPA router by design), but worth noting.
 
@@ -153,7 +158,7 @@ source, both are overstated:
 
 **Done:** the selection layer is built, tested (`npm test` green), and wired — sample on
 landing, ANDed filters → true matching set, geo regex, single-select facets, muses moved off
-the globe into the filter, filter + zoom on one left rail (S-1/S-2/S-3). The sighted
+the globe into the filter, Filter + List pills on one rail (S-1/S-2). The sighted
 globe↔list toggle (G-C) and the sparse fallback (A-4) are built; build-time HTML
 sanitization (SEC-1) and the Safari near-black dither (X-1) landed; GitHub Pages deploy with
 a subpath-safe `base` (DEPLOY-1) is wired. Decisions in [decisions.md](decisions.md).

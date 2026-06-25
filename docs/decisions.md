@@ -5,6 +5,63 @@
 > first. Earlier per-round build decisions live in
 > [archive/build-history.md](archive/build-history.md).
 
+## 2026-06-25 — Layer-4 art pass: controls, flip, tint (Memo + Claude)
+
+The G-D freeze condition is **satisfied** — layers 1–3 are built, tested, and wired — so this
+is the sanctioned "art last" phase (A-3 / G-D). The below is layer-4 polish in the working
+tree; exact colour/size values stay eyeball-tunable, but the decisions (the *what* + *why*)
+are settled.
+
+- **V-1 · Controls = two always-visible pills (Filter + List); zoom is gesture-only.** The
+  left rail (a bottom-centred row on mobile) holds just the Filter pill and the List toggle,
+  both always visible — no menu to open. The draggable zoom slider is gone; pinch + scroll-
+  wheel still drive `globe.setScale`.
+  *Why:* an interim "coin" that split into Filter/Zoom/List buried the List behind an open step
+  and spent ~0.6s of motion on a 3-item menu; once zoom proved redundant (the gestures already
+  cover it) only two controls remained, for which a splitting menu isn't worth the friction —
+  and a one-tap List is the reachability win the a11y review asked for.
+  *Apply:* `index.html` `.filter-wrap` holds `.filter-control` + `.view-pill` directly;
+  `observatory.js` dropped `initMenu` + the liquid-blob animation, renamed `initZoomControl` →
+  gesture-only `initGlobeZoom`, and moved the per-pill muse colours to `initPillColours`.
+  *Supersedes:* **S-3** (filter + zoom on one rail) — zoom left the rail; the panel still opens
+  to the right on desktop, centred on mobile.
+
+- **V-2 · Filter popup mirrors the LIST PAGE (brand surface), not a dark glass panel.** The
+  facet panel is a scaled-down echo of the accessible list: off-white paper, brand serif,
+  muse-glyph chip markers, hairline group dividers, a feTurbulence grain, rounded corners.
+  *Why:* the dark liquid-glass panel read as a SaaS filter; the list page is the canonical
+  on-brand surface (cocoex Brand Rules: off-white/ink, space as separator, no boxes), so the
+  popup should feel like a small-press monograph card.
+  *Apply:* `.filter-panel*` in `observatory.css`; chips emit the masked muse glyph (`chip()` in
+  `observatory.js`). The control-pill labels match (serif eyebrow treatment); the Filter pill
+  goes matte black while its panel is open (`aria-expanded`).
+
+- **V-3 · Flip morph sizes to the VISIBLE disc; the tile is hidden through the motion.** The
+  DOM flip-card grows from / lands on the tile's *rendered* disc, not the flat-quad radius —
+  `DISC_VISIBLE_K` (≈1.7) scales the anchor (the spherised disc renders ~that much larger, the
+  same fudge the tap hit-test uses). The WebGL tile stays hidden (`body.flip-open`) for the
+  whole open + close motion and is hidden/revealed **instantly** at the endpoints.
+  *Why:* sizing to the raw `getActiveTileScreen().r` made the card ~half the tile → a nested
+  "two discs" on close; drawing both card + tile during the motion double-ringed them. Hiding
+  the tile through the motion (only the card paints) + an instant, size-matched hand-off makes
+  open/close read as one object.
+  *Apply:* `openFlip`/`closeFlip` in `observatory.js`.
+
+- **V-4 · Hero colour = duotone (`color` blend) + a scrim behind the label.** The muse tint
+  over a campaign hero is a `color` blend at ~0.85 (recolours the photo into the muse hue,
+  keeping its luminance + texture) rather than a flat ~0.5 wash; a soft radial scrim seats the
+  centred white label. Kept **identical** on the WebGL tile (canvas `globalCompositeOperation`)
+  and the flip card (CSS `mix-blend-mode`) so the morph hand-off shows no tint jump.
+  *Why:* a flat wash read dull and `multiply` muddied; `color` makes the muse shade strong +
+  intentional (editorial duotone) while keeping photo detail — but it keeps the photo bright,
+  so the label needs the scrim back.
+  *Apply:* `HERO_TINT_ALPHA` + the radial scrim in `tile-atlas.js`; `.tile-flip-hero-wash` +
+  `.tile-flip-front.has-hero::before` in `observatory.css`. The two alphas must stay in sync.
+
+- **V-5 · Globe tiles +10%.** `baseScale` 0.25 → 0.275 so the disc cloud fills more of the
+  sphere (less negative space). *Why:* Memo — the tiles read sparse. *Apply:* `globe.js`
+  `#animate`. Verify they don't bleed past the halo at the limb.
+
 ## 2026-06-23 — Hardening fixes: sparse guard, view toggle, build-time sanitize (Memo + Claude)
 
 Closing out the open A-4 / G-C questions and adding a build-time XSS guard.
@@ -19,7 +76,7 @@ Closing out the open A-4 / G-C questions and adding a build-time XSS guard.
   *Apply:* `observatory.js` `initFilters` `apply()` calls `setListView(true, globe)` when
   `active && applySparseGuard(matched).sparse`. Detection stays in `selection.js`.
 
-- **G-C · Sighted globe ↔ list toggle built.** A third pill in the `.filter-wrap` rail
+- **G-C · Sighted globe ↔ list toggle built.** A List pill in the `.filter-wrap` rail
   (`#observatory-view-toggle`) flips the page between the WebGL globe and the accessible
   list as a first-class sighted peer. `body.list-view` reverses the a11y clip (restores
   document flow + scroll) and hides the globe + cosmic backdrop; the rail stays reachable.
@@ -110,6 +167,8 @@ tested in `selection.test.mjs`; consumed by `observatory.js` `boot`/`maybeInitGl
   it, and a right-opening panel keeps the zoom anchored.
   *Apply:* markup in `index.html` (`.filter-wrap` rail), styles in `observatory.css`. UI
   detail, not load-bearing — restyle freely.
+  *Superseded 2026-06-25 (V-1):* zoom left the rail (gesture-only); the rail now holds the
+  Filter + List pills, and the facet panel is an off-white brand card (V-2), not dark glass.
 
 ## 2026-06-22 — Data/backend hardening (Memo + Claude)
 

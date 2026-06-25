@@ -99,7 +99,7 @@ function hexToRgba(hex, a) {
 // footage at the true ~200px tile size (tint_eval): the label reads at every alpha 0.30–0.55
 // because the label's dark shadow is the real legibility backstop, so 0.35 honours the ~30%
 // ask (photo stays clearly visible) with a small margin for brighter shots to come. Tunable.
-const HERO_TINT_ALPHA = 0.35;
+const HERO_TINT_ALPHA = 0.85; // muse duotone strength (Memo). Keep in sync with .tile-flip-hero-wash.
 
 // centred type+number label, white with a soft dark shadow.
 function drawCampaignLabel(ctx, ox, oy, item) {
@@ -108,8 +108,8 @@ function drawCampaignLabel(ctx, ox, oy, item) {
   ctx.font = `700 ${CELL * 0.1}px canela, Georgia, serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.shadowColor = 'rgba(0,0,0,0.6)';
-  ctx.shadowBlur = CELL * 0.05;
+  ctx.shadowColor = 'rgba(0,0,0,0.85)';
+  ctx.shadowBlur = CELL * 0.06;
   ctx.fillText(typeNumberLabel(item), ox + CELL / 2, oy + CELL / 2);
   ctx.restore();
 }
@@ -121,9 +121,20 @@ function drawCampaignCell(ctx, ox, oy, item, hero) {
     // photo, circle-clipped. The wash gives the campaign its colour identity + label contrast.
     drawCover(ctx, hero, ox, oy);
     ctx.save();
+    ctx.globalCompositeOperation = 'color';      // DUOTONE: recolour the photo into the muse hue (matches .tile-flip-hero-wash)
     ctx.fillStyle = hexToRgba(item.hex || '#000000', HERO_TINT_ALPHA);
     ctx.fillRect(ox, oy, CELL, CELL);
-    ctx.restore();
+    ctx.restore();                                // restore() resets the composite op before the label
+    // Soft dark scrim behind the centred label: the 'color' duotone keeps the photo's brightness,
+    // so white text washes out — this seats it while leaving the disc RIM bright + vibrant. Matches
+    // .tile-flip-front.has-hero::before.
+    const lx = ox + CELL / 2, ly = oy + CELL / 2;
+    const scrim = ctx.createRadialGradient(lx, ly, 0, lx, ly, CELL * 0.66);
+    scrim.addColorStop(0, 'rgba(0,0,0,0.5)');
+    scrim.addColorStop(0.40, 'rgba(0,0,0,0.22)');
+    scrim.addColorStop(0.66, 'rgba(0,0,0,0)');
+    ctx.fillStyle = scrim;
+    ctx.fillRect(ox, oy, CELL, CELL);
     drawCampaignLabel(ctx, ox, oy, item);
     return;
   }

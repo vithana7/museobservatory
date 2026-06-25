@@ -28,34 +28,27 @@
   <!-- The globe (decorative; the accessible source of truth is the list below) -->
   <canvas id="observatory-globe" aria-hidden="true"></canvas>
 
-  <!-- Left rail (vertically centred, clears the cocoex logo): the filter pill + its facet
-       panel, with the zoom control docked below it. Both reuse the comet pill's beam-glow
-       + liquid-glass look. The filter narrows the globe to the TRUE matching set (S-2). -->
+  <!-- Control rail — two ALWAYS-VISIBLE pills (Filter + List), no menu to open. Desktop: a
+       vertically-centred left rail (clears the cocoex wordmark); mobile: bottom-centred row.
+       Hidden until .globe-active, so it's naturally absent in reduced-motion / no-WebGL2 mode
+       (where the list IS the page). Zoom is gesture-only now (pinch + scroll), no slider. -->
   <div class="filter-wrap">
-    <button id="observatory-filter-toggle" class="filter-pill beam-glow" type="button"
-            aria-expanded="false" aria-controls="observatory-filter-panel" aria-label="Filter campaigns">
-      <span class="pill-glass" aria-hidden="true"></span>
-      <span class="filter-pill-label">Filter</span>
-    </button>
-    <div id="observatory-filter-panel" class="filter-panel" hidden>
-      <!-- facet groups built by observatory.js from the live campaign set -->
-    </div>
-
-    <!-- Zoom control (draggable; −/+ glyphs sit INSIDE the track so it reads as a zoom) -->
-    <div class="zoom-wrap">
-      <div id="observatory-zoom" class="zoom-pill beam-glow" role="slider"
-           aria-label="Zoom the globe" aria-valuemin="0" aria-valuemax="100" aria-valuenow="33">
+    <!-- Filter pill + its facet panel (opens beside the pill on desktop, centred on mobile).
+         The .filter-control wrapper is the panel's positioning anchor. Narrows the globe + list
+         to the TRUE matching set (S-2). -->
+    <div class="filter-control">
+      <button id="observatory-filter-toggle" class="filter-pill" type="button"
+              aria-expanded="false" aria-controls="observatory-filter-panel" aria-label="Filter campaigns">
         <span class="pill-glass" aria-hidden="true"></span>
-        <span class="zoom-glyph zoom-glyph--minus" aria-hidden="true">−</span>
-        <span class="zoom-glyph zoom-glyph--plus" aria-hidden="true">+</span>
-        <span id="observatory-zoom-thumb" class="zoom-thumb" aria-hidden="true"></span>
+        <span class="filter-pill-label">Filter</span>
+      </button>
+      <div id="observatory-filter-panel" class="filter-panel" hidden>
+        <!-- facet groups built by observatory.js from the live campaign set -->
       </div>
     </div>
 
-    <!-- Globe ↔ list view toggle (G-C): switch to the accessible list as a sighted peer.
-         Naturally absent in reduced-motion / no-WebGL2 mode (the whole rail is hidden
-         until .globe-active, which only the globe path adds). -->
-    <button id="observatory-view-toggle" class="view-pill beam-glow" type="button"
+    <!-- Globe ↔ list view toggle (G-C): switch to the accessible list as a sighted peer. -->
+    <button id="observatory-view-toggle" class="view-pill" type="button"
             aria-pressed="false" aria-label="Toggle list view">
       <span class="pill-glass" aria-hidden="true"></span>
       <span class="view-pill-label">List</span>
