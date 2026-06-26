@@ -158,7 +158,7 @@ test('record shape: a normal campaign emits exactly the expected keys', () => {
   // draft/filler are intentionally undefined for a normal record (JSON.stringify drops them).
   const serialized = JSON.parse(JSON.stringify(index));
   assert.deepEqual(Object.keys(serialized).sort(), [
-    'cause', 'hero', 'hex', 'hasPage', 'location', 'locations',
+    'cause', 'hero', 'hex', 'hasPage', 'images', 'location', 'locations',
     'muse', 'number', 'slug', 'status', 'summary', 'title', 'type', 'url', 'year',
   ].sort());
 });
@@ -171,6 +171,17 @@ test('record shape: hero is root-absolute /assets/images/<slug>/<file>', () => {
 test('record shape: blank hero → null', () => {
   const { index } = parse(md('title: A', 'prose'), 'STARDUST001.md');
   assert.equal(index.hero, null);
+});
+
+test('record shape: images resolve to root-absolute /assets/images/<slug>/<file>', () => {
+  const { index } = parse(md('title: A\nimages:\n  - a.jpg\n  - b.jpg', 'prose'), 'STARDUST001.md');
+  assert.deepEqual(index.images, ['/assets/images/stardust001/a.jpg', '/assets/images/stardust001/b.jpg']);
+});
+
+test('record shape: missing/empty images → [] (and blank entries dropped)', () => {
+  assert.deepEqual(parse(md('title: A', 'prose'), 'STARDUST001.md').index.images, []);
+  assert.deepEqual(parse(md('title: A\nimages: []', 'prose'), 'STARDUST001.md').index.images, []);
+  assert.deepEqual(parse(md('title: A\nimages:\n  - a.jpg\n  -', 'prose'), 'STARDUST001.md').index.images, ['/assets/images/stardust001/a.jpg']);
 });
 
 // ── (f) hasPage / tile-only logic ────────────────────────────────────────────
@@ -220,7 +231,7 @@ test('pipeline: real content/ builds and every record has the index keys', async
   assert.ok(idx.length >= 5, 'expected the 5 real campaigns');
   assert.equal(summary.total, idx.length);
   const required = ['slug', 'type', 'number', 'title', 'muse', 'cause', 'hex',
-    'status', 'year', 'locations', 'location', 'hero', 'summary', 'hasPage', 'url'];
+    'status', 'year', 'locations', 'location', 'hero', 'images', 'summary', 'hasPage', 'url'];
   for (const c of idx) {
     for (const k of required) assert.ok(k in c, `${c.slug} missing key ${k}`);
   }

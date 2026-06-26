@@ -11,6 +11,7 @@ import { TILE_VERT, TILE_FRAG } from './globe-shaders.js';
 import { IcosahedronGeometry, QuadGeometry } from './globe-geometry.js';
 import { ArcballControl } from './globe-controls.js';
 import { buildAtlas, buildNoiseTile } from './tile-atlas.js';
+import { arrangeOnGraph } from './selection.js';
 
 const DPR = () => Math.min(2, window.devicePixelRatio || 1);
 
@@ -169,6 +170,12 @@ export class Globe {
     this.ico.subdivide(1).spherize(this.SPHERE_RADIUS);
     this.instancePositions = this.ico.vertices.map((v) => v.position);
     this.instanceCount = this.ico.vertices.length;
+    this.adjacency = this.#buildAdjacency();
+    // Arrange the item pool onto the vertices so no two ADJACENT circles show the same photo
+    // (Memo: no "same background next to each other"), then same-campaign neighbours are
+    // minimised too. Makes items.length === instanceCount so the shader's vInstanceId % count
+    // becomes an identity map (vertex v → items[v]). See #arrangeItems.
+    this.items = this.#arrangeItems(this.items);
 
     this.#initInstances();
     gl.bindVertexArray(null);
@@ -277,9 +284,27 @@ export class Globe {
     this.instanceFinalScale = new Float32Array(this.instanceCount);
   }
 
+  // Vertex adjacency of the spherised icosahedron: adjacency[v] = Set of vertices sharing an
+  // edge with v (from the triangle faces). Drives #arrangeItems' "no same background adjacent".
+  #buildAdjacency() {
+    const adj = Array.from({ length: this.instanceCount }, () => new Set());
+    for (const f of this.ico.faces) {
+      adj[f.a].add(f.b); adj[f.a].add(f.c);
+      adj[f.b].add(f.a); adj[f.b].add(f.c);
+      adj[f.c].add(f.a); adj[f.c].add(f.b);
+    }
+    return adj;
+  }
+
+  // Place the item pool onto the vertices so no two ADJACENT circles share a background
+  // (delegates to the pure, tested selection.arrangeOnGraph using this sphere's adjacency).
+  #arrangeItems(pool) {
+    return arrangeOnGraph(pool, this.adjacency, this.instanceCount);
+  }
+
   // ── public seam: swap the item set (Phase-4 filtering) ────────────────────────
   async setItems(items) {
-    this.items = items || [];
+    this.items = this.#arrangeItems(items || []);
     this.activeIndex = -1;
     this.#computeInstanceScales(); // muse/campaign sizes for the new set
     this.#computeInstanceColors(); // procedural-disc accent colours for the new set
@@ -435,7 +460,7 @@ export class Globe {
       m: mat4.create(), r: mat4.create(), s: mat4.create(),
       back: vec3.fromValues(0, 0, -this.SPHERE_RADIUS),
     });
-    const baseScale = 0.25;
+    const baseScale = 0.275;   // +10% (Memo: bigger circles, less negative space — verify no halo bleed)
     const SCALE_INTENSITY = 0.6;
     const orient = this.control.orientation;
 
@@ -585,6 +610,19 @@ export class Globe {
     const e = proj(this.SPHERE_RADIUS, 0, 0);
     if (!c || !e) return null;
     return Math.hypot(e[0] - c[0], e[1] - c[1]);
+  }
+
+  // Public: the sphere centre's on-screen position in CSS px (projection of the origin).
+  // The halo is centred at the viewport centre, so comparing this against
+  // (clientWidth/2, clientHeight/2) exposes any globe↔halo OFFSET — the heart of the
+  // Safari misalignment (the ?viewprobe reads it; the alignment fix can anchor to it).
+  getSphereScreenCenter() {
+    const vp = mat4.multiply(mat4.create(), this.camera.matrices.projection, this.camera.matrices.view);
+    const cssW = this.gl.canvas.clientWidth;
+    const cssH = this.gl.canvas.clientHeight;
+    const clip = vec4.transformMat4(vec4.create(), [0, 0, 0, 1], vp);
+    if (clip[3] <= 0) return null;
+    return { cx: (clip[0] / clip[3] * 0.5 + 0.5) * cssW, cy: (1 - (clip[1] / clip[3] * 0.5 + 0.5)) * cssH };
   }
 
   // Public: the active (centre-snapped) tile's on-screen circle in CSS px → { cx, cy, r }.

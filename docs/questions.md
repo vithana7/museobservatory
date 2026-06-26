@@ -30,15 +30,15 @@ see the 2026-06-23 section in [decisions.md](decisions.md). What's still open:
 
 ## Known follow-ups (not blocking)
 
-- **Q · Automate hero downscaling (`sharp`).** Authors can currently ship full-res heroes
-  by hand; a build/prepare step with `sharp` (staged devDep) would prevent it. Nice-to-have
-  once the foundation is locked.
+- **Q · Automate image downscaling (`sharp`).** Today it's a manual `sips` pass (≤2400px JPG q85,
+  HEIC/PNG → JPG; see D-4) — authors could still ship full-res by hand. A build/prepare step with
+  `sharp` (staged devDep) would enforce it. Nice-to-have once the foundation is locked.
 
 - **Q · `createProgram` hardening.** `globe.js:32` skips the attach on a failed shader
   compile, then relies on `linkProgram` to fail — returns `null` correctly but double-logs.
   Tighten to bail on the first null shader. Smell, not a bug; see [frontend.md](frontend.md).
 
 - **Q · `dispose()` listener teardown.** `dispose()` now `gl.delete*`s the textures/buffers/
-  program/VAO (done 2026-06-23). Window/document listener teardown (`initZoomControl`/
+  program/VAO (done 2026-06-23). Window/document listener teardown (`initGlobeZoom`/
   `initFilters`/`maybeInitGlobe`) is explicitly DEFERRED — no in-place re-init exists today,
   so it's speculative SPA plumbing; build it only if a future SPA re-inits the globe in-place.

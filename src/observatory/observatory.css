@@ -22,7 +22,9 @@ body.observatory {
   z-index: 10;
   display: block;
   line-height: 0;          /* no descender gap under the wordmark */
+  transition: scale 150ms var(--ease-out);   /* press feedback (Emil) — `scale` not `transform` so the mobile translateX centring survives */
 }
+.observatory-back:active { scale: 0.95; }
 .observatory-back img {
   display: block;
   height: clamp(16px, 2vw, 22px);
@@ -30,7 +32,9 @@ body.observatory {
   opacity: 0.7;
   transition: opacity 0.2s ease;
 }
-.observatory-back:hover img { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .observatory-back:hover img { opacity: 1; }
+}
 .observatory-back:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 /* Mobile: the wordmark goes top-CENTRE (the zoom pill lives bottom-centre on mobile, so the
    top middle is free and reads as the masthead). Desktop keeps it top-left. */
@@ -54,7 +58,7 @@ body.observatory {
   width: 100%;
   height: 100%;
   display: none;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s var(--ease-out);
 }
 #observatory-cloud {
   z-index: 0;
@@ -76,13 +80,19 @@ body.observatory {
 #observatory-halo {
   z-index: 1;
   --halo-r: 30vmin; /* fallback before the first frame sets px */
+  /* The radial ring (slightly brighter + wider feather so the wisps read). A low-frequency
+     fractal-noise MASK then carves the uniform band into sparse, uneven cloud — a milky-way
+     wisp rather than a clean halo. The interior is alpha 0, so the mask can't haze the globe.
+     The noise RGB is white so luminance-mask engines fall back to the full (un-wisped) ring. */
   background:
     radial-gradient(circle at 50% 50%,
       rgba(255, 255, 255, 0) 0,
-      rgba(255, 255, 255, 0) calc(var(--halo-r) - 12px),
-      rgba(255, 255, 255, 0.14) var(--halo-r),
-      rgba(232, 236, 245, 0.07) calc(var(--halo-r) + 10vmin),
-      rgba(255, 255, 255, 0) calc(var(--halo-r) + 28vmin));
+      rgba(255, 255, 255, 0) calc(var(--halo-r) - 16px),
+      rgba(255, 255, 255, 0.20) var(--halo-r),
+      rgba(232, 236, 245, 0.10) calc(var(--halo-r) + 12vmin),
+      rgba(255, 255, 255, 0) calc(var(--halo-r) + 30vmin));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='400'%20height='400'%3E%3Cfilter%20id='h'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.011'%20numOctaves='2'%20seed='9'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='matrix'%20values='0%200%200%200%201%200%200%200%200%201%200%200%200%200%201%200%200%200%201.5%20-0.35'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23h)'/%3E%3C/svg%3E") center / 165% 165% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='400'%20height='400'%3E%3Cfilter%20id='h'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.011'%20numOctaves='2'%20seed='9'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='matrix'%20values='0%200%200%200%201%200%200%200%200%201%200%200%200%200%201%200%200%200%201.5%20-0.35'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23h)'/%3E%3C/svg%3E") center / 165% 165% no-repeat;
   pointer-events: none;
 }
 #observatory-starfield {
@@ -93,7 +103,8 @@ body.observatory {
   z-index: 3;
   touch-action: none;     /* the globe claims drags; page itself doesn't scroll */
 }
-body.globe-active { overflow: hidden; }
+/* The globe scroll-lock is JS-managed on <html> (see setListView/maybeInitGlobe), not <body>
+   overflow — toggling overflow on the propagating <body> didn't re-enable scroll on Safari. */
 body.globe-active #observatory-cloud,
 body.globe-active #observatory-halo,
 body.globe-active #observatory-starfield,
@@ -129,7 +140,6 @@ body.globe-active.list-view .observatory-list {
   clip-path: none;
   white-space: normal;
 }
-body.list-view { overflow: auto; }
 body.globe-active.list-view #observatory-globe,
 body.globe-active.list-view #observatory-starfield,
 body.globe-active.list-view #observatory-cloud,
@@ -143,14 +153,18 @@ body.globe-active.list-view #observatory-halo { display: none; }
 }
 .observatory-list-title {
   margin: 0 0 8px;
-  font-weight: 700;
+  font-weight: 800;                  /* the title reads bold (was 700) */
   font-size: clamp(32px, 6vw, 56px);
   letter-spacing: -0.01em;
+  text-align: center;
+  text-wrap: balance;                /* never strand a single word on its own line */
 }
 .observatory-list-intro {
   margin: 0 0 clamp(32px, 6vw, 56px);
   color: rgba(255, 255, 255, 0.6);
   font-size: clamp(16px, 1.8vw, 20px);
+  text-align: center;
+  text-wrap: pretty;                 /* avoid a one-word last line (widow) */
 }
 .observatory-list-items { list-style: none; margin: 0; padding: 0; }
 
@@ -163,9 +177,11 @@ body.globe-active.list-view #observatory-halo { display: none; }
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   color: inherit;
   text-decoration: none;
-  transition: padding-left 0.2s ease, background 0.2s ease;
+  transition: transform 0.2s var(--ease-out), background 0.2s ease;
 }
-a.observatory-list-link:hover { padding-left: 14px; }
+@media (hover: hover) and (pointer: fine) {
+  a.observatory-list-link:hover { transform: translateX(14px); }   /* GPU transform, not padding-left (no reflow) */
+}
 
 .observatory-list-chip {
   flex: 0 0 auto;
@@ -174,6 +190,17 @@ a.observatory-list-link:hover { padding-left: 14px; }
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 12px -2px var(--accent);
+}
+/* muse glyph marker — the white muse silhouette (--glyph) tinted to the muse hex via a mask, so
+   it keeps the dot's colour identity but reads as the muse symbol. Falls back to nothing visible
+   if mask is unsupported (rare); the campaign name still carries the row. */
+.observatory-list-glyph {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  background: var(--accent);
+  -webkit-mask: var(--glyph) center / contain no-repeat;
+          mask: var(--glyph) center / contain no-repeat;
 }
 .observatory-list-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .observatory-list-eyebrow {
@@ -187,6 +214,7 @@ a.observatory-list-link:hover { padding-left: 14px; }
   font-size: clamp(19px, 2.4vw, 26px);
   font-weight: 700;
   line-height: 1.15;
+  text-wrap: balance;                /* keep the campaign name off a one-word last line */
 }
 .observatory-list-meta { font-size: 14px; color: rgba(255, 255, 255, 0.5); }
 
@@ -209,97 +237,37 @@ a.observatory-list-link:focus-visible {
   outline-offset: 2px;
 }
 
-/* ── zoom control — draggable pill (ported beam-glow rim + liquid-glass body from
-      base.css/comet.css; tuned for this dark page) ──────────────────────────────── */
-/* Mobile (base): bottom-centre. Desktop: top-right, mirroring the cocoex wordmark
-   (top-left). Shown only with the globe; subtle until hovered/used. */
-/* Zoom now lives inside the left .filter-wrap rail (below the filter), so it's static. The
-   −/+ glyphs sit INSIDE the track (black, on the bright glass) so it reads as a zoom. */
-.zoom-wrap {
-  display: flex;
-  align-items: center;
+/* ── list view INVERSE (dark-on-white) — the inverse of the space background. Applies whenever
+      the list is the full page: the globe↔list toggle (body.list-view) AND the no-WebGL /
+      reduced-motion fallback (body.list-only). Muse accents (glyph, eyebrow) are KEPT. ───── */
+body.list-view,
+body.list-only { background: var(--color-offwhite, #FAFAFA); }
+/* the cocoex wordmark is a WHITE png → invert it to read on the light background */
+body.list-view .observatory-back img,
+body.list-only .observatory-back img { filter: invert(1); }
+/* muse-less rows have no inline --accent → give them a neutral that reads on white (muse rows
+   keep their inline hex, which wins over this) */
+body.list-view .observatory-list-link,
+body.list-only .observatory-list-link {
+  --accent: #6b6b6b;
+  border-bottom-color: rgba(0, 0, 0, 0.12);
 }
-.zoom-glyph {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1;               /* above the glass, below the thumb (z-index:2) */
-  font-size: 13px;
-  line-height: 1;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.85);   /* light −/+ glyphs read on the dark pill */
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.zoom-glyph--minus { left: 6px; }
-.zoom-glyph--plus { right: 6px; }
+body.list-view .observatory-list-title,
+body.list-only .observatory-list-title,
+body.list-view .observatory-list-name,
+body.list-only .observatory-list-name { color: #1a1a1a; }
+body.list-view .observatory-list-intro,
+body.list-only .observatory-list-intro { color: rgba(0, 0, 0, 0.55); }
+body.list-view .observatory-list-meta,
+body.list-only .observatory-list-meta { color: rgba(0, 0, 0, 0.5); }
+body.list-view .observatory-list-soon,
+body.list-only .observatory-list-soon { color: rgba(0, 0, 0, 0.4); }
 
-.zoom-pill {
-  position: relative;
-  width: clamp(84px, 11vw, 116px);
-  height: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 50px;
-  cursor: pointer;
-  touch-action: pan-y;      /* horizontal drag is ours; vertical still scrolls */
-  user-select: none;
-  -webkit-user-select: none;
-}
-.zoom-thumb {
-  position: absolute;
-  top: 50%;
-  left: 2px;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-  transform: translateY(-50%);
-  z-index: 2;
-  pointer-events: none;     /* the pill handles the pointer */
-}
-.zoom-pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-
-/* ── @property + beam-glow rim (ported from base.css) ────────────────────────────── */
+/* ── @property + spin keyframe (the conic muse base under .pill-glass uses --beam-angle) ─── */
 @property --beam-angle {
   syntax: '<angle>';
   inherits: false;
   initial-value: 0deg;
-}
-.beam-glow { position: relative; isolation: isolate; }
-.beam-glow::before,
-.beam-glow::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  pointer-events: none;
-  background: conic-gradient(from var(--beam-angle),
-    rgba(213, 77, 46, 0) 0deg,
-    #D54D2E 40deg, #D48348 60deg, #F8D86A 80deg,
-    #8CB07F 100deg, #5783A6 120deg, #5E47A1 140deg,
-    rgba(127, 73, 162, 0) 170deg,
-    transparent 360deg);
-  animation: beam-spin 5s linear infinite;
-}
-.beam-glow::before {
-  padding: 2px;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  z-index: 1;
-}
-.beam-glow::after {
-  padding: 5px;
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  filter: blur(7px);
-  opacity: 0.55;
-  z-index: -1;
 }
 @keyframes beam-spin { to { --beam-angle: 360deg; } }
 
@@ -341,25 +309,47 @@ a.observatory-list-link:focus-visible {
   background-size: 150px 150px;
 }
 
-/* Zoom pill: slope-y glass — brighter on the left, fading to the right (a direction
-   cue that replaces the dropped "in/out" labels). The 90deg layer rides on top of the
-   shared vertical frost. */
-.zoom-pill .pill-glass::before {
-  /* Dark glass + a subtle left→right light slope (brighter sheen left, fading right) as the
-     direction cue, in the dark palette. */
+/* ── control pills: drifting randomised muse colours. A soft sweep of muse hexes, slowly
+      drifting; per-pill random delay/duration (set in JS, initPillColours) so they never sync
+      up. The frost is lightened so the colour reads while the white labels stay legible. ── */
+.filter-pill .pill-glass,
+.view-pill .pill-glass {
+  /* per-pill muse blend: --m1/--m2/--m3 are picked in JS (initPillColours) from a SHUFFLED
+     palette, windowed so the two pills span cools + warms. Fallback = a cool/warm mix if JS
+     hasn't run yet. */
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 45%),
-    linear-gradient(180deg, rgba(28, 28, 30, 0.86) 0%, rgba(18, 18, 20, 0.78) 45%, rgba(26, 26, 28, 0.86) 100%);
+    linear-gradient(160deg,
+      var(--m1, var(--lunes)), var(--m2, var(--shukra)),
+      var(--m3, var(--rabu)), var(--m1, var(--lunes)));
+  background-size: 220% 220%;
+  animation: muse-drift 22s ease-in-out infinite;
+}
+/* MATTE black overlay: no white top-sheen (shine), a deeper near-black frost so the muse colour
+   reads muted under glass rather than glossy. The .pill-glass::after grain supplies the matte tooth. */
+.filter-pill .pill-glass::before,
+.view-pill .pill-glass::before {
+  background: linear-gradient(180deg, rgba(13, 13, 13, 0.52) 0%, rgba(13, 13, 13, 0.62) 100%);
+}
+/* Filter pressed/open → solid matte black (label stays white); reverts to the muse glass on close. */
+.filter-pill[aria-expanded="true"] .pill-glass {
+  background: #0d0d0d;       /* brand ink */
+  animation: none;
+}
+.filter-pill[aria-expanded="true"] .pill-glass::before {
+  background: linear-gradient(180deg, rgba(13, 13, 13, 0.55), rgba(13, 13, 13, 0.7));
+}
+@keyframes muse-drift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .beam-glow::before, .beam-glow::after, .pill-glass { animation: none; }
+  .pill-glass { animation: none; }
 }
 
-/* ── filter control — a rail (same beam-glow + glass pill as zoom) ──────────────────
-      Desktop: a vertically-centred LEFT-edge rail (clears the cocoex wordmark, top-left,
-      z-index 10); the facet panel opens to the right. Mobile (≤767px, below): bottom-centred,
+/* ── control rail — Filter + List pills, vertically-centred at the LEFT edge (clears the cocoex
+      wordmark); the facet panel opens to the right. Mobile (≤767px, below): bottom-centred,
       panel opens upward. Shown only with the globe; subtle until used. */
 .filter-wrap {
   position: fixed;
@@ -372,22 +362,31 @@ a.observatory-list-link:focus-visible {
   align-items: flex-start;
   gap: 10px;
   max-height: 80vh;
-  opacity: 0.45;
-  transition: opacity 0.3s ease;
+  opacity: 0.85;          /* the rail stays legible at rest */
+  transition: opacity 0.3s var(--ease-out);
 }
 body.globe-active .filter-wrap { display: flex; }
-.filter-wrap:hover,
 .filter-wrap:focus-within,
 .filter-wrap:active,
 .filter-wrap.is-open { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .filter-wrap:hover { opacity: 1; }   /* hover gated so a tap on the mobile rail doesn't stick */
+}
+
+/* The rail holds two ALWAYS-VISIBLE pills (Filter + List) as direct children — no coin, no
+   open/close. The Filter pill opens its facet panel (.is-open); List toggles the view. */
+
+/* the filter pill + its panel share this relative anchor so the panel opens beside the PILL
+   (the panel is position:absolute against this). */
+.filter-control { position: relative; }
 
 .filter-pill {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: clamp(84px, 11vw, 116px);   /* match the zoom pill width */
-  height: 24px;
+  width: clamp(18px, 2.4vw, 21px);  /* 20% narrower; match the zoom pill width */
+  height: clamp(84px, 12vh, 110px); /* 20% longer */
   padding: 0;
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 50px;
@@ -400,9 +399,13 @@ body.globe-active .filter-wrap { display: flex; }
 .filter-pill-label {
   position: relative;
   z-index: 2;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  writing-mode: vertical-rl;     /* label reads bottom→top along the vertical bar */
+  text-orientation: mixed;
+  transform: rotate(180deg);     /* flip so it reads the other way (head-tilt left) */
+  font-family: var(--font-canela);  /* brand serif (the button breaks body inheritance) */
+  font-size: 10px;
+  font-weight: 700;              /* match the list-page eyebrow treatment (brand) */
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #fff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
@@ -416,8 +419,8 @@ body.globe-active .filter-wrap { display: flex; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: clamp(84px, 11vw, 116px);   /* match the filter/zoom pill width */
-  height: 24px;
+  width: clamp(18px, 2.4vw, 21px);  /* 20% narrower; match the filter/zoom pill width */
+  height: clamp(84px, 12vh, 110px); /* 20% longer */
   padding: 0;
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 50px;
@@ -430,9 +433,13 @@ body.globe-active .filter-wrap { display: flex; }
 .view-pill-label {
   position: relative;
   z-index: 2;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  writing-mode: vertical-rl;     /* label reads bottom→top along the vertical bar */
+  text-orientation: mixed;
+  transform: rotate(180deg);     /* flip so it reads the other way (head-tilt left) */
+  font-family: var(--font-canela);  /* brand serif (the button breaks body inheritance) */
+  font-size: 10px;
+  font-weight: 700;              /* match the list-page eyebrow treatment (brand) */
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #fff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
@@ -440,105 +447,169 @@ body.globe-active .filter-wrap { display: flex; }
 .view-pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .view-pill .pill-glass { opacity: 0.85; }
 
-/* The panel opens to the RIGHT of the filter pill (anchored to its top edge) so it sticks
-   beside the pill rather than pushing the zoom down. Dark liquid-glass body to match the
-   dark pill aesthetic. Scrolls internally if the facet list ever outgrows the rail. */
+/* press feedback — a subtle push-in so the pills feel like they're listening (Emil). `scale`
+   (the independent transform prop, not `transform`) so the mobile bottom-rail centring survives. */
+.filter-pill, .view-pill { transition: scale 150ms var(--ease-out); }
+.filter-pill:active, .view-pill:active { scale: 0.96; }
+
+/* The panel opens to the RIGHT of the filter pill (anchored to its top edge) so it sticks beside
+   the pill rather than pushing the zoom down. It is a SCALED-DOWN echo of the list page (the
+   canonical brand surface): off-white paper floating on the dark globe, brand serif, muse-coloured
+   eyebrows + muse glyphs, hairline dividers — space is the separator, no boxes/chips. */
 .filter-panel {
   position: absolute;
   top: 0;
-  left: calc(100% + 12px);   /* just right of the rail (pill width) */
-  width: min(260px, 70vw);
+  left: calc(100% + 14px);   /* just right of the rail (pill width) */
+  width: min(258px, 72vw);
   max-height: 80vh;
   overflow-y: auto;
-  padding: 18px 18px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 18px;
-  /* Dark translucent glass to match the dark pills (was white liquid-glass). */
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 45%),
-    linear-gradient(180deg, rgba(22, 22, 24, 0.92) 0%, rgba(14, 14, 16, 0.86) 45%, rgba(20, 20, 22, 0.92) 100%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  color: #eee;
+  padding: 22px 22px 18px;
+  border: none;
+  border-radius: 16px;       /* softer, rounded card */
+  background: var(--color-offwhite, #FAFAFA);    /* mirrors the list-view ground */
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);   /* soft lift so it floats, no hard box edge */
+  color: #1a1a1a;                                /* mirrors the list title/name ink */
   display: flex;
   flex-direction: column;
+  /* Entrance: grow from the pill it's anchored to (Emil — popovers scale from their trigger, not
+     centre), ~180ms strong ease-out, opacity + scale only. `scale` is the independent transform
+     prop so the mobile `translate` centring composes cleanly. CLASS-driven (.is-open) rather than
+     @starting-style so the grow animates on EVERY iOS version, not just Safari 18+. `visibility`
+     is delayed on close so the panel stays rendered through the fade-out, then hides — keeping it
+     out of the a11y tree + untabbable when closed (the old `hidden` did this). */
+  transform-origin: left center;
+  opacity: 0;
+  scale: 0.96;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 180ms var(--ease-out), scale 180ms var(--ease-out), visibility 0s linear 180ms;
 }
-.filter-panel[hidden] { display: none; }
-.filter-group { margin-bottom: 16px; }
-.filter-group:last-of-type { margin-bottom: 12px; }
+.filter-panel.is-open {
+  opacity: 1;
+  scale: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 180ms var(--ease-out), scale 180ms var(--ease-out), visibility 0s;
+}
+/* subtle feTurbulence grain → a matte "glass"/paper tooth over the card (same noise the pills +
+   flip use). multiply on the off-white darkens just enough to texture it; pointer-transparent. */
+.filter-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+.filter-panel[hidden] { display: none; }   /* no-JS fallback; JS removes the attribute and drives .is-open */
+/* hairline dividers between facet groups — the list-row device, not boxes */
+.filter-group { padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid rgba(0, 0, 0, 0.12); }
+.filter-group:last-of-type { padding-bottom: 12px; margin-bottom: 12px; }
+/* mirrors .observatory-list-eyebrow, scaled down */
 .filter-group-label {
   display: block;
-  margin-bottom: 7px;
+  margin-bottom: 11px;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(0, 0, 0, 0.5);
 }
-.filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 9px 18px; }   /* generous space, no chip boxes */
+/* a chip = an optional muse glyph + a serif word floating on the paper (like a list name, small);
+   selecting it inks the word + draws a short muse-coloured underline — no pill/box, per the brand. */
 .filter-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  font-size: 11px;
-  line-height: 1.2;
-  color: #eee;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50px;
+  gap: 8px;
+  padding: 2px 0;
+  font-family: inherit;          /* the brand serif — buttons don't inherit body font-family */
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: rgba(0, 0, 0, 0.45);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease, scale 0.15s var(--ease-out);
 }
-.filter-chip:hover { background: rgba(255, 255, 255, 0.16); }
+@media (hover: hover) and (pointer: fine) {
+  .filter-chip:hover { color: rgba(0, 0, 0, 0.8); }
+}
+.filter-chip:active { scale: 0.97; }   /* press feedback (Emil) */
 .filter-chip[aria-pressed="true"] {
-  /* INVERTED on the dark panel: a bright chip pops as the selected state. */
-  background: #fff;
-  color: #111;
-  border-color: #fff;
+  color: #1a1a1a;
+  border-bottom-color: var(--chip, #1a1a1a);   /* muse hue for muse chips; ink for type/status */
 }
-.filter-chip-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--chip, #888);
+/* muse marker — the masked muse silhouette tinted to its hue (the list-page glyph, scaled down) */
+.filter-chip-glyph {
+  width: 17px;
+  height: 17px;
   flex: none;
+  background: var(--chip, #888);
+  -webkit-mask: var(--glyph) center / contain no-repeat;
+          mask: var(--glyph) center / contain no-repeat;
 }
+/* Stagger: when the panel opens the chips cascade in (Emil — group entrances stagger 30–80ms).
+   Re-runs each open because the panel toggles display:none→flex. Uses `transform`; the press
+   `scale` is the independent prop so the two never clobber. nth-child restarts per group. */
+@keyframes chip-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.filter-panel.is-open .filter-chip {
+  animation: chip-in 200ms var(--ease-out) both;
+}
+.filter-chips .filter-chip:nth-child(2) { animation-delay: 30ms; }
+.filter-chips .filter-chip:nth-child(3) { animation-delay: 60ms; }
+.filter-chips .filter-chip:nth-child(4) { animation-delay: 90ms; }
+.filter-chips .filter-chip:nth-child(5) { animation-delay: 120ms; }
+.filter-chips .filter-chip:nth-child(6) { animation-delay: 150ms; }
+.filter-chips .filter-chip:nth-child(n+7) { animation-delay: 180ms; }   /* cap: tightens the tail + guards >7 chips from popping with no delay */
 .filter-geo {
   width: 100%;
-  padding: 6px 10px;
-  font-size: 12px;
-  color: #eee;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  padding: 5px 2px;
+  font-family: inherit;          /* brand serif — inputs don't inherit body font-family */
+  font-size: 13px;
+  color: #1a1a1a;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);   /* a baseline, not a box */
+  border-radius: 0;
 }
-.filter-geo::placeholder { color: rgba(255, 255, 255, 0.4); }
-.filter-geo:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.filter-geo::placeholder { color: rgba(0, 0, 0, 0.4); }
+.filter-geo:focus-visible { outline: none; border-bottom-color: #1a1a1a; }
 .filter-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12px;
+  margin-top: 14px;
 }
-.filter-count { font-size: 11px; color: rgba(255, 255, 255, 0.55); }
+.filter-count { font-size: 12px; color: rgba(0, 0, 0, 0.5); }
 .filter-clear {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.9);
+  font-family: inherit;          /* brand serif — buttons don't inherit body font-family */
+  font-size: 12px;
+  color: #1a1a1a;
   background: none;
   border: none;
   text-decoration: underline;
   cursor: pointer;
   opacity: 0.7;
 }
-.filter-clear:hover { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .filter-clear:hover { opacity: 1; }
+}
 .filter-clear[hidden] { display: none; }
 
 /* Mobile: the rail sits BOTTOM-CENTRED (not the left edge), pill + zoom side by side, and
    the facet panel opens UPWARD + centred (the desktop right-opening panel would overflow a
    narrow viewport). Desktop keeps the left rail untouched. */
 @media (max-width: 767px) {
+  /* the rail docks bottom-centre and lays its two pills in a HORIZONTAL row (side-by-side). */
   .filter-wrap {
     left: 50%;
     right: auto;
@@ -547,14 +618,34 @@ body.globe-active .filter-wrap { display: flex; }
     transform: translateX(-50%);
     flex-direction: row;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
     max-height: none;
   }
+  /* the two bars turn HORIZONTAL (wide + short). Slimmer than a chunky button (closer to the
+     desktop W/L ratio), with a ≥34px floor so they stay comfortably tappable. */
+  .filter-pill, .view-pill {
+    width: clamp(108px, 40vw, 150px);
+    height: clamp(34px, 5.2vh, 40px);
+  }
+  /* labels read horizontally inside the horizontal bars (un-rotate the vertical desktop label),
+     and bigger than the tiny desktop label since there's room on mobile. */
+  .filter-pill-label, .view-pill-label {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: 13px;
+  }
+  /* the facet panel centres on the VIEWPORT, not the off-centre Filter pill: dropping the
+     .filter-control positioning context makes the absolute panel anchor to the centred
+     .filter-wrap instead — so left:50% is screen-centre and it can never spill off-edge. */
+  .filter-control { position: static; }
   .filter-panel {
     top: auto;
-    bottom: calc(100% + 12px);   /* open upward, above the rail */
+    bottom: calc(100% + 14px);   /* open upward, above the rail */
     left: 50%;
-    transform: translateX(-50%);
+    transform: none;
+    translate: -50% 0;                 /* centre via the independent prop so the `scale` entrance is free */
+    transform-origin: bottom center;   /* mobile panel opens UPWARD → grow from its bottom (the rail) */
+    width: min(320px, calc(100vw - 32px));
     max-height: 60vh;
   }
 }
@@ -589,15 +680,18 @@ body.globe-active .filter-wrap { display: flex; }
   aspect-ratio: 1;
   perspective: 1200px;
   transform-origin: 50% 50%;
-  transition: transform 0.82s cubic-bezier(0.34, 1.56, 0.5, 1);
+  /* OPEN: the hero moment — expressive grow, but trimmed from 0.82s and the overshoot eased
+     (1.56→1.3) so it reads intentional, not slow. The faster, un-bouncy CLOSE is set inline in
+     observatory.js (asymmetric: grand open, snappy dismiss — Emil). */
+  transition: transform 0.55s cubic-bezier(0.34, 1.3, 0.5, 1);
 }
 .tile-flip-inner {
   position: relative;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  /* weighted back-out flip, matching the homepage orbit card (muse.css) */
-  transition: transform 0.82s cubic-bezier(0.34, 1.56, 0.5, 1);
+  /* weighted back-out flip (trimmed to match the card's open). Close overrides this inline. */
+  transition: transform 0.55s cubic-bezier(0.34, 1.3, 0.5, 1);
 }
 #observatory-flip.is-open .tile-flip-inner { transform: rotateY(180deg); }
 
@@ -658,7 +752,23 @@ body.globe-active .filter-wrap { display: flex; }
   font-weight: 700;
   font-size: clamp(22px, 3.2vw, 32px);
   color: #fff;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  /* tight dark edge + soft glow so the label holds on the bright duotone */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.92), 0 2px 14px rgba(0, 0, 0, 0.6);
+}
+/* soft dark scrim behind the centred label on HERO discs (the 'color' duotone keeps the photo
+   bright, so white text needs seating). Sits above the photo + wash, below the label (z 2). The
+   rim stays vibrant. Matches the canvas tile's radial scrim in tile-atlas.js. */
+.tile-flip-front.has-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  /* centre alpha 0.29 → 0.44× at 40% → 0 at 66%. Mirrors the canvas tile's radial scrim
+     (HERO_TINT.scrimCenter in tile-atlas.js) — keep the two in sync. */
+  background: radial-gradient(circle at 50% 50%,
+    rgba(0, 0, 0, 0.29) 0%, rgba(0, 0, 0, 0.128) 40%, rgba(0, 0, 0, 0) 66%);
 }
 
 /* front hero photo — mirrors the WebGL campaign tile (cover-fit + accent wash + label) so the
@@ -669,13 +779,18 @@ body.globe-active .filter-wrap { display: flex; }
   border-radius: 50%;
   background-size: cover;
   background-position: center;
+  filter: contrast(0.82) brightness(1.06); /* "tamed": soften the photo before the colour blend
+                                              (matches canvas HERO_TINT.photoFilter) */
 }
 .tile-flip-hero-wash {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   background: var(--accent, #5783A6);
-  opacity: 0.35;            /* matches tile-atlas.js HERO_TINT_ALPHA */
+  opacity: 1;               /* muse shade strength (matches canvas HERO_TINT.alpha) */
+  mix-blend-mode: color;    /* DUOTONE: recolour the SOFTENED photo INTO the muse hue. Matches the
+                               canvas tile's 'color' composite (HERO_TINT.blend) so the flip
+                               open/close swap stays seamless. Eyeball-tunable — keep tile ↔ flip in sync. */
 }
 
 /* curved rim title (seal-style): the eyebrow runs along the inside top arc of the disc, freeing
@@ -703,7 +818,9 @@ body.globe-active .filter-wrap { display: flex; }
    copy held inside the inscribed square via generous padding so it never spills the curve. */
 .tile-flip-back {
   transform: rotateY(180deg);
-  padding: clamp(28px, 13%, 58px);
+  /* asymmetric (more top, less bottom) → the centred name+desc+action block sits lower, clear of
+     the top rim arc, so the description reads balanced rather than high. */
+  padding: clamp(46px, 20%, 78px) clamp(28px, 13%, 58px) clamp(22px, 9%, 40px);
   text-align: center;
   background:
     radial-gradient(ellipse 90% 65% at 50% 20%, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0) 60%),
@@ -732,10 +849,11 @@ body.globe-active .filter-wrap { display: flex; }
   margin: 0 0 8px;
   font-family: var(--font-canela);
   font-weight: 700;
-  font-size: clamp(18px, 2.6vw, 24px);
+  font-size: clamp(20px, 3vw, 28px);   /* batch 3: title regains weight vs the smaller rim arc */
   line-height: 1.08;
   text-transform: uppercase;
   letter-spacing: -0.01em;
+  text-wrap: balance;                /* keep the title off a one-word last line */
   color: #fff; /* fallback if color-mix unsupported */
   color: color-mix(in srgb, var(--accent, #ffffff) 78%, #fff); /* muse hue, lifted for AA on black */
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
@@ -746,6 +864,7 @@ body.globe-active .filter-wrap { display: flex; }
   margin: 0 0 14px;
   font-size: clamp(12px, 1.4vw, 14px);
   line-height: 1.4;
+  text-wrap: pretty;                 /* avoid a one-word last line in the summary */
   color: rgba(255, 255, 255, 0.72);
   /* safety: a long summary can't overflow the disc's curve */
   display: -webkit-box;
@@ -764,9 +883,12 @@ body.globe-active .filter-wrap { display: flex; }
   text-decoration: none;
   font-size: 12px;
   letter-spacing: 0.04em;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, scale 0.15s var(--ease-out);
 }
-a.tile-flip-action:hover { background: var(--accent, #fff); color: #000; }
+@media (hover: hover) and (pointer: fine) {
+  a.tile-flip-action:hover { background: var(--accent, #fff); color: #000; }
+}
+.tile-flip-action:active { scale: 0.97; }   /* press feedback (Emil) */
 .tile-flip-action--inert { opacity: 0.5; }
 
 /* While a flip is open, HIDE the globe entirely (opacity 0, was 0.22) so the real WebGL
@@ -781,4 +903,16 @@ body.flip-open #observatory-halo { opacity: 0.22; }
 @media (prefers-reduced-motion: reduce) {
   .tile-flip-card,
   .tile-flip-inner { transition: none; }
+}
+
+/* Reduced motion: neutralise the NEW press/scale + popup-grow + chip-stagger motion as well
+   (the blocks above already cover the rail, the pills' gradient, the chips' colour, and the
+   flip). Keep it gentle — instant, not removed. */
+@media (prefers-reduced-motion: reduce) {
+  .filter-pill, .view-pill, .observatory-back, .tile-flip-action,
+  .filter-panel, .observatory-list-link { transition: none; }
+  .filter-pill:active, .view-pill:active, .observatory-back:active,
+  .filter-chip:active, .tile-flip-action:active { scale: 1; }
+  .filter-panel { scale: 1; }
+  .filter-panel.is-open .filter-chip { animation: none; }
 }

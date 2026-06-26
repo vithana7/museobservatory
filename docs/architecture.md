@@ -62,7 +62,7 @@ between `campaigns.json` and the views:
 It is wired in `observatory.js`: `boot()` samples the landing set, `initFilters()` builds
 the filter UI and swaps `globe.setItems()` + the list on every facet change. This is what
 lets the archive grow without limit while the globe stays a fixed, performant size. See
-the locked semantics (S-1/S-2/S-3) in [decisions.md](decisions.md).
+the locked semantics (S-1/S-2) in [decisions.md](decisions.md).
 
 ### Layer 4 — Views
 
@@ -72,7 +72,8 @@ the locked semantics (S-1/S-2/S-3) in [decisions.md](decisions.md).
   sync with the filtered set. A first-class sighted peer: the `.filter-wrap` rail has a
   globe↔list toggle (`body.list-view`), and a sparse filter match auto-falls-back to it
   (G-C / A-4, see [decisions.md](decisions.md)).
-- **Record pages** — generated static HTML, one per campaign.
+- **Record pages** — generated static HTML, one per campaign (cropped responsive hero,
+  swipeable gallery slideshow, cocoex footer; a small inlined script drives the slideshow — V-7).
 
 ## Data flow
 

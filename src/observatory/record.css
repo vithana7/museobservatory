@@ -117,6 +117,111 @@ body.observatory-record {
   margin: 12px 0;
 }
 
+/* lead cover image (frontmatter `hero`) — cropped to a standard hero BANNER so a big/tall source
+   photo can't dominate the page. Responsive: tall 4:5 on phones (immersive), wide 16:9 ≥600px. */
+.record-hero { margin: 0 0 clamp(32px, 6vw, 56px); }
+.record-hero img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 6px;
+}
+@media (min-width: 600px) {
+  .record-hero img { aspect-ratio: 16 / 9; }
+}
+
+/* gallery (frontmatter `images`) — a swipeable, AUTO-LOOPING slideshow. Each photo shows WHOLE
+   (object-fit: contain; letterbox matches the page so it's invisible) so artworks are never cropped.
+   Native scroll-snap = swipe; the inlined script (record-template.mjs) auto-advances + loops
+   continuously (seamless via a trailing clone of slide 0), builds the dots, and wires the minimal
+   background-less ‹ › prev/next arrows. */
+.record-gallery {
+  margin-top: clamp(44px, 8vw, 72px);
+  padding-top: clamp(28px, 5vw, 40px);
+  border-top: 1px solid #e2e2dc;
+}
+.gallery-viewport { position: relative; overflow: hidden; border-radius: 8px; }
+.gallery-track {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;              /* Firefox */
+}
+.gallery-track::-webkit-scrollbar { display: none; }   /* WebKit */
+.gallery-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: min(68vh, 560px);
+  background: var(--color-offwhite, #FAFAFA);   /* match the page → the letterbox is invisible */
+}
+.gallery-slide img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+/* minimal prev/next arrows — bare ‹ › chevrons, NO coin/background (subtle). A faint halo keeps
+   them legible whether they land over the page-coloured letterbox or a dark photo edge. */
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: none;                  /* no coin */
+  color: #1a1a1a;
+  opacity: 0.5;                      /* subtle at rest */
+  cursor: pointer;
+  transition: opacity 150ms var(--ease-out), scale 150ms var(--ease-out);
+}
+.gallery-prev { left: 2px; }
+.gallery-next { right: 2px; }
+.gallery-arrow svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.7));   /* halo so the bare glyph reads on dark photos */
+}
+.gallery-arrow:active { scale: 0.9; }   /* press feedback (Emil) */
+@media (hover: hover) and (pointer: fine) {
+  .gallery-arrow:hover { opacity: 0.9; }
+}
+/* dot indicators (built by the script) */
+.gallery-dots {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.gallery-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #c9c9c2;
+  cursor: pointer;
+  transition: background 150ms var(--ease-out), scale 150ms var(--ease-out);
+}
+.gallery-dot[aria-selected="true"] { background: var(--accent); scale: 1.3; }
+
 /* unverified [confirm] notes — flagged in dev preview */
 mark.confirm {
   background: #fff1bf;
@@ -124,6 +229,54 @@ mark.confirm {
   padding: 0 4px;
   border-radius: 2px;
   font-size: 0.9em;
+}
+
+/* ── cocoex footer — mirrors the main site: a full-bleed dark band (mission · socials · wordmark ·
+      legal) anchoring the foot of the light record page. Breaks out of the body padding to reach
+      the viewport edges + bottom (the same negative-margin device the draft banner uses). ── */
+.record-footer {
+  margin: clamp(56px, 10vh, 120px) calc(-1 * clamp(20px, 6vw, 80px)) calc(-1 * clamp(64px, 12vh, 160px));
+  padding: clamp(48px, 9vw, 96px) clamp(20px, 6vw, 80px) clamp(40px, 7vw, 72px);
+  background: var(--color-black, #000);
+  color: #fff;
+  text-align: center;
+}
+.footer-mission {
+  margin: 0 0 clamp(28px, 5vw, 44px);
+  font-size: clamp(22px, 3.4vw, 38px);
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin-bottom: clamp(26px, 4vw, 40px);
+}
+.footer-social a {
+  display: block;
+  color: rgba(255, 255, 255, 0.68);
+  transition: color 150ms var(--ease-out), scale 150ms var(--ease-out);
+}
+.footer-social a:active { scale: 0.9; }   /* press feedback (Emil) */
+.footer-social svg { display: block; width: 24px; height: 24px; }
+@media (hover: hover) and (pointer: fine) {
+  .footer-social a:hover { color: #fff; }
+}
+.footer-wordmark {
+  display: block;
+  width: clamp(118px, 18vw, 164px);
+  height: auto;
+  margin: 0 auto clamp(16px, 3vw, 26px);
+  opacity: 0.92;
+}
+.footer-legal {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 @media (prefers-reduced-motion: reduce) {

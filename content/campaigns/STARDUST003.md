@@ -5,8 +5,10 @@ status: upcoming
 year: 2026
 location:                  # list — one entry per place
   - Silent Rixdorf, Berlin · Germany
-hero: HoGP.png             # resolves to assets/images/stardust003/HoGP.png
-images: []
+hero: 00-hero.jpg                # cover circle → assets/images/stardust003/
+images:                    # full gallery (page) + extra globe leaves — order follows filename
+  - 1.jpg
+  - 2.jpg
 
 # Stardust factual block
 artist: Silat Beksi (record) · Memo (painting)
@@ -23,14 +25,14 @@ event:
 
 ## The work
 
-Silat Beksi — born and raised in Ukraine, a musician shaped by downtempo and ambient — releases a mini-LP dedicated to his country through the Berlin label La Luna. Alongside the record sits a painting. Both are made to be sold, turning sound and image into direct support for the people the work is about.
+Silat Beksi, a musician born and raised in Ukraine and shaped by downtempo and ambient, releases a mini-LP for his country on the Berlin label La Luna. A painting sits alongside the record. Both are made to be sold to raise funds for Ukraine.
 
 ## The event
 
 Silent Rixdorf, Berlin · 22 August 2026
 
-A listening session for the record, with performances alongside it.
+A listening session for the record, with live performances.
 
 ## The Comet
 
-The record and the painting are sold to raise funds for Repair Together — a volunteer-led initiative supporting Ukrainian communities affected by the war. Since 2022 they have run over 100 clean-up events, helped rebuild more than 30 homes, and mobilised more than 2,500 volunteers.
+The record and the painting are sold to raise funds for Repair Together, a volunteer-led group helping Ukrainian communities hit by the war. Since 2022 they've run over 100 clean-up events, rebuilt more than 30 homes, and brought together more than 2,500 volunteers.
