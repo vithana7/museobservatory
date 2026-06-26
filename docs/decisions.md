@@ -5,6 +5,39 @@
 > first. Earlier per-round build decisions live in
 > [archive/build-history.md](archive/build-history.md).
 
+## 2026-06-26 — Safari-mobile globe fix + drag weight (branch `fix/safari-globe-squish`)
+
+The globe shipped correct on Chrome/desktop, but Memo found two mobile-Safari problems: the round
+tiles rendered as tall **ellipses**, and the drag felt **slippery**. Both fixed on a branch off the
+post-merge `main`; verified on Memo's iPhone (Safari) + a headless-Chrome regression. G-D still
+holds — these are correctness/feel fixes within the layer-4 pass, not a reopening of device-polish.
+
+- **X-2 · Safari globe "squish" = projection aspect from the RENDERED buffer + re-measure on every
+  viewport change.** The tiles are uniform-scaled, camera-facing billboards, so an ellipse can only
+  come from the projection's aspect ratio not matching the actual viewport. Two fixes:
+  (1) `#updateProjectionMatrix` derives aspect from `gl.drawingBufferWidth/Height` (what's truly
+  rendered, matching `gl.viewport`) instead of CSS `clientWidth/Height` — on iOS Safari the two can
+  diverge (backing-store clamp/rounding, stale reads); (2) `resize()` now re-fires on `visualViewport`
+  resize, `orientationchange`, a `ResizeObserver` on the canvas, and a double-rAF right after
+  `.globe-active` — iOS Safari doesn't reliably fire `window.resize` when the URL bar shows/hides, so
+  a boot-time aspect used to stick.
+  *Why:* an aspect/viewport mismatch is the only thing that can stretch a uniform billboard; both
+  fixes make the projection track the real rendered pixels, not a stale CSS proxy. Device-independent
+  (same rationale as X-1). *Apply:* `globe.js` (`#updateProjectionMatrix`, `resize`); `observatory.js`
+  boot (factored `resizeAll`/`resizeSoon` + the observers). Verify: Safari mobile (Memo) + headless
+  Chrome (circles in landscape AND portrait). `?viewprobe` stays for diagnosis. The separate
+  halo/sphere-centre **offset** misalignment is still open.
+
+- **G-E · Globe drag "weight" is split touch vs mouse.** Touch (phones) felt too fast/slippery while
+  desktop/mouse felt right, so `ArcballControl` branches on `pointerType`: mouse keeps the original
+  feel; **touch** uses `touchDragGain = 0.40` (rotation-per-finger) + `touchGlideDamp = 0.08`
+  (post-release settle), dialed in by Memo on Safari via a temporary `?dragtune` panel (since removed).
+  Also `#project` normalises by `Math.max(w,h)` — both axes share the divisor so the feel is already
+  isotropic; a short-edge (`Math.min`) experiment only ~doubled phone speed and was reverted.
+  *Why:* a finger swipe covers far more of a small screen than a mouse drag, so touch needs less gain
+  to feel controlled; Memo set the exact values by feel. *Apply:* `globe-controls.js`
+  (`isTouch`/`touchDragGain`/`touchGlideDamp`). Desktop/mouse unaffected.
+
 ## 2026-06-26 — Record-page redesign + motion-craft pass (Memo + Claude)
 
 More layer-4 polish (G-D satisfied). Two strands: the campaign **record pages** got a proper

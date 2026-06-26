@@ -40,5 +40,7 @@ see the 2026-06-23 section in [decisions.md](decisions.md). What's still open:
 
 - **Q · `dispose()` listener teardown.** `dispose()` now `gl.delete*`s the textures/buffers/
   program/VAO (done 2026-06-23). Window/document listener teardown (`initGlobeZoom`/
-  `initFilters`/`maybeInitGlobe`) is explicitly DEFERRED — no in-place re-init exists today,
-  so it's speculative SPA plumbing; build it only if a future SPA re-inits the globe in-place.
+  `initFilters`/`maybeInitGlobe` — incl. the globe's viewport re-measure listeners added for X-2:
+  `window.resize`/`orientationchange`/`visualViewport` resize + a canvas `ResizeObserver`) is
+  explicitly DEFERRED — no in-place re-init exists today, so it's speculative SPA plumbing; build
+  it only if a future SPA re-inits the globe in-place.

@@ -18,6 +18,17 @@ export class ArcballControl {
   EPSILON = 0.1;
   IDENTITY_QUAT = quat.create();
 
+  // "Weight" of the drag, split by input: touch felt too fast/slippery on phones, so touch gets
+  // a heavier feel than mouse. `dragGain` scales rotation-per-finger (lower = slower turn);
+  // `glideDamp` is the post-release settle in the pointer-up slerp (higher = less coast). The
+  // mouse/desktop values reproduce the original feel exactly. Touch values were dialed in by feel
+  // on Safari mobile (Memo): 0.40 turn = calm, not slippery; 0.08 coast = a long, smooth glide.
+  isTouch = false;
+  touchDragGain = 0.4;
+  touchGlideDamp = 0.08;
+  mouseDragGain = 1.0;
+  mouseGlideDamp = 0.1;
+
   constructor(canvas, updateCallback) {
     this.canvas = canvas;
     this.updateCallback = updateCallback || (() => null);
@@ -31,6 +42,7 @@ export class ArcballControl {
       vec2.set(this.pointerPos, e.clientX, e.clientY);
       vec2.copy(this.previousPointerPos, this.pointerPos);
       this.isPointerDown = true;
+      this.isTouch = e.pointerType === 'touch'; // picks the touch vs mouse "weight" (kept for release)
     };
     this._onUp = () => { this.isPointerDown = false; };
     this._onMove = (e) => {
@@ -75,13 +87,15 @@ export class ArcballControl {
 
         vec2.copy(this.previousPointerPos, midPointerPos);
 
-        angleFactor *= ANGLE_AMPLIFICATION;
+        // dragGain weights rotation-per-finger (touch heavier than mouse — see fields above).
+        angleFactor *= ANGLE_AMPLIFICATION * (this.isTouch ? this.touchDragGain : this.mouseDragGain);
         this.quatFromVectors(a, b, this.pointerRotation, angleFactor);
       } else {
         quat.slerp(this.pointerRotation, this.pointerRotation, this.IDENTITY_QUAT, INTENSITY);
       }
     } else {
-      const INTENSITY = 0.1 * timeScale;
+      // Post-release coast: higher glideDamp settles sooner (less "ice"). Touch heavier than mouse.
+      const INTENSITY = (this.isTouch ? this.touchGlideDamp : this.mouseGlideDamp) * timeScale;
       quat.slerp(this.pointerRotation, this.pointerRotation, this.IDENTITY_QUAT, INTENSITY);
 
       if (this.snapTargetDirection) {
@@ -133,6 +147,9 @@ export class ArcballControl {
     const r = 2;
     const w = this.canvas.clientWidth;
     const h = this.canvas.clientHeight;
+    // Normalise by the LARGER dimension. Both x and y share this divisor, so the feel is already
+    // isotropic; using the SHORT edge (Math.min) only ~doubled drag speed on a tall phone (felt
+    // slippery). Touch "weight" is handled by dragGain/glideDamp instead.
     const s = Math.max(w, h) - 1;
 
     const x = (2 * pos[0] - w - 1) / s;
