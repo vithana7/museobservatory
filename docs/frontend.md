@@ -127,9 +127,9 @@ the experience and the rail is naturally absent (`maybeInitGlobe`).
    design), but worth noting.
 
 **What is already good:** interaction itself is smooth — the arcball control
-(`globe-controls.js`) has quaternion drag + inertia + snap-to-tile, two-finger pinch zoom
-is gated so it doesn't fight rotation, and the flip-card freezes the globe so the focused
-tile can't drift (`globe.js`). Accessibility is solid: canvas is `aria-hidden`, the list is
+(`globe-controls.js`) has quaternion drag + inertia + snap-to-tile, with touch weighted heavier
+than mouse so phones don't feel slippery (G-E); two-finger pinch zoom is gated so it doesn't fight
+rotation, and the flip-card freezes the globe so the focused tile can't drift (`globe.js`). Accessibility is solid: canvas is `aria-hidden`, the list is
 semantic and keyboard-navigable, reduced-motion fully gates the globe.
 
 ### A correction worth recording
@@ -162,8 +162,9 @@ source, both are overstated:
 landing, ANDed filters → true matching set, geo regex, single-select facets, muses moved off
 the globe into the filter, Filter + List pills on one rail (S-1/S-2). The sighted
 globe↔list toggle (G-C) and the sparse fallback (A-4) are built; build-time HTML
-sanitization (SEC-1) and the Safari near-black dither (X-1) landed; GitHub Pages deploy with
-a subpath-safe `base` (DEPLOY-1) is wired. Decisions in [decisions.md](decisions.md).
+sanitization (SEC-1), the Safari near-black dither (X-1), and the Safari-mobile globe squish fix +
+touch drag weight (X-2 / G-E) landed; GitHub Pages deploy with a subpath-safe `base` (DEPLOY-1) is
+wired. Decisions in [decisions.md](decisions.md).
 
 **Next (not yet built):**
 - **Structured geo (A-1)** when filters need per-place facets — `geoFields()` already folds

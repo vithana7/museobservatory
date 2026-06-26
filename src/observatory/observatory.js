@@ -157,6 +157,11 @@ function maybeInitGlobe(landing, allCampaigns) {
   // scrolling on Safari when switching to list-view. setListView clears it for the list.
   document.documentElement.style.overflow = 'hidden';
   globe.resize();
+  // iOS Safari: the address bar can still be settling at this point, so the first measure can
+  // catch a transient viewport shape and stick (round tiles → ellipses). Re-measure after the
+  // next couple of paints, once layout/the URL bar have settled. (The standing listeners below
+  // also re-correct on later viewport changes.)
+  requestAnimationFrame(() => requestAnimationFrame(() => globe.resize()));
   globe.start();
   globe.loadAtlas();
   initGlobeZoom(globe);
@@ -243,11 +248,19 @@ function maybeInitGlobe(landing, allCampaigns) {
     }, 700);
   }
 
+  // Re-measure on every signal that can change the RENDERED viewport, debounced into one pass.
+  // iOS Safari is why this is belt-and-braces: the canvas is `position:fixed; inset:0`, so its CSS
+  // box barely moves when the URL bar shows/hides — but the VISUAL viewport (and thus the drawing
+  // buffer's aspect) does, without firing `resize`. So we also listen on visualViewport +
+  // orientationchange and observe the canvas box directly; otherwise a wrong aspect sticks and the
+  // round tiles render as ellipses.
   let t;
-  window.addEventListener('resize', () => {
-    clearTimeout(t);
-    t = setTimeout(() => { globe.resize(); starfield.resize(); cloud.resize(); }, 150);
-  });
+  const resizeAll = () => { globe.resize(); starfield.resize(); cloud.resize(); };
+  const resizeSoon = () => { clearTimeout(t); t = setTimeout(resizeAll, 150); };
+  window.addEventListener('resize', resizeSoon);
+  window.addEventListener('orientationchange', resizeSoon);
+  window.visualViewport?.addEventListener('resize', resizeSoon);
+  if (window.ResizeObserver) new ResizeObserver(resizeSoon).observe(globe.gl.canvas);
 }
 
 // ── globe zoom: gesture-only (scroll-wheel + two-finger pinch → globe.setScale) ───────

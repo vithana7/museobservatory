@@ -536,7 +536,12 @@ export class Globe {
 
   #updateProjectionMatrix() {
     const gl = this.gl;
-    this.camera.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    // Aspect from the ACTUALLY-RENDERED buffer (the same dimensions gl.viewport uses — see
+    // resize()), not the CSS box. On iOS Safari the two can diverge (backing-store clamp/rounding
+    // or a stale client read), which skews the projection against the viewport and renders the
+    // round, uniform-scaled billboard tiles as ellipses. Guard the pre-visible 0×0 case (→ NaN).
+    const bw = gl.drawingBufferWidth, bh = gl.drawingBufferHeight;
+    this.camera.aspect = bh > 0 ? bw / bh : 1;
     const height = this.SPHERE_RADIUS * 0.35;
     const distance = this.camera.position[2];
     this.camera.fov = this.camera.aspect > 1
