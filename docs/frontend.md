@@ -120,9 +120,11 @@ the experience and the rail is naturally absent (`maybeInitGlobe`).
    per group with toggle-off.
 3. **Zoom is gesture-only** — pinch + scroll-wheel drive `globe.setScale` (`initGlobeZoom`);
    the draggable zoom slider was retired (it duplicated the gestures and cluttered the rail).
-4. **Full-page navigation tears state.** Record pages are separate static HTML; clicking
-   "Explore" is a real navigation, and returning re-boots the page (fresh sample, globe
-   reset, list re-render). Acceptable for now (no SPA router by design), but worth noting.
+4. **Full-page navigation tears state.** Record pages are separate static HTML (cropped
+   responsive hero, swipeable photo slideshow, cocoex footer — V-7; a small inlined script
+   drives the slideshow); clicking "Explore" is a real navigation, and returning re-boots the
+   page (fresh sample, globe reset, list re-render). Acceptable for now (no SPA router by
+   design), but worth noting.
 
 **What is already good:** interaction itself is smooth — the arcball control
 (`globe-controls.js`) has quaternion drag + inertia + snap-to-tile, two-finger pinch zoom

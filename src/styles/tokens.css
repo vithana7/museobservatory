@@ -39,7 +39,10 @@
   --spacing-lg: clamp(2rem, 5vw, 4rem);
   --spacing-xl: clamp(3rem, 8vw, 8rem);
 
-  --transition-fast: 0.15s ease-out;
-  --transition-medium: 0.3s ease-out;
-  --transition-slow: 0.5s ease-out;
+  /* Emil-strong UI easing — the built-in `ease-out` is too weak to read as intentional;
+     this is the canonical strong ease-out (fast start, long graceful settle). */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --transition-fast: 0.15s var(--ease-out);
+  --transition-medium: 0.3s var(--ease-out);
+  --transition-slow: 0.5s var(--ease-out);
 }

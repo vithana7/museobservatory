@@ -94,12 +94,18 @@ function hexToRgba(hex, a) {
   return `rgba(${r},${g},${b},${a})`;
 }
 
-// Accent-colour wash over a hero photo, giving the tile its campaign colour while keeping
-// the white label legible (Memo's ask: "~30% colour overlay"). Evaluated against the real
-// footage at the true ~200px tile size (tint_eval): the label reads at every alpha 0.30–0.55
-// because the label's dark shadow is the real legibility backstop, so 0.35 honours the ~30%
-// ask (photo stays clearly visible) with a small margin for brighter shots to come. Tunable.
-const HERO_TINT_ALPHA = 0.85; // muse duotone strength (Memo). Keep in sync with .tile-flip-hero-wash.
+// Hero duotone tint — the muse-colour treatment over a campaign photo, kept in lockstep with the
+// flip card's CSS (.tile-flip-hero / -hero-wash / .has-hero::before) so the morph hand-off shows
+// no jump. "Tamed duotone" (chosen on the ?tint live compare, 2026-06-25 / decision V-4): the
+// photo is SOFTENED first (contrast/brightness) so the full-strength `color` blend recolours it
+// into the muse hue boldly but without the harsh contrast the raw blend had. `blend` is a Canvas2D
+// composite op with a matching CSS mix-blend-mode. Eyeball-tunable — keep the CSS values in sync.
+const HERO_TINT = {
+  blend: 'color',                                  // duotone blend; canvas globalCompositeOperation === CSS mix-blend-mode
+  alpha: 1.0,                                      // muse shade strength (CSS: .tile-flip-hero-wash opacity)
+  photoFilter: 'contrast(0.82) brightness(1.06)',  // soften the photo BEFORE the blend (CSS: .tile-flip-hero filter)
+  scrimCenter: 0.29,                               // dark label-scrim centre alpha (CSS: .has-hero::before)
+};
 
 // centred type+number label, white with a soft dark shadow.
 function drawCampaignLabel(ctx, ox, oy, item) {
@@ -116,22 +122,26 @@ function drawCampaignLabel(ctx, ox, oy, item) {
 
 function drawCampaignCell(ctx, ox, oy, item, hero) {
   if (hero) {
-    // hero photo (cover-fit) → accent wash → label. The cell is fully OPAQUE, so the shader
-    // composite (col = disc·(1−fg.a) + fg.rgb, fg.a=1) replaces the procedural disc with the
-    // photo, circle-clipped. The wash gives the campaign its colour identity + label contrast.
-    drawCover(ctx, hero, ox, oy);
+    // hero photo (cover-fit) → contrast-soften → duotone tint → label scrim → label. The cell is
+    // fully OPAQUE, so the shader composite (col = disc·(1−fg.a) + fg.rgb, fg.a=1) replaces the
+    // procedural disc with the photo, circle-clipped.
     ctx.save();
-    ctx.globalCompositeOperation = 'color';      // DUOTONE: recolour the photo into the muse hue (matches .tile-flip-hero-wash)
-    ctx.fillStyle = hexToRgba(item.hex || '#000000', HERO_TINT_ALPHA);
+    ctx.filter = HERO_TINT.photoFilter;          // "tamed": soften the photo BEFORE the colour blend
+    drawCover(ctx, hero, ox, oy);
+    ctx.restore();
+    ctx.save();
+    ctx.globalCompositeOperation = HERO_TINT.blend; // DUOTONE: matches .tile-flip-hero-wash mix-blend-mode
+    ctx.fillStyle = hexToRgba(item.hex || '#000000', HERO_TINT.alpha);
     ctx.fillRect(ox, oy, CELL, CELL);
     ctx.restore();                                // restore() resets the composite op before the label
-    // Soft dark scrim behind the centred label: the 'color' duotone keeps the photo's brightness,
-    // so white text washes out — this seats it while leaving the disc RIM bright + vibrant. Matches
-    // .tile-flip-front.has-hero::before.
+    // Soft dark scrim behind the centred label so white text seats on the bright photo while the
+    // disc RIM stays vibrant. The centre alpha drives the falloff (0.44× at 40%, 0 at 66%).
+    // Matches .tile-flip-front.has-hero::before.
     const lx = ox + CELL / 2, ly = oy + CELL / 2;
+    const c = HERO_TINT.scrimCenter;
     const scrim = ctx.createRadialGradient(lx, ly, 0, lx, ly, CELL * 0.66);
-    scrim.addColorStop(0, 'rgba(0,0,0,0.5)');
-    scrim.addColorStop(0.40, 'rgba(0,0,0,0.22)');
+    scrim.addColorStop(0, `rgba(0,0,0,${c})`);
+    scrim.addColorStop(0.40, `rgba(0,0,0,${c * 0.44})`);
     scrim.addColorStop(0.66, 'rgba(0,0,0,0)');
     ctx.fillStyle = scrim;
     ctx.fillRect(ox, oy, CELL, CELL);

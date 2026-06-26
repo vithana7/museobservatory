@@ -5,6 +5,52 @@
 > first. Earlier per-round build decisions live in
 > [archive/build-history.md](archive/build-history.md).
 
+## 2026-06-26 — Record-page redesign + motion-craft pass (Memo + Claude)
+
+More layer-4 polish (G-D satisfied). Two strands: the campaign **record pages** got a proper
+hero / gallery / footer, and the globe view's **interactions** got a motion-craft pass. Exact
+ms/scale/colour values stay eyeball-tunable; the *what + why* below are settled.
+
+- **V-7 · Record page = cropped responsive hero + whole-artwork slideshow + cocoex footer.**
+  The hero is cropped to a banner (`object-fit: cover`) — **4:5 on phones, 16:9 ≥600px** — so a
+  big/tall source photo no longer dominates the header. The `images[]` gallery is now a swipeable
+  continuously **auto-looping slideshow** (scroll-snap track + dot indicators + minimal background-less ‹ › arrows;
+  seamless loop via a trailing clone of slide 0), each photo shown **whole** (`object-fit: contain`,
+  page-matched letterbox) so artworks are never cropped.
+  A **cocoex footer** (mirrors the main site: "Art moves people…" + Telegram / Instagram /
+  LinkedIn + the cocoex wordmark + legal) anchors the foot as a full-bleed dark band.
+  *Why:* Memo — the old full-width hero rendered huge on desktop and the responsive grid gave no
+  way to look through a campaign's photos one at a time; the page needed the cocoex footer for
+  brand consistency + reachable socials. Hero crop + slide-fit were chosen from side-by-side
+  options (responsive crop; whole-artwork letterbox — keeping V-6's "art isn't crop-able" spirit).
+  *Apply:* `record-template.mjs` (slideshow markup, footer markup, and a small **inlined** carousel
+  script — record pages were script-free before; inlining keeps each page standalone, the same
+  rationale as the inlined CSS) + `record.css` (`.record-hero` aspect-ratio, `.gallery-*` slideshow,
+  `.record-footer` band). Degrades cleanly: 0 images → no slideshow/script; 1 image → a single static photo (no
+  arrows/dots/autoplay). Honours `prefers-reduced-motion` (no auto-play; instant scroll). Footer assets (`cocoex-text.png`,
+  social SVGs) already live in `public/assets/images/`.
+  *Supersedes:* the V-6 `.record-gallery` grid (gallery layout was flagged tunable there).
+
+- **V-8 · Motion-craft pass (Emil Kowalski framework) on the globe view.** A craft pass over
+  layer-4 motion, establishing reusable conventions: (1) a shared strong **`--ease-out`** curve
+  token (`cubic-bezier(.23, 1, .32, 1)`, `tokens.css`) replacing weak built-in `ease` on
+  entrances; (2) **press feedback** — a subtle `:active { scale }` on every control (pills, chips,
+  back link, gallery/footer buttons); (3) the **filter popup grows from its trigger pill**
+  (origin-aware, ~180ms) instead of appearing instantly — driven by a class, not `@starting-style`,
+  so it animates on **every iOS**, not just Safari 18+; (4) the flip is **asymmetric** — an
+  expressive 0.55s grand open, a snappy un-bouncy 0.24s close (refines **V-3**); (5) every
+  `:hover` gated behind `(hover: hover) and (pointer: fine)` so taps don't stick on the mobile
+  rail. All new motion respects `prefers-reduced-motion`.
+  *Why:* the motion "worked" but read under-finished — popups blinked in, nothing answered a
+  press, close was as slow + bouncy as open, hovers stuck on touch. Emil's rules (origin-aware
+  popovers, sub-300ms UI, strong custom easing, asymmetric enter/exit, press feedback, touch
+  hover-gating) are the settled conventions; future layer-4 motion should follow them.
+  *Apply:* `observatory.css` (press `:active` scales, `.filter-panel.is-open` entrance, hover
+  media-query gating), `observatory.js` (`setOpen` class toggle + `closeFlip` inline snappy
+  curve), `tokens.css` (`--ease-out`). Reviewed via the `review-animations` skill (verdict: pass).
+  The one deliberate over-budget value: the flip **open** at 550ms (> Emil's 300ms UI ceiling) —
+  kept as the hero moment.
+
 ## 2026-06-25 — Layer-4 art pass: controls, flip, tint (Memo + Claude)
 
 The G-D freeze condition is **satisfied** — layers 1–3 are built, tested, and wired — so this
@@ -47,20 +93,65 @@ are settled.
   open/close read as one object.
   *Apply:* `openFlip`/`closeFlip` in `observatory.js`.
 
-- **V-4 · Hero colour = duotone (`color` blend) + a scrim behind the label.** The muse tint
-  over a campaign hero is a `color` blend at ~0.85 (recolours the photo into the muse hue,
-  keeping its luminance + texture) rather than a flat ~0.5 wash; a soft radial scrim seats the
-  centred white label. Kept **identical** on the WebGL tile (canvas `globalCompositeOperation`)
-  and the flip card (CSS `mix-blend-mode`) so the morph hand-off shows no tint jump.
-  *Why:* a flat wash read dull and `multiply` muddied; `color` makes the muse shade strong +
-  intentional (editorial duotone) while keeping photo detail — but it keeps the photo bright,
-  so the label needs the scrim back.
-  *Apply:* `HERO_TINT_ALPHA` + the radial scrim in `tile-atlas.js`; `.tile-flip-hero-wash` +
-  `.tile-flip-front.has-hero::before` in `observatory.css`. The two alphas must stay in sync.
+- **V-4 · Hero colour = "tamed" duotone (soften the photo, then a full `color` blend) + a
+  light scrim.** The campaign hero is **softened first** (`contrast(0.82) brightness(1.06)`),
+  then recoloured into the muse hue with a `color` blend at full strength (alpha 1.0); a soft
+  radial scrim (centre 0.29) seats the centred white label. Kept **identical** on the WebGL
+  tile (canvas `globalCompositeOperation` + `ctx.filter`) and the flip card (CSS
+  `mix-blend-mode` + `filter`) so the morph hand-off shows no tint jump.
+  *Why:* a flat wash read dull and `multiply` muddied; a *raw* `color` blend (the first cut,
+  ~0.85) made the muse shade strong but kept 100% of the photo's tonal range, so punchy photos
+  read **too contrasty/vivid** (Memo). Softening the photo *before* the blend compresses that
+  contrast while the full-strength `color` keeps the hue bold — the editorial duotone, minus
+  the harshness. The softer photo then needs less label seating, so the scrim dropped 0.5 → 0.29.
+  *How chosen:* a temporary `?tint` live-compare panel (dev-gated, since removed) flipped
+  soft-light / hue / tamed on the real globe + flip card in sync; Memo landed on
+  `tamed · strength 1.00 · scrim 0.29`.
+  *Apply:* `HERO_TINT` (blend/alpha/photoFilter/scrimCenter) in `tile-atlas.js`;
+  `.tile-flip-hero` filter + `.tile-flip-hero-wash` + `.tile-flip-front.has-hero::before` in
+  `observatory.css`. The tile ↔ flip values must stay in sync.
 
 - **V-5 · Globe tiles +10%.** `baseScale` 0.25 → 0.275 so the disc cloud fills more of the
   sphere (less negative space). *Why:* Memo — the tiles read sparse. *Apply:* `globe.js`
-  `#animate`. Verify they don't bleed past the halo at the limb.
+  `#animate`. Verified (headless Chrome, calibrated to the live globe) that the +10% is safe re:
+  the halo — tile *size* moves the limb only ~1–2%; position, not size, sets the outermost reach.
+
+- **V-6 · Globe shows "leaves", record page is the "root" (campaign photos).** A campaign repeats
+  across globe vertices (42 vertices, few campaigns); each repeat ("leaf") now shows a DIFFERENT
+  photo from that campaign's set, and every leaf opens the same record page ("root"), which carries
+  the campaign's full gallery + description. `images:` frontmatter (a list of bare filenames,
+  long-defined in TEMPLATE but never wired) is now the gallery + the extra leaves.
+  *Why:* Memo — duplicate circles showing the same photo read as a bug; diversifying them turns the
+  repetition into intentional variety ("leaves of one plant") and surfaces more of each campaign's
+  imagery, while keeping a single canonical page. Honest: the list/filters/sparse-guard stay
+  **campaign-based** (leaves are a globe-only visual expansion, never new archive entries).
+  *Apply:* `build.mjs` resolves + existence-checks `images[]` → `/assets/images/<slug>/<file>` and
+  emits it; `selection.expandToLeaves()` (pure, round-robin, capped to `CAMPAIGN_CAP`) builds the
+  leaves — `observatory.js` `buildItems` feeds them to the globe. The atlas/shader/flip were already
+  per-item, so a leaf's photo shows on its circle, its flip front, and morphs seamlessly; the flip's
+  "Explore" + every leaf resolve to the campaign `url`. Record page: `.record-hero` (the `hero`) +
+  `.record-gallery` (the `images`) in `record-template.mjs` / `record.css` — both redesigned
+  (cropped hero + slideshow + footer) in V-7. Photos are
+  downscaled web copies (D-4, sips → ≤2400px JPG q85, HEIC/PNG converted) imported from the
+  cocoex-website `comet-collabs/campaign-footage/`. The slideshow + leaves show `images[]` in
+  **filename order** (numeric-aware, `build.mjs`), so the footage convention `00-hero` + `1, 2 … N`
+  sets the cover and the order — renaming files reorders the slideshow, no frontmatter edit (Memo).
+  *No "same background next to each other" (Memo):* `selection.arrangeOnGraph(pool, adjacency, count)`
+  places the leaves onto the 42 globe vertices so no two ADJACENT circles share a photo (and
+  same-campaign neighbours are minimised). Two phases — a greedy fill, then a **swap repair** that
+  provably only removes same-photo adjacencies (each accepted swap lands both vertices clash-free),
+  so it reaches **zero** clashes whenever the photo multiset allows (the greedy alone can stall when
+  few distinct photos repeat across 42 vertices). The globe builds the icosahedron vertex adjacency
+  (`#buildAdjacency`) and arranges in `setItems`/init, making `items.length === instanceCount` so the
+  shader's `vInstanceId % count` is an identity map (vertex v → items[v]). Pure + tested on the real
+  graph (0 clashes).
+  *Balance — per-campaign leaf cap (`GLOBE_LEAVES_PER_CAMPAIGN = 8`):* a photo-heavy campaign no
+  longer dominates the globe (horizon001's 18 photos would otherwise fill ~half the sphere). `expandToLeaves`
+  caps each campaign to its hero + first 7 gallery photos for the GLOBE; the **full** set still shows
+  on the record page. Real distribution now: horizon001 8 · stardust001 8 · stardust002 5 ·
+  stardust003 3 · horizon002 1 = 25 leaves. *Why:* Memo — keep the globe a balanced sample, not a
+  one-campaign wall. *Tunable/eyeball:* the per-campaign cover (`hero`), gallery contents, and the
+  cap value (8).
 
 ## 2026-06-23 — Hardening fixes: sparse guard, view toggle, build-time sanitize (Memo + Claude)
 
@@ -197,12 +288,14 @@ Making the content pipeline rock-solid for CRUD before any selection/view work.
   Web-sized images served at `/assets/images/<slug>/<file>`; `hero` is a bare filename
   resolved there. Full-res originals are **not** committed or shipped.
   *Why:* the slug already names the campaign — making it the folder name removes the only
-  remaining path-sync footgun, and `public/` is what Vite serves at root. The 70 MB of
-  full-res footage currently in `public/` is placeholder material and the live publish
-  blocker (OBS-1/2/3); shipping downscaled web images keeps `dist/` small.
-  *Apply:* move referenced heroes into `public/assets/images/<slug>/`; downscale before
-  they land; keep raw originals in a separate store, never the repo. Build resolves +
-  existence-checks under `public/assets/images/<slug>/`.
+  remaining path-sync footgun, and `public/` is what Vite serves at root. The original full-res
+  footage (drone/phone, HEIC, ~50 MB/campaign) was the live publish blocker (OBS-1/2/3); shipping
+  downscaled web images keeps `dist/` small.
+  *Apply:* the four published campaigns now carry web copies — `sips`-downscaled to **≤2400px**
+  long edge, JPG q85 (HEIC/PNG → JPG), ~0.5–1.3 MB each, slideshows lazy-loaded — imported from
+  the cocoex-website `comet-collabs/campaign-footage/` originals, which stay out of the repo. Build
+  resolves + existence-checks under `public/assets/images/<slug>/`. Automated downscaling (`sharp`)
+  is still the deferred P2.1 step; today it's the manual `sips` pass.
 
 - **D-5 · `location` is a list; build emits array + joined display.** Authored as a YAML
   list (one entry per place); `campaigns.json` carries `locations: [...]` and a `" · "`

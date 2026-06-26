@@ -72,7 +72,8 @@ the locked semantics (S-1/S-2) in [decisions.md](decisions.md).
   sync with the filtered set. A first-class sighted peer: the `.filter-wrap` rail has a
   globe↔list toggle (`body.list-view`), and a sparse filter match auto-falls-back to it
   (G-C / A-4, see [decisions.md](decisions.md)).
-- **Record pages** — generated static HTML, one per campaign.
+- **Record pages** — generated static HTML, one per campaign (cropped responsive hero,
+  swipeable gallery slideshow, cocoex footer; a small inlined script drives the slideshow — V-7).
 
 ## Data flow
 

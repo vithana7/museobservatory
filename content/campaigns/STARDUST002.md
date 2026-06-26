@@ -5,8 +5,12 @@ status: upcoming
 year: 2026
 location:                  # list — one entry per place
   - Colli Tortonesi · Italy
-hero:                      # none yet → muse-colour placeholder tile
-images: []
+hero: 1.jpg                # cover circle → assets/images/stardust002/
+images:                    # full gallery (page) + extra globe leaves
+  - 2.jpg
+  - 3.jpg
+  - 4.jpg
+  - 5.jpg
 
 # Stardust factual block
 artist: 2 international + 2 local artists (residency)
@@ -25,14 +29,14 @@ event:
 
 *How can art sustain the ground it stands on?*
 
-Practicing Futures is a residency and group show at the Vinili & Vinelli festival in the Colli Tortonesi. Two international artists join two local artists for a two-week residency, making bold, spatial works that double as fundraising tools — art that helps secure the future of the residency that produced it.
+Practicing Futures is a residency and group show at the Vinili & Vinelli festival in the Colli Tortonesi. Two international and two local artists share a two-week residency, making large spatial works built to be sold, with the proceeds going back into the residency that made them.
 
 ## The event
 
 Vinili & Vinelli · Colli Tortonesi, Italy · 9–11 July 2026
 
-The work is made and shown across two host sites: Cascina La Zerba, the Cantine Volpi organic estate in Volpedo, and Terra Nuda, the rural artist residency in Montacuto. cocoex facilitates the festival's commitment to keeping artistic and cultural life within reach of rural and remote communities.
+The work is made and shown across two sites: Cascina La Zerba, the Cantine Volpi organic estate in Volpedo, and Terra Nuda, the rural artist residency in Montacuto. The festival sets out to keep art and culture within reach of rural and remote communities, and cocoex helps make it happen.
 
 ## The Comet
 
-Each artist defines, in agreement with cocoex, the share of proceeds they retain and the share allocated to Terra Nuda — the residency the campaign is raising to sustain.
+Each artist agrees with cocoex how much of the proceeds they keep and how much goes to Terra Nuda, the residency this campaign is raising money to sustain.

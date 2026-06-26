@@ -11,6 +11,7 @@ import { TILE_VERT, TILE_FRAG } from './globe-shaders.js';
 import { IcosahedronGeometry, QuadGeometry } from './globe-geometry.js';
 import { ArcballControl } from './globe-controls.js';
 import { buildAtlas, buildNoiseTile } from './tile-atlas.js';
+import { arrangeOnGraph } from './selection.js';
 
 const DPR = () => Math.min(2, window.devicePixelRatio || 1);
 
@@ -169,6 +170,12 @@ export class Globe {
     this.ico.subdivide(1).spherize(this.SPHERE_RADIUS);
     this.instancePositions = this.ico.vertices.map((v) => v.position);
     this.instanceCount = this.ico.vertices.length;
+    this.adjacency = this.#buildAdjacency();
+    // Arrange the item pool onto the vertices so no two ADJACENT circles show the same photo
+    // (Memo: no "same background next to each other"), then same-campaign neighbours are
+    // minimised too. Makes items.length === instanceCount so the shader's vInstanceId % count
+    // becomes an identity map (vertex v → items[v]). See #arrangeItems.
+    this.items = this.#arrangeItems(this.items);
 
     this.#initInstances();
     gl.bindVertexArray(null);
@@ -277,9 +284,27 @@ export class Globe {
     this.instanceFinalScale = new Float32Array(this.instanceCount);
   }
 
+  // Vertex adjacency of the spherised icosahedron: adjacency[v] = Set of vertices sharing an
+  // edge with v (from the triangle faces). Drives #arrangeItems' "no same background adjacent".
+  #buildAdjacency() {
+    const adj = Array.from({ length: this.instanceCount }, () => new Set());
+    for (const f of this.ico.faces) {
+      adj[f.a].add(f.b); adj[f.a].add(f.c);
+      adj[f.b].add(f.a); adj[f.b].add(f.c);
+      adj[f.c].add(f.a); adj[f.c].add(f.b);
+    }
+    return adj;
+  }
+
+  // Place the item pool onto the vertices so no two ADJACENT circles share a background
+  // (delegates to the pure, tested selection.arrangeOnGraph using this sphere's adjacency).
+  #arrangeItems(pool) {
+    return arrangeOnGraph(pool, this.adjacency, this.instanceCount);
+  }
+
   // ── public seam: swap the item set (Phase-4 filtering) ────────────────────────
   async setItems(items) {
-    this.items = items || [];
+    this.items = this.#arrangeItems(items || []);
     this.activeIndex = -1;
     this.#computeInstanceScales(); // muse/campaign sizes for the new set
     this.#computeInstanceColors(); // procedural-disc accent colours for the new set

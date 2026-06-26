@@ -14,7 +14,7 @@ import './observatory.css';
 import { Globe } from './globe.js';
 import { createStarfield } from '../webgl/starfield.js';
 import { createIntroStarfield } from '../webgl/intro-starfield.js';
-import { CAMPAIGN_CAP, makeSeed, sample, filterCampaigns, applySparseGuard } from './selection.js';
+import { CAMPAIGN_CAP, makeSeed, sample, filterCampaigns, applySparseGuard, expandToLeaves } from './selection.js';
 
 // BASE_URL is '/' in dev and '/museobservatory/' on the GitHub Pages subpath build (always
 // trailing-slashed). campaigns.json bakes root-absolute paths (/campaigns.json, /<slug>/,
@@ -48,7 +48,12 @@ async function boot() {
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     campaigns = await res.json();
     // Re-root the baked root-absolute paths onto BASE_URL (subpath-safe on GitHub Pages).
-    campaigns = campaigns.map((c) => ({ ...c, url: withBase(c.url), hero: withBase(c.hero) }));
+    campaigns = campaigns.map((c) => ({
+      ...c,
+      url: withBase(c.url),
+      hero: withBase(c.hero),
+      images: Array.isArray(c.images) ? c.images.map(withBase) : [],
+    }));
   } catch (err) {
     console.error('[observatory] failed to load campaigns.json:', err);
     return; // the static list intro stays; nothing else to show
@@ -67,16 +72,18 @@ async function boot() {
 
 // ── globe items: campaign tiles ONLY ────────────────────────────────────────────
 // Muses no longer ride the globe (decision S-1, revised 2026-06-22): they live solely in
-// the filter as the "Muse" facet. The globe shows only Stardust/Horizon campaign tiles, so
-// all 42 vertices are available for campaigns (CAMPAIGN_CAP is back to 42).
+// the filter as the "Muse" facet. The globe shows only Stardust/Horizon campaign tiles.
+// Each campaign is expanded into "leaves" (one tile per photo) so the duplicate circles a
+// campaign occupies show DIFFERENT photos but all open the same record page (selection
+// .expandToLeaves — Memo's "leaves & root"). The list/filters stay campaign-based.
 function buildItems(campaigns) {
-  return campaigns.map((c) => ({
+  return expandToLeaves(campaigns).map((c) => ({
     kind: 'campaign',
     title: c.title,
     cause: c.cause,
     summary: c.summary,
     hex: c.hex,
-    hero: c.hero || null, // campaigns.json carries the root-absolute /assets/images/<slug>/<file> path (D-4)
+    hero: c.hero || null, // the LEAF's photo (root-absolute /assets/images/<slug>/<file>, D-4)
     url: c.url,
     hasPage: c.hasPage,
     type: c.type,
@@ -419,7 +426,17 @@ function openFlip(item, rect, globe) {
 function closeFlip() {
   const wrap = document.getElementById('observatory-flip');
   const card = wrap?.querySelector('.tile-flip-card');
+  const inner = wrap?.querySelector('.tile-flip-inner');
   if (!wrap || wrap.hidden) return;
+  // CLOSE is a system response, not a deliberate act → snap it: fast + NO overshoot, asymmetric
+  // against the expressive 0.55s open (Emil). Set on BOTH the card (shrink) and inner (flip-back)
+  // BEFORE toggling is-open so the rotate uses the snappy curve too, not the CSS open easing.
+  const CLOSE = 'transform 0.24s cubic-bezier(0.23, 1, 0.32, 1)';
+  if (inner) inner.style.transition = CLOSE;
+  if (card) card.style.transition = CLOSE;
+  // Fade the backdrop out WITH the card (0.2s), not its slower 0.4s open fade — otherwise the
+  // overlay is hidden mid-fade and the last sliver of dim visibly snaps off.
+  wrap.style.transition = 'background 0.2s cubic-bezier(0.23, 1, 0.32, 1)';
   wrap.classList.remove('is-open');                      // flip back to front + fade backdrop
   // Shrink back onto the LIVE (still-frozen) tile — recompute its rect so we land where the tile
   // actually is, not a stale open-time position.
@@ -429,7 +446,6 @@ function closeFlip() {
     const vpCx = window.innerWidth / 2;
     const vpCy = window.innerHeight / 2;
     const s = Math.max(0.04, (rect.r * DISC_VISIBLE_K * 2) / finalSize);
-    card.style.transition = '';
     card.style.transform = `translate(${(rect.cx - vpCx).toFixed(1)}px, ${(rect.cy - vpCy).toFixed(1)}px) scale(${s.toFixed(4)})`;
   }
   // The globe tile stays HIDDEN + frozen for the whole shrink (body.flip-open → globe opacity 0):
@@ -446,13 +462,15 @@ function closeFlip() {
     if (g) { void g.offsetWidth; g.style.transition = ''; }   // restore so the OPEN still fades the tile out
     wrap.hidden = true;                                        // hide the card now the tile is under it
     if (card) { card.style.transition = 'none'; card.style.transform = ''; card.style.width = ''; } // reset → next open recomputes
+    if (inner) inner.style.transition = '';                   // reset → next open uses the CSS open easing
+    wrap.style.transition = '';                               // reset → next open uses the CSS 0.4s backdrop fade-in
     if (flipGlobe) { flipGlobe.thaw(); flipGlobe.canvas.style.pointerEvents = ''; }
     flipRect = null;
     flipGlobe = null;
   };
   const onEnd = (e) => { if (e.target === card && e.propertyName === 'transform') done(); };
   card?.addEventListener('transitionend', onEnd);
-  const timer = setTimeout(done, 950); // fallback if transitionend doesn't fire
+  const timer = setTimeout(done, 320); // fallback if transitionend doesn't fire (matches the 0.24s snappy close)
 }
 
 function initFlip(canvas, globe) {
@@ -477,8 +495,17 @@ function initFlip(canvas, globe) {
     openFlip(currentFocus, rect, globe);
   });
 
-  // close on backdrop click or Escape
-  wrap.addEventListener('click', (e) => { if (e.target === wrap) closeFlip(); });
+  // close on a click anywhere OUTSIDE the visible disc, or Escape. The card is a SQUARE
+  // (border-radius only makes it LOOK round — its transparent corners still catch clicks),
+  // so the old `e.target === wrap` test missed every click that landed in those corner zones
+  // → it felt like leaving the circle took several clicks. Measure the click against the disc
+  // radius instead: outside the disc closes (one tap); inside keeps the "Explore" link live.
+  wrap.addEventListener('click', (e) => {
+    const card = wrap.querySelector('.tile-flip-card');
+    const r = (parseFloat(card?.style.width) || flipCardSize()) / 2;
+    const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    if (Math.hypot(e.clientX - cx, e.clientY - cy) > r) closeFlip();
+  });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFlip(); });
 }
 
@@ -551,6 +578,13 @@ function initFilters(globe, allCampaigns) {
   const panel = document.getElementById('observatory-filter-panel');
   const wrap = document.querySelector('.filter-wrap');
   if (!toggle || !panel || !wrap) return;
+
+  // Class-driven open/close (was the `hidden` attribute). Removing `hidden` hands visibility to
+  // CSS (`.filter-panel` stays hidden until `.is-open`), so the grow/fade animates on EVERY iOS
+  // version — `@starting-style`/`allow-discrete` only fire on iOS Safari 18+. The `hidden`
+  // attribute stays in the HTML as the no-JS fallback (the panel's contents are JS-built anyway).
+  panel.removeAttribute('hidden');
+  const isOpen = () => panel.classList.contains('is-open');
 
   const pool = allCampaigns.filter((c) => !c.filler); // real entries only
   const facets = { muse: null, type: null, status: null, geo: '' };
@@ -637,7 +671,7 @@ function initFilters(globe, allCampaigns) {
     renderList(active ? matched : allCampaigns);
     countEl.textContent = active ? `${matched.length} match${matched.length === 1 ? '' : 'es'}` : '';
     clearBtn.hidden = !active;
-    wrap.classList.toggle('is-open', !panel.hidden);
+    wrap.classList.toggle('is-open', isOpen());
     // A-4: too few matches makes the globe repeat tiles + look broken — force the list
     // (the agreed fallback is show-the-list, not pad the globe). We never forcibly switch
     // BACK when matches are plentiful, so the user's chosen view is respected otherwise.
@@ -670,15 +704,15 @@ function initFilters(globe, allCampaigns) {
   });
 
   const setOpen = (open) => {
-    panel.hidden = !open;
+    panel.classList.toggle('is-open', open);
     toggle.setAttribute('aria-expanded', String(open));
     wrap.classList.toggle('is-open', open || isActive());
   };
-  toggle.addEventListener('click', () => setOpen(panel.hidden));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) setOpen(false); });
+  toggle.addEventListener('click', () => setOpen(!isOpen()));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) setOpen(false); });
   // click anywhere outside the rail (pill + panel) closes the open panel
   document.addEventListener('pointerdown', (e) => {
-    if (!panel.hidden && !wrap.contains(e.target)) setOpen(false);
+    if (isOpen() && !wrap.contains(e.target)) setOpen(false);
   });
 }
 

@@ -22,7 +22,9 @@ body.observatory {
   z-index: 10;
   display: block;
   line-height: 0;          /* no descender gap under the wordmark */
+  transition: scale 150ms var(--ease-out);   /* press feedback (Emil) — `scale` not `transform` so the mobile translateX centring survives */
 }
+.observatory-back:active { scale: 0.95; }
 .observatory-back img {
   display: block;
   height: clamp(16px, 2vw, 22px);
@@ -30,7 +32,9 @@ body.observatory {
   opacity: 0.7;
   transition: opacity 0.2s ease;
 }
-.observatory-back:hover img { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .observatory-back:hover img { opacity: 1; }
+}
 .observatory-back:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 /* Mobile: the wordmark goes top-CENTRE (the zoom pill lives bottom-centre on mobile, so the
    top middle is free and reads as the masthead). Desktop keeps it top-left. */
@@ -54,7 +58,7 @@ body.observatory {
   width: 100%;
   height: 100%;
   display: none;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s var(--ease-out);
 }
 #observatory-cloud {
   z-index: 0;
@@ -173,9 +177,11 @@ body.globe-active.list-view #observatory-halo { display: none; }
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   color: inherit;
   text-decoration: none;
-  transition: padding-left 0.2s ease, background 0.2s ease;
+  transition: transform 0.2s var(--ease-out), background 0.2s ease;
 }
-a.observatory-list-link:hover { padding-left: 14px; }
+@media (hover: hover) and (pointer: fine) {
+  a.observatory-list-link:hover { transform: translateX(14px); }   /* GPU transform, not padding-left (no reflow) */
+}
 
 .observatory-list-chip {
   flex: 0 0 auto;
@@ -357,13 +363,15 @@ body.list-only .observatory-list-soon { color: rgba(0, 0, 0, 0.4); }
   gap: 10px;
   max-height: 80vh;
   opacity: 0.85;          /* the rail stays legible at rest */
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s var(--ease-out);
 }
 body.globe-active .filter-wrap { display: flex; }
-.filter-wrap:hover,
 .filter-wrap:focus-within,
 .filter-wrap:active,
 .filter-wrap.is-open { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .filter-wrap:hover { opacity: 1; }   /* hover gated so a tap on the mobile rail doesn't stick */
+}
 
 /* The rail holds two ALWAYS-VISIBLE pills (Filter + List) as direct children — no coin, no
    open/close. The Filter pill opens its facet panel (.is-open); List toggles the view. */
@@ -439,6 +447,11 @@ body.globe-active .filter-wrap { display: flex; }
 .view-pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 .view-pill .pill-glass { opacity: 0.85; }
 
+/* press feedback — a subtle push-in so the pills feel like they're listening (Emil). `scale`
+   (the independent transform prop, not `transform`) so the mobile bottom-rail centring survives. */
+.filter-pill, .view-pill { transition: scale 150ms var(--ease-out); }
+.filter-pill:active, .view-pill:active { scale: 0.96; }
+
 /* The panel opens to the RIGHT of the filter pill (anchored to its top edge) so it sticks beside
    the pill rather than pushing the zoom down. It is a SCALED-DOWN echo of the list page (the
    canonical brand surface): off-white paper floating on the dark globe, brand serif, muse-coloured
@@ -458,6 +471,25 @@ body.globe-active .filter-wrap { display: flex; }
   color: #1a1a1a;                                /* mirrors the list title/name ink */
   display: flex;
   flex-direction: column;
+  /* Entrance: grow from the pill it's anchored to (Emil — popovers scale from their trigger, not
+     centre), ~180ms strong ease-out, opacity + scale only. `scale` is the independent transform
+     prop so the mobile `translate` centring composes cleanly. CLASS-driven (.is-open) rather than
+     @starting-style so the grow animates on EVERY iOS version, not just Safari 18+. `visibility`
+     is delayed on close so the panel stays rendered through the fade-out, then hides — keeping it
+     out of the a11y tree + untabbable when closed (the old `hidden` did this). */
+  transform-origin: left center;
+  opacity: 0;
+  scale: 0.96;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 180ms var(--ease-out), scale 180ms var(--ease-out), visibility 0s linear 180ms;
+}
+.filter-panel.is-open {
+  opacity: 1;
+  scale: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 180ms var(--ease-out), scale 180ms var(--ease-out), visibility 0s;
 }
 /* subtle feTurbulence grain → a matte "glass"/paper tooth over the card (same noise the pills +
    flip use). multiply on the off-white darkens just enough to texture it; pointer-transparent. */
@@ -472,7 +504,7 @@ body.globe-active .filter-wrap { display: flex; }
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 160px 160px;
 }
-.filter-panel[hidden] { display: none; }
+.filter-panel[hidden] { display: none; }   /* no-JS fallback; JS removes the attribute and drives .is-open */
 /* hairline dividers between facet groups — the list-row device, not boxes */
 .filter-group { padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid rgba(0, 0, 0, 0.12); }
 .filter-group:last-of-type { padding-bottom: 12px; margin-bottom: 12px; }
@@ -503,9 +535,12 @@ body.globe-active .filter-wrap { display: flex; }
   border: none;
   border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease, scale 0.15s var(--ease-out);
 }
-.filter-chip:hover { color: rgba(0, 0, 0, 0.8); }
+@media (hover: hover) and (pointer: fine) {
+  .filter-chip:hover { color: rgba(0, 0, 0, 0.8); }
+}
+.filter-chip:active { scale: 0.97; }   /* press feedback (Emil) */
 .filter-chip[aria-pressed="true"] {
   color: #1a1a1a;
   border-bottom-color: var(--chip, #1a1a1a);   /* muse hue for muse chips; ink for type/status */
@@ -519,6 +554,22 @@ body.globe-active .filter-wrap { display: flex; }
   -webkit-mask: var(--glyph) center / contain no-repeat;
           mask: var(--glyph) center / contain no-repeat;
 }
+/* Stagger: when the panel opens the chips cascade in (Emil — group entrances stagger 30–80ms).
+   Re-runs each open because the panel toggles display:none→flex. Uses `transform`; the press
+   `scale` is the independent prop so the two never clobber. nth-child restarts per group. */
+@keyframes chip-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.filter-panel.is-open .filter-chip {
+  animation: chip-in 200ms var(--ease-out) both;
+}
+.filter-chips .filter-chip:nth-child(2) { animation-delay: 30ms; }
+.filter-chips .filter-chip:nth-child(3) { animation-delay: 60ms; }
+.filter-chips .filter-chip:nth-child(4) { animation-delay: 90ms; }
+.filter-chips .filter-chip:nth-child(5) { animation-delay: 120ms; }
+.filter-chips .filter-chip:nth-child(6) { animation-delay: 150ms; }
+.filter-chips .filter-chip:nth-child(n+7) { animation-delay: 180ms; }   /* cap: tightens the tail + guards >7 chips from popping with no delay */
 .filter-geo {
   width: 100%;
   padding: 5px 2px;
@@ -549,7 +600,9 @@ body.globe-active .filter-wrap { display: flex; }
   cursor: pointer;
   opacity: 0.7;
 }
-.filter-clear:hover { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .filter-clear:hover { opacity: 1; }
+}
 .filter-clear[hidden] { display: none; }
 
 /* Mobile: the rail sits BOTTOM-CENTRED (not the left edge), pill + zoom side by side, and
@@ -589,7 +642,9 @@ body.globe-active .filter-wrap { display: flex; }
     top: auto;
     bottom: calc(100% + 14px);   /* open upward, above the rail */
     left: 50%;
-    transform: translateX(-50%);
+    transform: none;
+    translate: -50% 0;                 /* centre via the independent prop so the `scale` entrance is free */
+    transform-origin: bottom center;   /* mobile panel opens UPWARD → grow from its bottom (the rail) */
     width: min(320px, calc(100vw - 32px));
     max-height: 60vh;
   }
@@ -625,15 +680,18 @@ body.globe-active .filter-wrap { display: flex; }
   aspect-ratio: 1;
   perspective: 1200px;
   transform-origin: 50% 50%;
-  transition: transform 0.82s cubic-bezier(0.34, 1.56, 0.5, 1);
+  /* OPEN: the hero moment — expressive grow, but trimmed from 0.82s and the overshoot eased
+     (1.56→1.3) so it reads intentional, not slow. The faster, un-bouncy CLOSE is set inline in
+     observatory.js (asymmetric: grand open, snappy dismiss — Emil). */
+  transition: transform 0.55s cubic-bezier(0.34, 1.3, 0.5, 1);
 }
 .tile-flip-inner {
   position: relative;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  /* weighted back-out flip, matching the homepage orbit card (muse.css) */
-  transition: transform 0.82s cubic-bezier(0.34, 1.56, 0.5, 1);
+  /* weighted back-out flip (trimmed to match the card's open). Close overrides this inline. */
+  transition: transform 0.55s cubic-bezier(0.34, 1.3, 0.5, 1);
 }
 #observatory-flip.is-open .tile-flip-inner { transform: rotateY(180deg); }
 
@@ -707,8 +765,10 @@ body.globe-active .filter-wrap { display: flex; }
   border-radius: 50%;
   z-index: 1;
   pointer-events: none;
+  /* centre alpha 0.29 → 0.44× at 40% → 0 at 66%. Mirrors the canvas tile's radial scrim
+     (HERO_TINT.scrimCenter in tile-atlas.js) — keep the two in sync. */
   background: radial-gradient(circle at 50% 50%,
-    rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.22) 40%, rgba(0, 0, 0, 0) 66%);
+    rgba(0, 0, 0, 0.29) 0%, rgba(0, 0, 0, 0.128) 40%, rgba(0, 0, 0, 0) 66%);
 }
 
 /* front hero photo — mirrors the WebGL campaign tile (cover-fit + accent wash + label) so the
@@ -719,16 +779,18 @@ body.globe-active .filter-wrap { display: flex; }
   border-radius: 50%;
   background-size: cover;
   background-position: center;
+  filter: contrast(0.82) brightness(1.06); /* "tamed": soften the photo before the colour blend
+                                              (matches canvas HERO_TINT.photoFilter) */
 }
 .tile-flip-hero-wash {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   background: var(--accent, #5783A6);
-  opacity: 0.85;            /* strong muse shade, but the photo keeps its brightness + detail */
-  mix-blend-mode: color;    /* DUOTONE: recolour the photo INTO the muse hue (keeps luminance +
-                               texture) rather than veiling/darkening it. Matches the canvas tile's
-                               'color' composite so the open/close swap stays seamless. Tunable. */
+  opacity: 1;               /* muse shade strength (matches canvas HERO_TINT.alpha) */
+  mix-blend-mode: color;    /* DUOTONE: recolour the SOFTENED photo INTO the muse hue. Matches the
+                               canvas tile's 'color' composite (HERO_TINT.blend) so the flip
+                               open/close swap stays seamless. Eyeball-tunable — keep tile ↔ flip in sync. */
 }
 
 /* curved rim title (seal-style): the eyebrow runs along the inside top arc of the disc, freeing
@@ -821,9 +883,12 @@ body.globe-active .filter-wrap { display: flex; }
   text-decoration: none;
   font-size: 12px;
   letter-spacing: 0.04em;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, scale 0.15s var(--ease-out);
 }
-a.tile-flip-action:hover { background: var(--accent, #fff); color: #000; }
+@media (hover: hover) and (pointer: fine) {
+  a.tile-flip-action:hover { background: var(--accent, #fff); color: #000; }
+}
+.tile-flip-action:active { scale: 0.97; }   /* press feedback (Emil) */
 .tile-flip-action--inert { opacity: 0.5; }
 
 /* While a flip is open, HIDE the globe entirely (opacity 0, was 0.22) so the real WebGL
@@ -838,4 +903,16 @@ body.flip-open #observatory-halo { opacity: 0.22; }
 @media (prefers-reduced-motion: reduce) {
   .tile-flip-card,
   .tile-flip-inner { transition: none; }
+}
+
+/* Reduced motion: neutralise the NEW press/scale + popup-grow + chip-stagger motion as well
+   (the blocks above already cover the rail, the pills' gradient, the chips' colour, and the
+   flip). Keep it gentle — instant, not removed. */
+@media (prefers-reduced-motion: reduce) {
+  .filter-pill, .view-pill, .observatory-back, .tile-flip-action,
+  .filter-panel, .observatory-list-link { transition: none; }
+  .filter-pill:active, .view-pill:active, .observatory-back:active,
+  .filter-chip:active, .tile-flip-action:active { scale: 1; }
+  .filter-panel { scale: 1; }
+  .filter-panel.is-open .filter-chip { animation: none; }
 }

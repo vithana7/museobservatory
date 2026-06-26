@@ -5,8 +5,21 @@ status: closed
 year: 2025
 location:                  # list — one entry per place
   - Volpedo, Alessandria · Italy
-hero: IMG_2364.jpg         # resolves to assets/images/stardust001/IMG_2364.jpg
-images: []
+hero: 00-hero.jpg                # cover circle → assets/images/stardust001/
+images:                    # full gallery (page) + extra globe leaves — order follows filename
+  - 1.jpg
+  - 2.jpg
+  - 3.jpg
+  - 4.jpg
+  - 5.jpg
+  - 6.jpg
+  - 7.jpg
+  - 8.jpg
+  - 9.jpg
+  - 10.jpg
+  - 11.jpg
+  - 12.jpg
+  - 13.jpg
 
 # Stardust factual block
 artist: Memose Vithana (Memo)
@@ -26,15 +39,15 @@ event:
 
 ## The work
 
-Memo — co-founder of cocoex and the artist behind this campaign — had been collaborating with Cantine Volpi since 2021, when the winery commissioned him to design a limited-edition wine label. That first commission quietly seeded something larger: an artist-led charity-bottle programme that ran annually for four consecutive years, raising over €15,000 for four Italian NGOs before cocoex existed as a formal entity.
+Memo, co-founder of cocoex and the artist behind this campaign, had been working with Cantine Volpi since 2021, when the winery asked him to design a limited-edition wine label. That one commission grew into something bigger: an artist-led charity-bottle programme that ran for four years straight and raised over €15,000 for four Italian NGOs, all before cocoex existed as a formal entity.
 
-Stardust 001 was the first cycle carried under the cocoex banner.
+Stardust 001 was the first cycle run under the cocoex name.
 
-Two series of paintings were produced. Alongside them, a collection card introduced a younger collector audience to the work and to the cause. The artworks were presented at an event at Cantine Volpi, with Anffas Tortona present to speak directly to their work.
+Memo made two series of paintings. A collection card alongside them brought the work and the cause to younger collectors. The paintings were shown at an event at Cantine Volpi, with Anffas Tortona there to talk about what they do.
 
 ## The Comet
 
-Comets — the physical and digital assets produced by a campaign — were sold, with the fund split between artist and NGO agreed for this cycle at 50/50.
+The Comets (the physical and digital pieces a campaign produces) were sold, and the proceeds split 50/50 between artist and NGO for this cycle.
 
 ## Impact
 

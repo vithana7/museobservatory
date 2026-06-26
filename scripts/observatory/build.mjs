@@ -181,6 +181,7 @@ function validateCampaign({ filename, meta, id, pageWorthy, museSlug }, warn) {
  * @property {string[]}  locations The real place list (for filter/count later); [] if none.
  * @property {string|null} location " · "-joined display string of `locations`; null if none.
  * @property {string|null} hero    Root-absolute /assets/images/<slug>/<file>; null → muse-colour placeholder.
+ * @property {string[]}  images    Gallery photos (root-absolute); [] if none. Page gallery + globe leaves.
  * @property {string|null} summary First prose paragraph, capped; null if no prose.
  * @property {boolean}   hasPage   true → a record page exists at `url`; false → tile-only.
  * @property {(true|undefined)} draft    true only when a page-worthy record is a held-back draft.
@@ -235,6 +236,17 @@ export function parseCampaign(raw, filename, museMap, warn) {
     // Emitted root-absolute (/assets/images/<slug>/<hero>) — public/ is served at the
     // domain root by Vite, matching how logowhite.png/muse symbols are referenced (D-4).
     hero: isBlank(meta.hero) ? null : `/assets/images/${slug}/${meta.hero}`,
+    // images: the record-page gallery AND the extra globe "leaves" (a campaign repeats across
+    // globe vertices; each repeat shows a different one of these photos — selection.expandToLeaves).
+    // Bare filenames in the slug folder → root-absolute, blanks dropped (D-4, same model as hero).
+    // Ordered by FILENAME (numeric-aware: 2 before 10), so renaming photos 1,2,3… sets the
+    // slideshow order — no need to re-order the frontmatter list (D-?).
+    images: Array.isArray(meta.images)
+      ? meta.images
+          .filter((f) => !isBlank(f))
+          .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+          .map((f) => `/assets/images/${slug}/${f}`)
+      : [],
     summary: summarize(body),
     hasPage,
     draft: pageWorthy && draft ? true : undefined,
@@ -306,6 +318,19 @@ export async function generateObservatory({ includeDrafts = false, base = '/' } 
     }
   }
 
+  // Gallery-image existence check (same rationale as hero): a missing file renders broken.
+  for (const p of parsed) {
+    for (const img of Array.isArray(p.meta.images) ? p.meta.images : []) {
+      if (isBlank(img)) continue;
+      const rel = `${p.slug}/${img}`;
+      try {
+        await fs.access(path.join(ASSETS_DIR, rel));
+      } catch {
+        warn(`${p.slug}: image "${img}" not found at public/assets/images/${rel}.`);
+      }
+    }
+  }
+
   if (warnings.length) {
     console.warn(`\n[observatory] ${warnings.length} warning(s):`);
     for (const w of warnings) console.warn(`  • ${w}`);
@@ -325,7 +350,7 @@ export async function generateObservatory({ includeDrafts = false, base = '/' } 
     // blockquote, …). THEN inject the [confirm] highlight with the note text ESCAPED.
     const bodyHtml = DOMPurify.sanitize(String(marked.parse(p.body)))
       .replace(CONFIRM_RE, (_, t) => `<mark class="confirm">[confirm:${esc(t)}]</mark>`);
-    pages.push({ slug: p.slug, html: renderRecordPage({ meta: p.meta, joined: p.joined, bodyHtml, draft: p.draft, base }) });
+    pages.push({ slug: p.slug, html: renderRecordPage({ meta: p.meta, joined: p.joined, bodyHtml, draft: p.draft, base, hero: p.index.hero, images: p.index.images }) });
   }
 
   const summary = {

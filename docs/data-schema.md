@@ -43,8 +43,8 @@ status: closed | ongoing | upcoming
 year: 2025
 location:                          # LIST — one entry per place (even a single place is a 1-item list)
   - Volpedo, Alessandria · Italy   #   multi-place event: one line per place (e.g. Berlin / Krefeld / …)
-hero: cover.jpg                    # BARE filename → assets/images/<slug>/cover.jpg
-images: []                         # bare filenames, same folder
+hero: 00-hero.jpg                  # BARE filename → assets/images/<slug>/00-hero.jpg (cover circle)
+images: []                         # bare filenames, same folder — SHOWN IN FILENAME ORDER (1, 2 … 10)
 ```
 
 > **Images live in `public/assets/images/<slug>/`** (decision D-4) — one folder per
@@ -54,6 +54,15 @@ images: []                         # bare filenames, same folder
 > into that folder by the build — the author never writes a path. A `hero` missing from that
 > folder warns (never fails). Drop **web-sized** images here; raw originals stay out of the repo
 > (automated downscaling is the deferred P2.1 `sharp` step).
+>
+> **Slideshow order = filename order.** `build.mjs` sorts `images[]` by filename, numeric-aware
+> (so `2` precedes `10`) — the order they're *listed* in frontmatter is ignored. To reorder the
+> record-page slideshow, rename the files; you don't edit the list. Convention used by the imported
+> footage: `00-hero.*` = the cover, `1.jpg`, `2.jpg`, … = the slides in order. The `hero` is a
+> separate banner and is **not** repeated in the slideshow (it's not in `images[]`).
+>
+> **Web copies** are downscaled with `sips` to **≤2400px** long edge, JPG quality ~85
+> (HEIC/PNG → JPG), imported from the cocoex-website `comet-collabs/campaign-footage/` originals.
 
 > **`location` is a list of free strings (one per place).** A single-place campaign is a
 > one-item list; a multi-place event (e.g. HORIZON002 across Berlin · Krefeld · Salzburg ·
@@ -129,7 +138,7 @@ The complete index — *every* campaign, no sampling/filtering at build time.
   "status": "closed", "year": 2025,
   "locations": ["Volpedo, Alessandria · Italy"], // the real list (filter/count later)
   "location": "Volpedo, Alessandria · Italy", //  " · "-joined display string
-  "hero": "/assets/images/stardust001/IMG_2364.jpg", // root-absolute; null → muse-colour placeholder
+  "hero": "/assets/images/stardust001/img-2364.jpg", // root-absolute; null → muse-colour placeholder
   "summary": "Memo — co-founder of cocoex…",  // first prose paragraph, capped
   "hasPage": true,                           // false = tile-only (no nav target)
   "draft": true,                             // OMITTED unless a page-worthy record is a held-back draft

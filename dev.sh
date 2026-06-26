@@ -31,7 +31,7 @@ case "$MODE" in
     echo "Starting dev server (hot-reload)…"
     # Open the browser shortly after Vite boots. macOS only; harmless elsewhere.
     if command -v open >/dev/null 2>&1; then
-      ( sleep 2 && open http://localhost:5173/observatory/ ) &
+      ( sleep 2 && open http://localhost:5173/ ) &
     fi
     npm run dev
     ;;
@@ -41,7 +41,7 @@ case "$MODE" in
     npm run build
     echo "Serving the production build…"
     if command -v open >/dev/null 2>&1; then
-      ( sleep 2 && open http://localhost:4173/observatory/ ) &
+      ( sleep 2 && open http://localhost:4173/ ) &
     fi
     npm run preview
     ;;

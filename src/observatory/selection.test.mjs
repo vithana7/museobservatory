@@ -16,7 +16,30 @@ import {
   sample,
   filterCampaigns,
   applySparseGuard,
+  expandToLeaves,
+  arrangeOnGraph,
+  GLOBE_LEAVES_PER_CAMPAIGN,
 } from './selection.js';
+import { IcosahedronGeometry } from './globe-geometry.js';
+
+// The REAL globe adjacency (42-vertex spherised icosahedron) so the arrangement is tested
+// against the graph it actually runs on, not a toy.
+function icoAdjacency() {
+  const ico = new IcosahedronGeometry();
+  ico.subdivide(1).spherize(2);
+  const adj = Array.from({ length: ico.vertices.length }, () => new Set());
+  for (const f of ico.faces) {
+    adj[f.a].add(f.b); adj[f.a].add(f.c);
+    adj[f.b].add(f.a); adj[f.b].add(f.c);
+    adj[f.c].add(f.a); adj[f.c].add(f.b);
+  }
+  return { adj, count: ico.vertices.length };
+}
+function edges(adj) {
+  const e = [];
+  for (let v = 0; v < adj.length; v++) for (const nb of adj[v]) if (v < nb) e.push([v, nb]);
+  return e;
+}
 
 // Minimal-but-realistic CampaignIndex fixtures (muse/type/status/locations populated).
 // `location` is the build's joined display of `locations[]` — mirror that here so the
@@ -196,4 +219,95 @@ test('sparse guard: custom threshold is honoured and returned', () => {
   const out = applySparseGuard(FIXTURES.slice(0, 2), 3); // 2 < 3
   assert.equal(out.sparse, true);
   assert.equal(out.threshold, 3);
+});
+
+// ── expandToLeaves() — campaigns → per-photo globe leaves (Memo's "leaves & root") ──
+test('leaves: one leaf per photo (hero + images), hero first, all keep the campaign url', () => {
+  const c = { slug: 's1', url: '/s1/', hero: '/h.jpg', images: ['/a.jpg', '/b.jpg'] };
+  const leaves = expandToLeaves([c]);
+  assert.equal(leaves.length, 3);
+  assert.deepEqual(leaves.map((l) => l.hero), ['/h.jpg', '/a.jpg', '/b.jpg']);
+  assert.ok(leaves.every((l) => l.url === '/s1/' && l.slug === 's1'), 'every leaf links to the same root');
+});
+
+test('leaves: a campaign with no photo still yields ONE placeholder leaf (hero:null)', () => {
+  const leaves = expandToLeaves([{ slug: 's1', url: '/s1/', hero: null, images: [] }]);
+  assert.equal(leaves.length, 1);
+  assert.equal(leaves[0].hero, null);
+});
+
+test('leaves: hero duplicated in images is de-duped', () => {
+  const leaves = expandToLeaves([{ slug: 's1', hero: '/h.jpg', images: ['/h.jpg', '/a.jpg'] }]);
+  assert.deepEqual(leaves.map((l) => l.hero), ['/h.jpg', '/a.jpg']);
+});
+
+test('leaves: emitted ROUND-ROBIN so each campaign contributes before any repeats', () => {
+  const a = { slug: 'a', hero: '/a1', images: ['/a2', '/a3'] };
+  const b = { slug: 'b', hero: '/b1', images: [] };
+  // round 0: a1, b1 ; round 1: a2 ; round 2: a3
+  const leaves = expandToLeaves([a, b]);
+  assert.deepEqual(leaves.map((l) => `${l.slug}:${l.hero}`), ['a:/a1', 'b:/b1', 'a:/a2', 'a:/a3']);
+});
+
+test('leaves: capped to `cap`, never exceeding it', () => {
+  const a = { slug: 'a', hero: '/a1', images: ['/a2', '/a3', '/a4'] };
+  assert.equal(expandToLeaves([a], 2).length, 2);
+  assert.equal(expandToLeaves([a, a, a], CAMPAIGN_CAP).length <= CAMPAIGN_CAP, true);
+});
+
+test('leaves: per-campaign cap stops one photo-heavy campaign dominating', () => {
+  const big = { slug: 'big', url: '/big/', hero: '/b0', images: Array.from({ length: 20 }, (_, i) => `/b${i + 1}`) };
+  const small = { slug: 'sm', url: '/sm/', hero: '/s0', images: ['/s1'] };
+  const leaves = expandToLeaves([big, small]); // default per-campaign cap
+  const bigCount = leaves.filter((l) => l.slug === 'big').length;
+  const smallCount = leaves.filter((l) => l.slug === 'sm').length;
+  assert.equal(bigCount, GLOBE_LEAVES_PER_CAMPAIGN, 'big campaign capped to the per-campaign limit');
+  assert.equal(smallCount, 2, 'small campaign keeps its full (sub-cap) set');
+  // the cap uses the hero + the first (cap−1) gallery photos, hero included
+  assert.ok(leaves.some((l) => l.slug === 'big' && l.hero === '/b0'), 'hero leaf is kept');
+});
+
+test('leaves: per-campaign cap is overridable', () => {
+  const big = { slug: 'big', hero: '/b0', images: Array.from({ length: 20 }, (_, i) => `/b${i + 1}`) };
+  assert.equal(expandToLeaves([big], 42, 3).filter((l) => l.slug === 'big').length, 3);
+});
+
+test('leaves: does not mutate input campaigns', () => {
+  const c = { slug: 's1', hero: '/h.jpg', images: ['/a.jpg'] };
+  const snapshot = JSON.stringify(c);
+  expandToLeaves([c]);
+  assert.equal(JSON.stringify(c), snapshot);
+});
+
+// ── arrangeOnGraph() — no "same background next to each other" on the globe ──────────
+test('arrange: fills every vertex (length === count, no holes)', () => {
+  const { adj, count } = icoAdjacency();
+  const pool = expandToLeaves([{ slug: 'a', url: '/a/', hero: '/a1', images: ['/a2', '/a3'] }]);
+  const out = arrangeOnGraph(pool, adj, count);
+  assert.equal(out.length, count);
+  assert.ok(out.every((x) => x != null), 'no empty vertices');
+});
+
+test('arrange: NO two adjacent vertices share the same photo (realistic pool)', () => {
+  const { adj, count } = icoAdjacency();
+  // a realistic spread: a dominant campaign + several smaller ones (mirrors the real archive)
+  const campaigns = [
+    { slug: 'h1', url: '/h1/', hex: '#D48348', hero: '/h1/0', images: Array.from({ length: 14 }, (_, i) => `/h1/${i + 1}`) },
+    { slug: 's1', url: '/s1/', hex: '#8CB07F', hero: '/s1/0', images: Array.from({ length: 8 }, (_, i) => `/s1/${i + 1}`) },
+    { slug: 's2', url: '/s2/', hex: '#D48348', hero: '/s2/0', images: ['/s2/1', '/s2/2'] },
+    { slug: 's3', url: '/s3/', hex: '#7F49A2', hero: '/s3/0', images: [] },
+  ];
+  const out = arrangeOnGraph(expandToLeaves(campaigns, 42), adj, count);
+  let clashes = 0;
+  for (const [u, v] of edges(adj)) {
+    if (out[u].hero && out[v].hero && out[u].hero === out[v].hero) clashes++;
+  }
+  assert.equal(clashes, 0, 'no edge connects two identical photos');
+});
+
+test('arrange: empty pool → [], single-photo pool fills without throwing', () => {
+  const { adj, count } = icoAdjacency();
+  assert.deepEqual(arrangeOnGraph([], adj, count), []);
+  const one = arrangeOnGraph([{ slug: 'x', url: '/x/', hero: '/x/0' }], adj, count);
+  assert.equal(one.length, count);
 });
